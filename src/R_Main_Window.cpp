@@ -5,8 +5,10 @@ Main_Window::Main_Window(QT_Application* P_App) : QT_Main_Window() {
 	Log = new QT_Text_Stream();
 	App = P_App;
 
-	R_Workspace_Vulkan_Viewport* Vulkan = new R_Workspace_Vulkan_Viewport(Log);
-	setCentralWidget(Vulkan->Vulkan_Widget);
+	//R_Workspace_Vulkan_Viewport* Vulkan = new R_Workspace_Vulkan_Viewport(Log);
+	//setCentralWidget(Vulkan->Vulkan_Widget);
+	R_Workspace_OpenGL_Viewport* OpenGL = new R_Workspace_OpenGL_Viewport(Log);
+	setCentralWidget(OpenGL);
 	readStyle();
 	showMaximized();
 

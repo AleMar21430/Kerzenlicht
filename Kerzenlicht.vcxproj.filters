@@ -45,14 +45,8 @@
     <ClInclude Include="src\R_Settings.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\R_Renderer_Viewport.h">
-      <Filter>Header Files\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Kerzenlicht\src\R_String.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\R_Workspace_Vulkan_Viewport.h">
-      <Filter>Header Files\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
       <Filter>Header Files\OpenGL</Filter>
@@ -62,7 +56,7 @@
     <QtMoc Include="src\R_Main_Window.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="src\R_Vulkan_Viewport.h">
+    <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h">
       <Filter>Header Files\Vulkan</Filter>
     </QtMoc>
   </ItemGroup>
@@ -81,12 +75,6 @@
     </ClCompile>
     <ClCompile Include="src\R_Main_Window.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\R_Renderer_Viewport.cpp">
-      <Filter>Source Files\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\R_Vulkan_Viewport.cpp">
-      <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\R_Workspace_Vulkan_Viewport.cpp">
       <Filter>Source Files\Vulkan</Filter>
@@ -113,5 +101,10 @@
     <Text Include="src\Style.txt">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

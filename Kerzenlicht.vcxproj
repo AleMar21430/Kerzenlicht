@@ -103,11 +103,9 @@
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h" />
     <ClInclude Include="src\QT_Core.h" />
     <ClInclude Include="src\R_Math.h" />
-    <ClInclude Include="src\R_Renderer_Viewport.h" />
     <ClInclude Include="src\R_Render_Settings.h" />
     <ClInclude Include="src\R_Settings.h" />
-    <ClInclude Include="src\R_Workspace_Vulkan_Viewport.h" />
-    <QtMoc Include="src\R_Vulkan_Viewport.h" />
+    <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h" />
     <QtMoc Include="src\R_Main_Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -115,10 +113,8 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\QT_Core.cpp" />
     <ClCompile Include="src\R_Main_Window.cpp" />
-    <ClCompile Include="src\R_Renderer_Viewport.cpp" />
     <ClCompile Include="src\R_Render_Settings.cpp" />
     <ClCompile Include="src\R_Settings.cpp" />
-    <ClCompile Include="src\R_Vulkan_Viewport.cpp" />
     <ClCompile Include="src\R_Workspace_Vulkan_Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +125,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\Style.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\Icon.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
