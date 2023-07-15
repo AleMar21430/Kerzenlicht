@@ -14,7 +14,7 @@ Main_Window::Main_Window(QT_Application* P_App) : QT_Main_Window() {
 	readStyle();
 	showMaximized();
 
-	Log->log("Raylight Version 1.0 Initialized Succesfully");
+	Log->log("Kerzenlicht Version 1.0 Initialized Succesfully");
 }
 
 void Main_Window::readStyle() {

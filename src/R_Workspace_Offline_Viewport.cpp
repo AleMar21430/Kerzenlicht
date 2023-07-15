@@ -42,10 +42,6 @@ void OpenGL_Preview::paintGL() {
 				glEnd();
 			}
 		}
-		glFlush();
-
-		//glDeleteTextures(1, &texture_id);
-		//glDisable(GL_TEXTURE_2D);
 	}
 }
 
@@ -53,21 +49,22 @@ void OpenGL_Preview::resizeGL(int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-Offline_Renderer::Offline_Renderer(QT_Text_Stream* P_Log, uint32_t Resolution_Width, uint32_t Resolution_Height) {
+Offline_Renderer::Offline_Renderer(QT_Text_Stream* P_Log, uint32_t P_ResX, uint32_t P_ResY) {
 	Log = P_Log;
 
-	ResX = Resolution_Width;
-	ResY = Resolution_Height;
+	ResX = P_ResX;
+	ResY = P_ResY;
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
 
-	Pixmap = std::vector(Resolution_Height,std::vector<Rgba>(Resolution_Width));
+	Pixmap = std::vector(ResY,std::vector<Rgba>(ResX));
 
-	for (int y = 0; y < ResY; y++) {
-		for (int x = 0; x < ResX; x++) {
+	for (int y = 0; y < P_ResY; y++) {
+		for (int x = 0; x < P_ResX; x++) {
 			Pixmap[y][x] = Rgba();
 		}
 	}
+
 	std::stringstream log;
 	log << "X: " << Pixmap[0].size() << std::endl << "Y: " << Pixmap.size() << std::endl;
 	/*for (const auto& row : Pixmap) {

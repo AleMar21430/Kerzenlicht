@@ -20,7 +20,7 @@ struct Offline_Renderer {
 	float Pen_Opacity;
 	std::vector<std::vector<Rgba>> Pixmap;
 
-	Offline_Renderer(QT_Text_Stream* P_Log, uint32_t Resolution_Width, uint32_t Resolution_Height);
+	Offline_Renderer(QT_Text_Stream* P_Log, uint32_t P_ResX, uint32_t P_ResY);
 };
 
 struct OpenGL_Preview : public QOpenGLWidget, protected QOpenGLFunctions {
