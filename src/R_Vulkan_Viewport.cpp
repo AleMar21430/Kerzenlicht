@@ -11,8 +11,7 @@ void R_Vulkan_Viewport_Widget::onGrabRequested() {
 
 	QImage img = Wrapped_Window->grab();
 
-	// Our startNextFrame() implementation is synchronous so img is ready to be
-	// used right here.
+	// startNextFrame() is synchronous so img is ready to be used here.
 
 	QFileDialog fd(this);
 	fd.setAcceptMode(QFileDialog::AcceptSave);

@@ -13,24 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Resource Files\Workspace Icons">
-      <UniqueIdentifier>{80857be1-594e-45bb-9a6a-0673f4aa7e3f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{db829631-c86e-4a51-9359-23f4ac1cccce}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{aa4aabad-7c7c-495b-b79c-16e1814c31e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Vulkan">
+      <UniqueIdentifier>{a5f99faa-c4bd-4f5e-ad31-2a60b308ccc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OpenGL">
+      <UniqueIdentifier>{db54f0bb-7711-45a6-9f28-53bc347be53a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Vulkan">
+      <UniqueIdentifier>{21054336-f1aa-4204-84d5-e9457ef98113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\OpenGL">
+      <UniqueIdentifier>{22c9b08b-1e77-4f54-a2e0-886a9da1c780}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\R_Workspace_3D_Viewport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\R_Renderer_Viewport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RUI_Core.h">
+    <ClInclude Include="src\QT_Core.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\R_Math.h">
@@ -42,94 +45,32 @@
     <ClInclude Include="src\R_Settings.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\R_Renderer_Viewport.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Kerzenlicht\src\R_String.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Workspace_Vulkan_Viewport.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\R_Main_Window.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="src\R_Vulkan_Viewport.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Vulkan</Filter>
     </QtMoc>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\Add.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Add_Dock_Bottom.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Add_Dock_Left.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Add_Dock_Right.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Add_Dock_Top.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Add_Tab.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Close.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Collapse.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Expand.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Float_Dock.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Icon.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Maximize.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Minimize.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Redock_Dock.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Sub.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Workspaces\Log.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Workspaces\Settings.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Workspaces\Viewport_3D.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="resources\Workspaces\Dock_Manager.png">
-      <Filter>Resource Files\Workspace Icons</Filter>
-    </Image>
-    <Image Include="resources\Workspaces\Properties.png">
-      <Filter>Resource Files\Workspace Icons</Filter>
-    </Image>
-    <Image Include="resources\Workspaces\Outliner.png">
-      <Filter>Resource Files\Workspace Icons</Filter>
-    </Image>
-    <Image Include="resources\Settings.png">
-      <Filter>Resource Files\Workspace Icons</Filter>
-    </Image>
-    <Image Include="resources\Workspaces\Renderer.png">
-      <Filter>Resource Files\Workspace Icons</Filter>
-    </Image>
-    <Image Include="resources\Workspaces\Style_Editor.png">
-      <Filter>Resource Files\Workspace Icons</Filter>
-    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RUI_Core.cpp">
+    <ClCompile Include="src\QT_Core.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\R_Settings.cpp">
@@ -138,17 +79,20 @@
     <ClCompile Include="src\R_Render_Settings.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\R_Renderer_Viewport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\R_Vulkan_Viewport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\R_Main_Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\R_Workspace_3D_Viewport.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\R_Renderer_Viewport.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Vulkan_Viewport.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Workspace_Vulkan_Viewport.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp">
+      <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

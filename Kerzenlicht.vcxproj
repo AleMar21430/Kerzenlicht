@@ -99,50 +99,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\RUI_Core.h" />
+    <ClInclude Include="..\..\Kerzenlicht\src\R_String.h" />
+    <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h" />
+    <ClInclude Include="src\QT_Core.h" />
     <ClInclude Include="src\R_Math.h" />
     <ClInclude Include="src\R_Renderer_Viewport.h" />
     <ClInclude Include="src\R_Render_Settings.h" />
     <ClInclude Include="src\R_Settings.h" />
-    <ClInclude Include="src\R_Workspace_3D_Viewport.h" />
+    <ClInclude Include="src\R_Workspace_Vulkan_Viewport.h" />
     <QtMoc Include="src\R_Vulkan_Viewport.h" />
     <QtMoc Include="src\R_Main_Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\Add.png" />
-    <Image Include="resources\Add_Dock_Bottom.png" />
-    <Image Include="resources\Add_Dock_Left.png" />
-    <Image Include="resources\Add_Dock_Right.png" />
-    <Image Include="resources\Add_Dock_Top.png" />
-    <Image Include="resources\Add_Tab.png" />
-    <Image Include="resources\Close.png" />
-    <Image Include="resources\Collapse.png" />
-    <Image Include="resources\Expand.png" />
-    <Image Include="resources\Float_Dock.png" />
-    <Image Include="resources\Icon.png" />
-    <Image Include="resources\Maximize.png" />
-    <Image Include="resources\Minimize.png" />
-    <Image Include="resources\Redock_Dock.png" />
-    <Image Include="resources\Settings.png" />
-    <Image Include="resources\Sub.png" />
-    <Image Include="resources\Workspaces\Dock_Manager.png" />
-    <Image Include="resources\Workspaces\Log.png" />
-    <Image Include="resources\Workspaces\Outliner.png" />
-    <Image Include="resources\Workspaces\Properties.png" />
-    <Image Include="resources\Workspaces\Renderer.png" />
-    <Image Include="resources\Workspaces\Settings.png" />
-    <Image Include="resources\Workspaces\Style_Editor.png" />
-    <Image Include="resources\Workspaces\Viewport_3D.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\RUI_Core.cpp" />
+    <ClCompile Include="src\QT_Core.cpp" />
     <ClCompile Include="src\R_Main_Window.cpp" />
     <ClCompile Include="src\R_Renderer_Viewport.cpp" />
     <ClCompile Include="src\R_Render_Settings.cpp" />
     <ClCompile Include="src\R_Settings.cpp" />
     <ClCompile Include="src\R_Vulkan_Viewport.cpp" />
-    <ClCompile Include="src\R_Workspace_3D_Viewport.cpp" />
+    <ClCompile Include="src\R_Workspace_Vulkan_Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\color.frag" />

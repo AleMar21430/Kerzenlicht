@@ -1,8 +1,8 @@
-#include "RUI_Core.h"
+#include "QT_Core.h"
 #include "R_Main_Window.h"
 
 int main(int argc, char *argv[]) {
-	RUI_Application* Application = new RUI_Application(argc, argv);
-	R_Main_Window* Main_Window = new R_Main_Window(Application);
+	QT_Application* Application = new QT_Application(argc, argv);
+	Main_Window* Window = new Main_Window(Application);
 	return Application->exec();
 }

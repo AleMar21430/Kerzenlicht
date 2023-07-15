@@ -1,6 +1,6 @@
 #include "R_Settings.h"
 
-R_Settings::R_Settings(RUI_Application * Application) {
+R_Settings::R_Settings(QT_Application * Application) {
 	App = Application;
 	Font = Application->font();
 	ResX = Application->primaryScreen()->size().width();

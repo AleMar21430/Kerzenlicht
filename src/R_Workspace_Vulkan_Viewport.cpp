@@ -1,6 +1,6 @@
-#include "R_Workspace_3D_Viewport.h"
+#include "R_Workspace_Vulkan_Viewport.h"
 
-R_Workspace_3D_Viewport::R_Workspace_3D_Viewport(RUI_Text_Stream* P_Log) : RUI_Linear_Contents("_Container", true) {
+R_Workspace_Vulkan_Viewport::R_Workspace_Vulkan_Viewport(QT_Text_Stream* P_Log) : QT_Linear_Contents("_Container", true) {
 	Log = P_Log;
 
 	QVulkanInstance* inst = new QVulkanInstance();
