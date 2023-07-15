@@ -1,6 +1,6 @@
-#include "R_Workspace_OpenGL_Viewport.h"
+#include "R_Workspace_Offline_Viewport.h"
 
-R_Workspace_OpenGL_Viewport::R_Workspace_OpenGL_Viewport(QT_Text_Stream* P_Log) : QT_Linear_Contents("_Container", true) {
+R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log) : QT_Linear_Contents("_Container", true) {
 	Log = P_Log;
 
 	QOpenGLWidget* OpenGL_Container = new QOpenGLWidget();
@@ -9,5 +9,9 @@ R_Workspace_OpenGL_Viewport::R_Workspace_OpenGL_Viewport(QT_Text_Stream* P_Log) 
 }
 
 OpenGL::OpenGL(QT_Text_Stream* P_Log) : QOpenGLWidget() {
+	Log = P_Log;
+}
+
+Renderer::Renderer(QT_Text_Stream* P_Log) {
 	Log = P_Log;
 }
