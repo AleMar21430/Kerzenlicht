@@ -4,6 +4,8 @@
 #include "Core.h"
 
 #include <QOpenGLFunctions>
+#include <gl/GLU.h>
+#include <gl/GL.h>
 #include <vector>
 
 struct Offline_Renderer {
@@ -18,13 +20,15 @@ struct Offline_Renderer {
 	Offline_Renderer(QT_Text_Stream* P_Log, uint32_t Resolution_Width, uint32_t Resolution_Height);
 };
 
-struct OpenGL_Preview : QOpenGLWidget, QOpenGLFunctions {
+struct OpenGL_Preview : public QOpenGLWidget, protected QOpenGLFunctions {
 	QT_Text_Stream* Log;
 	bool Render;
 
 	Offline_Renderer* Renderer;
 
 	OpenGL_Preview(QT_Text_Stream* P_Log);
+
+	void resizeGL(int width, int height) override;
 	void initializeGL() override;
 	void paintGL() override;
 };

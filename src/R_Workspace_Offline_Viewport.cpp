@@ -9,7 +9,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Log->append("<p style = color:rgb(250,140,25);>Opengl Viewport Initialized</p>");
 }
 
-OpenGL_Preview::OpenGL_Preview(QT_Text_Stream* P_Log) : QOpenGLWidget(), QOpenGLFunctions() {
+OpenGL_Preview::OpenGL_Preview(QT_Text_Stream* P_Log) : QOpenGLWidget() {
 	Log = P_Log;
 	Render = false;
 
@@ -18,21 +18,29 @@ OpenGL_Preview::OpenGL_Preview(QT_Text_Stream* P_Log) : QOpenGLWidget(), QOpenGL
 
 void OpenGL_Preview::initializeGL() {
 	initializeOpenGLFunctions();
-	glClearColor(0, 0, 1.0, 1.0);
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
 void OpenGL_Preview::paintGL() {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	glOrtho(-this->width() / this->height(), this->width() / this->height(), -1.0, 1.0, -1.0, 1.0);
+	glOrtho(-width()/height(), width()/height(), -1, 1, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	/*if (this->Render) {
-		int width = this->width() / this->Renderer.Pixmap[0].size();
-		int height = this->height() / this->Renderer.Pixmap.size();
 
+	glBegin(GL_TRIANGLES);
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex2f(-0.6,-0.4);
+	glColor3f(0.0, 1.0, 0.0);
+	glVertex2f(0.6,-0.4);
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex2f(0,0.6);
+	glEnd();
+
+	if (Render) {
 		glEnable(GL_TEXTURE_2D);
 
 		GLuint texture_id;
@@ -44,7 +52,7 @@ void OpenGL_Preview::paintGL() {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->Renderer.Pixmap.data());
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width() / Renderer->Pixmap[0].size(), height() / Renderer->Pixmap.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, this->Renderer->Pixmap.data());
 
 		glBegin(GL_QUADS);
 		glTexCoord2f(0, 0);
@@ -59,7 +67,11 @@ void OpenGL_Preview::paintGL() {
 
 		glDeleteTextures(1, &texture_id);
 		glDisable(GL_TEXTURE_2D);
-	}*/
+	}
+}
+
+void OpenGL_Preview::resizeGL(int width, int height) {
+	glViewport(0, 0, width, height);
 }
 
 Offline_Renderer::Offline_Renderer(QT_Text_Stream* P_Log, uint32_t Resolution_Width, uint32_t Resolution_Height) {
