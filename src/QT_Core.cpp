@@ -71,6 +71,8 @@ QT_Linear_Contents::QT_Linear_Contents(bool P_Vertical) {
 
 QT_Linear_Contents::QT_Linear_Contents(std::string P_Style, bool P_Vertical) {
 	setObjectName(P_Style);
+	setContentsMargins(0, 0, 0, 0);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	Layout = new QT_Linear_Layout(P_Vertical);
 	setLayout(Layout);
 }

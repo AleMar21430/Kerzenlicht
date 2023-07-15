@@ -3,21 +3,33 @@
 R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log) : QT_Linear_Contents("_Container", true) {
 	Log = P_Log;
 
-	OpenGL_Preview* Preview = new OpenGL_Preview(Log);
+	Preview = new OpenGL_Preview(Log);
+	Layout->addWidget(Preview);
 
 	Log->append("<p style = color:rgb(250,140,25);>Opengl Viewport Initialized</p>");
 }
 
-OpenGL_Preview::OpenGL_Preview(QT_Text_Stream* P_Log) : QOpenGLWidget() {
+OpenGL_Preview::OpenGL_Preview(QT_Text_Stream* P_Log) : QOpenGLWidget(), QOpenGLFunctions() {
 	Log = P_Log;
 	Render = false;
 
-	Renderer = new Offline_Renderer(Log, 3840u, 2160u);
+	Renderer = new Offline_Renderer(Log, 3840, 2160);
+}
+
+void OpenGL_Preview::initializeGL() {
+	initializeOpenGLFunctions();
+	glClearColor(0, 0, 1.0, 1.0);
 }
 
 void OpenGL_Preview::paintGL() {
-	/*glClear(GL_COLOR_BUFFER_BIT);
-	if (this->Render) {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glOrtho(-this->width() / this->height(), this->width() / this->height(), -1.0, 1.0, -1.0, 1.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	/*if (this->Render) {
 		int width = this->width() / this->Renderer.Pixmap[0].size();
 		int height = this->height() / this->Renderer.Pixmap.size();
 

@@ -4,6 +4,7 @@
 
 #include "R_Workspace_Vulkan_Viewport.h"
 #include "R_Workspace_OpenGL_Viewport.h"
+#include "R_Workspace_Offline_Viewport.h"
 
 #include <sstream>
 #include <fstream>
