@@ -31,6 +31,12 @@
     <Filter Include="Header Files\OpenGL">
       <UniqueIdentifier>{22c9b08b-1e77-4f54-a2e0-886a9da1c780}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Offline">
+      <UniqueIdentifier>{37f49562-e950-4963-8232-61163fb566d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Offline">
+      <UniqueIdentifier>{2be8f611-2ece-4c43-83f8-72ab75a56887}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\QT_Core.h">
@@ -45,11 +51,17 @@
     <ClInclude Include="src\R_Settings.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Kerzenlicht\src\R_String.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
       <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Workspace_Offline_Viewport.h">
+      <Filter>Header Files\Offline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_String.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp">
       <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp">
+      <Filter>Source Files\Offline</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

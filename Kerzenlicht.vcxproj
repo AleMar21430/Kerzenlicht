@@ -99,7 +99,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Kerzenlicht\src\R_String.h" />
+    <ClInclude Include="src\R_String.h" />
+    <ClInclude Include="src\Core.h" />
+    <ClInclude Include="src\R_Workspace_Offline_Viewport.h" />
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h" />
     <ClInclude Include="src\QT_Core.h" />
     <ClInclude Include="src\R_Math.h" />
@@ -109,6 +111,7 @@
     <QtMoc Include="src\R_Main_Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp" />
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\QT_Core.cpp" />

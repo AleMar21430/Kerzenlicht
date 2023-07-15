@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QtCore>
 #include <QtGui>
+#include <QtCore>
 #include <QtWidgets>
+#include <QtOpenGLWidgets>
 
 struct QT_Application;		// Application
 struct QT_Button;			// Push Button
