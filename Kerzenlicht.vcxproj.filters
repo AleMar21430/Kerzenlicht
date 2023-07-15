@@ -13,40 +13,34 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Workspaces">
-      <UniqueIdentifier>{9c48ccf6-0c53-4fc3-8cb0-cda0ba82be65}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Raylight Core">
-      <UniqueIdentifier>{aa4aabad-7c7c-495b-b79c-16e1814c31e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Workspaces\Vulkan Viewport">
-      <UniqueIdentifier>{ea6f6022-ea00-4166-9dad-519985de11ab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Workspace Icons">
       <UniqueIdentifier>{80857be1-594e-45bb-9a6a-0673f4aa7e3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{db829631-c86e-4a51-9359-23f4ac1cccce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{aa4aabad-7c7c-495b-b79c-16e1814c31e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\R_Math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\R_Render_Settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\R_Settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\R_Workspace_3D_Viewport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RUI_Core.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RUI_Nodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\R_Renderer_Viewport.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RUI_Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Math.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Render_Settings.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Settings.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -135,26 +129,26 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\R_Workspace_3D_Viewport.cpp">
-      <Filter>Source Files\Workspaces</Filter>
-    </ClCompile>
-    <ClCompile Include="src\R_Vulkan_Viewport.cpp">
-      <Filter>Source Files\Workspaces\Vulkan Viewport</Filter>
-    </ClCompile>
-    <ClCompile Include="src\R_Main_Window.cpp">
-      <Filter>Source Files\Workspaces</Filter>
-    </ClCompile>
-    <ClCompile Include="src\R_Renderer_Viewport.cpp">
-      <Filter>Source Files\Workspaces\Vulkan Viewport</Filter>
-    </ClCompile>
     <ClCompile Include="src\RUI_Core.cpp">
-      <Filter>Source Files\Raylight Core</Filter>
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\R_Settings.cpp">
-      <Filter>Source Files\Raylight Core</Filter>
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\R_Render_Settings.cpp">
-      <Filter>Source Files\Raylight Core</Filter>
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Renderer_Viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Vulkan_Viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Main_Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Workspace_3D_Viewport.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
