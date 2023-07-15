@@ -6,9 +6,6 @@
 #include "R_Workspace_OpenGL_Viewport.h"
 #include "R_Workspace_Offline_Viewport.h"
 
-#include <sstream>
-#include <fstream>
-
 struct Main_Window : QT_Main_Window {
 	QT_Text_Stream* Log;
 	QT_Application* App;

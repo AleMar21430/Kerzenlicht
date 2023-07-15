@@ -14,7 +14,7 @@ Main_Window::Main_Window(QT_Application* P_App) : QT_Main_Window() {
 	readStyle();
 	showMaximized();
 
-	Log->append("<p style = color:rgb(250,140,25);>Raylight Version 1.0 Initialized Succesfully< / p>");
+	Log->log("Raylight Version 1.0 Initialized Succesfully");
 }
 
 void Main_Window::readStyle() {

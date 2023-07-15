@@ -13,7 +13,8 @@ OpenGL_Preview::OpenGL_Preview(QT_Text_Stream* P_Log) : QOpenGLWidget() {
 	Log = P_Log;
 	Render = false;
 
-	Renderer = new Offline_Renderer(Log, 3840, 2160);
+	Renderer = new Offline_Renderer(Log, 256, 256);
+	Render = true;
 }
 
 void OpenGL_Preview::initializeGL() {
@@ -31,42 +32,20 @@ void OpenGL_Preview::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glBegin(GL_TRIANGLES);
-	glColor3f(1.0, 0.0, 0.0);
-	glVertex2f(-0.6,-0.4);
-	glColor3f(0.0, 1.0, 0.0);
-	glVertex2f(0.6,-0.4);
-	glColor3f(0.0, 0.0, 1.0);
-	glVertex2f(0,0.6);
-	glEnd();
-
 	if (Render) {
-		glEnable(GL_TEXTURE_2D);
+		for (int y = 0; y < Renderer->Pixmap.size(); y++) {
+			for (int x = 0; x < Renderer->Pixmap[0].size(); x++) {
+				Rgba& rgba = Renderer->Pixmap[y][x];
+				glColor4f(rgba.R, rgba.G, rgba.B, rgba.A);
+				glBegin(GL_POINTS);
+				glVertex2f(x, y);
+				glEnd();
+			}
+		}
+		glFlush();
 
-		GLuint texture_id;
-		glGenTextures(1, &texture_id);
-		glBindTexture(GL_TEXTURE_2D, texture_id);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width() / Renderer->Pixmap[0].size(), height() / Renderer->Pixmap.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, this->Renderer->Pixmap.data());
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 0);
-		glVertex2f(-1, -1);
-		glTexCoord2f(1, 0);
-		glVertex2f(1, -1);
-		glTexCoord2f(1, 1);
-		glVertex2f(1, 1);
-		glTexCoord2f(0, 1);
-		glVertex2f(-1, 1);
-		glEnd();
-
-		glDeleteTextures(1, &texture_id);
-		glDisable(GL_TEXTURE_2D);
+		//glDeleteTextures(1, &texture_id);
+		//glDisable(GL_TEXTURE_2D);
 	}
 }
 
@@ -82,5 +61,20 @@ Offline_Renderer::Offline_Renderer(QT_Text_Stream* P_Log, uint32_t Resolution_Wi
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
 
-	Pixmap = std::vector(Resolution_Height,std::vector(Resolution_Width,Rgba()));
+	Pixmap = std::vector(Resolution_Height,std::vector<Rgba>(Resolution_Width));
+
+	for (int y = 0; y < ResY; y++) {
+		for (int x = 0; x < ResX; x++) {
+			Pixmap[y][x] = Rgba();
+		}
+	}
+	std::stringstream log;
+	log << "X: " << Pixmap[0].size() << std::endl << "Y: " << Pixmap.size() << std::endl;
+	/*for (const auto& row : Pixmap) {
+		for (const auto& pixel : row) {
+			log << "R: " << pixel.R << ", " << "G: " << pixel.G << ", " << "B: " << pixel.B << ", " << "A: " << pixel.A << std::endl;
+		}
+		log << std::endl;
+	}*/
+	Log->log(log.str());
 }

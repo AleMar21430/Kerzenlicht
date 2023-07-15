@@ -8,6 +8,9 @@
 #include <gl/GL.h>
 #include <vector>
 
+#include <iostream>
+#include <fstream>
+
 struct Offline_Renderer {
 	QT_Text_Stream* Log;
 
