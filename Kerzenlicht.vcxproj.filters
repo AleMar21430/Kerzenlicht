@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>qml;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Workspaces">
+      <UniqueIdentifier>{9c48ccf6-0c53-4fc3-8cb0-cda0ba82be65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Raylight Core">
+      <UniqueIdentifier>{aa4aabad-7c7c-495b-b79c-16e1814c31e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Workspaces\Vulkan Viewport">
+      <UniqueIdentifier>{ea6f6022-ea00-4166-9dad-519985de11ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Workspace Icons">
+      <UniqueIdentifier>{80857be1-594e-45bb-9a6a-0673f4aa7e3f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\R_Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Render_Settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Workspace_3D_Viewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RUI_Core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RUI_Nodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\R_Renderer_Viewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="src\R_Main_Window.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="src\R_Vulkan_Viewport.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\Add.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Add_Dock_Bottom.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Add_Dock_Left.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Add_Dock_Right.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Add_Dock_Top.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Add_Tab.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Close.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Collapse.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Expand.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Float_Dock.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Maximize.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Minimize.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Redock_Dock.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Sub.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Workspaces\Log.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Workspaces\Settings.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Workspaces\Viewport_3D.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Workspaces\Dock_Manager.png">
+      <Filter>Resource Files\Workspace Icons</Filter>
+    </Image>
+    <Image Include="resources\Workspaces\Properties.png">
+      <Filter>Resource Files\Workspace Icons</Filter>
+    </Image>
+    <Image Include="resources\Workspaces\Outliner.png">
+      <Filter>Resource Files\Workspace Icons</Filter>
+    </Image>
+    <Image Include="resources\Settings.png">
+      <Filter>Resource Files\Workspace Icons</Filter>
+    </Image>
+    <Image Include="resources\Workspaces\Renderer.png">
+      <Filter>Resource Files\Workspace Icons</Filter>
+    </Image>
+    <Image Include="resources\Workspaces\Style_Editor.png">
+      <Filter>Resource Files\Workspace Icons</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Workspace_3D_Viewport.cpp">
+      <Filter>Source Files\Workspaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Vulkan_Viewport.cpp">
+      <Filter>Source Files\Workspaces\Vulkan Viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Main_Window.cpp">
+      <Filter>Source Files\Workspaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Renderer_Viewport.cpp">
+      <Filter>Source Files\Workspaces\Vulkan Viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RUI_Core.cpp">
+      <Filter>Source Files\Raylight Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Settings.cpp">
+      <Filter>Source Files\Raylight Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\R_Render_Settings.cpp">
+      <Filter>Source Files\Raylight Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\color.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\color_frag.spv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\color_vert.spv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\color.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\Style.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
