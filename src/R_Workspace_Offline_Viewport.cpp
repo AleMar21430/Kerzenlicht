@@ -21,8 +21,8 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Renderer->loadModel("Paimon");
 	Renderer->clearBuffers();
 
-	Renderer->Object_Array["Paimon"].scale(0.25);
-	Renderer->Object_Array["Paimon"].translate(Vec3(0,-0.5,0));
+	Renderer->Object_Array["Paimon"].scale(0.2);
+	Renderer->Object_Array["Paimon"].translate(Vec3(0,-1,0));
 
 	Renderer->renderWire();
 	//Renderer->renderLine(0, 0, 250, 250);
