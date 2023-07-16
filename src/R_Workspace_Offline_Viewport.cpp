@@ -134,10 +134,12 @@ void Offline_Renderer::loadObj(std::string P_File) {
 			Vertex_Buffer.push_back(vertex);
 		}
 		else if (prefix == "f") {
-			std::string Value;
-			iss >> Value;
-			std::vector<std::string> Values = splitString(Value,"/");
-			Tri triangle(std::stoi(Values[0])-1, std::stoi(Values[1])-1, std::stoi(Values[2])-1);
+			std::string V1, V2, V3;
+			iss >> V1 >> V2 >> V3;
+			int I1 = std::stoi(splitString(V1,"/")[0]) - 1;
+			int I2 = std::stoi(splitString(V2, "/")[0]) - 1;
+			int I3 = std::stoi(splitString(V3, "/")[0]) - 1;
+			Tri triangle(I1,I2,I3);
 			Triangle_Buffer.push_back(triangle);
 		}
 	}
