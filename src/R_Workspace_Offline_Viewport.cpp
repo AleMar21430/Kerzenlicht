@@ -15,11 +15,14 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	setRenderHint(QPainter::RenderHint::Antialiasing);
 
 	Renderer = new Offline_Renderer(Log, 1024, 1024);
-	Renderer->loadObj("D:/UVG/Kerzenlicht/resources/Head.obj");
-	Renderer->renderTriWire();
+	Renderer->createObject("Paimon");
+	Renderer->loadObj("./Paimon.obj");
+	Renderer->loadModel("Paimon");
+	Renderer->clearBuffers();
+	Renderer->renderWire();
 	//Renderer->renderLine(0, 0, 250, 250);
 	Renderer->storeBmp("Output.bmp");
-	setImage("D:/UVG/Kerzenlicht/Output.bmp");
+	setImage("./Output.bmp");
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
@@ -63,6 +66,8 @@ Offline_Renderer::Offline_Renderer(QT_Text_Stream* P_Log, uint32_t P_ResX, uint3
 	Pen_Opacity = 1.0f;
 
 	Pixmap = std::vector(ResY,std::vector<Rgba>(ResX));
+
+	Object_Array = std::map<std::string, Object>();
 
 	Vertex_Buffer = std::vector<Vertex>();
 	Triangle_Buffer = std::vector<Tri>();
@@ -136,7 +141,7 @@ void Offline_Renderer::loadObj(std::string P_File) {
 		else if (prefix == "f") {
 			std::string V1, V2, V3;
 			iss >> V1 >> V2 >> V3;
-			int I1 = std::stoi(splitString(V1,"/")[0]) - 1;
+			int I1 = std::stoi(splitString(V1, "/")[0]) - 1;
 			int I2 = std::stoi(splitString(V2, "/")[0]) - 1;
 			int I3 = std::stoi(splitString(V3, "/")[0]) - 1;
 			Tri triangle(I1,I2,I3);
@@ -146,24 +151,42 @@ void Offline_Renderer::loadObj(std::string P_File) {
 	file.close();
 }
 
-void Offline_Renderer::renderTriWire() {
-	for (Tri tri : Triangle_Buffer) {
-		if (tri.I1 > 0 && tri.I1 < Vertex_Buffer.size() &&
-			tri.I2 > 0 && tri.I2 < Vertex_Buffer.size() &&
-			tri.I3 > 0 && tri.I3 < Vertex_Buffer.size()) {
-			Vertex v1 = Vertex_Buffer[tri.I1];
-			Vertex v2 = Vertex_Buffer[tri.I2];
-			Vertex v3 = Vertex_Buffer[tri.I3];
-			int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResY);
-			int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResX);
-			int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResY);
-			int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResX);
-			int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResY);
-			int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResX);
+void Offline_Renderer::createObject(std::string P_Name) {
+	Object Temp(P_Name);
+	Object_Array[P_Name] = Temp;
+}
 
-			renderLine(x1, y1, x2, y2);
-			renderLine(x2, y2, x3, y3);
-			renderLine(x3, y3, x1, y1);
+void Offline_Renderer::loadModel(std::string P_Name) {
+	Object& Ref = Object_Array[P_Name];
+	Ref.Vertex_Buffer = Vertex_Buffer;
+	Ref.Triangle_Buffer = Triangle_Buffer;
+}
+
+void Offline_Renderer::clearBuffers() {
+	Vertex_Buffer = std::vector<Vertex>();
+	Triangle_Buffer = std::vector<Tri>();
+}
+
+void Offline_Renderer::renderWire() {
+	for (auto& Data : Object_Array) {
+		for (Tri tri : Data.second.Triangle_Buffer) {
+			if (tri.I1 > 0 && tri.I1 < Data.second.Vertex_Buffer.size() &&
+				tri.I2 > 0 && tri.I2 < Data.second.Vertex_Buffer.size() &&
+				tri.I3 > 0 && tri.I3 < Data.second.Vertex_Buffer.size()) {
+				Vertex v1 = Data.second.Vertex_Buffer[tri.I1];
+				Vertex v2 = Data.second.Vertex_Buffer[tri.I2];
+				Vertex v3 = Data.second.Vertex_Buffer[tri.I3];
+				int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResY);
+				int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResX);
+				int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResY);
+				int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResX);
+				int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResY);
+				int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResX);
+
+				renderLine(x1, y1, x2, y2);
+				renderLine(x2, y2, x3, y3);
+				renderLine(x3, y3, x1, y1);
+			}
 		}
 	}
 }

@@ -41,3 +41,23 @@ struct Tri {
 		I3 = P_I3;
 	}
 };
+
+struct Object {
+	std::string Name;
+	Vec3 Pos;
+	Vec3 Rot_Euler;
+	Vec3 Scale;
+
+	std::vector<Vertex> Vertex_Buffer;
+	std::vector<Tri> Triangle_Buffer;
+
+	Object(std::string P_Name = "Object") {
+		Name = P_Name;
+		Pos = Vec3();
+		Rot_Euler = Vec3();
+		Scale = Vec3(1, 1, 1);
+
+		Vertex_Buffer = std::vector<Vertex>();
+		Triangle_Buffer = std::vector<Tri>();
+	}
+};
