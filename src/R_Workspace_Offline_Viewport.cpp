@@ -37,10 +37,13 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	log << "Res X: " << Pixmap[0].size() << std::endl;
 	log << "Res Y: " << Pixmap.size() << std::endl;
 	Log->log(log.str());
+
 	///////////
 	// Scene //
 	///////////
+
 	createObject("Paimon");
+
 	loadObj("./Paimon.obj");
 	loadModel("Paimon");
 	clearBuffers();
@@ -50,8 +53,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	renderWire();
 	renderDirect();
-	//storeBmp("Output.bmp");
-	//setImage("./Output.bmp");
+	storeBmp("Output.bmp");
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
