@@ -18,7 +18,7 @@ struct Offline_Renderer {
 	void setPenColor(Rgba P_Color);
 	void setPenOpacity(float P_Opacity);
 	void renderPixel(uint32_t P_X, uint32_t P_Y);
-	void renderLine(int32_t P_Start_X, int32_t P_Start_Y, int32_t P_End_X, int32_t P_End_Y);
+	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
 
 	void renderTriWire();
 	void loadObj(std::string P_File);

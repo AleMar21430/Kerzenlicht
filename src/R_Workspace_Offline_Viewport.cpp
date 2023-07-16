@@ -10,8 +10,8 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Renderer->loadObj("D:/UVG/Kerzenlicht/resources/Head.obj");
 	Renderer->renderTriWire();
 	//Renderer->renderLine(0, 0, 250, 250);
-	//Renderer->storeBmp("Output.bmp");
-	//setImage("D:/UVG/Kerzenlicht/Output.bmp");
+	Renderer->storeBmp("Output.bmp");
+	setImage("D:/UVG/Kerzenlicht/Output.bmp");
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
@@ -62,12 +62,12 @@ void Offline_Renderer::setPenOpacity(float P_Opacity) {
 }
 
 void Offline_Renderer::renderPixel(uint32_t P_X, uint32_t P_Y) {
-	if (P_X <= ResX && P_Y <= ResY) {
+	if (P_X < ResX && P_X >= 0 && P_Y < ResY && P_Y >= 0) {
 		Pixmap[P_Y][P_X] = Pen_Color;
 	}
 }
 
-void Offline_Renderer::renderLine(int32_t P_Start_X, int32_t P_Start_Y, int32_t P_End_X, int32_t P_End_Y) {
+void Offline_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y) {
 	int dx = std::abs(P_End_X - P_Start_X);
 	int dy = std::abs(P_End_Y - P_Start_Y);
 	int err = dx - dy;
@@ -92,9 +92,6 @@ void Offline_Renderer::renderLine(int32_t P_Start_X, int32_t P_Start_Y, int32_t 
 
 void Offline_Renderer::loadObj(std::string P_File) {
 	std::ifstream file(P_File);
-
-	std::stringstream log;
-
 	std::string line;
 	while (std::getline(file, line)) {
 		std::istringstream iss(line);
@@ -107,40 +104,36 @@ void Offline_Renderer::loadObj(std::string P_File) {
 			iss >> y;
 			iss >> z;
 			Vertex vertex(Vec3(x,y,z));
-			log << "v" << "|" << x << "|" << y << "|" << z << std::endl;
 			Vertex_Buffer.push_back(vertex);
 		}
 		else if (prefix == "f") {
 			std::string Value;
 			iss >> Value;
 			std::vector<std::string> Values = splitString(Value,"/");
-			Tri triangle(std::stoi(Values[0]), std::stoi(Values[1]), std::stoi(Values[2]));
-			log << "f" << "|" << Values[0] << "|" << Values[1] << "|" << Values[2] << std::endl;
+			Tri triangle(std::stoi(Values[0])-1, std::stoi(Values[1])-1, std::stoi(Values[2])-1);
 			Triangle_Buffer.push_back(triangle);
 		}
 	}
 	file.close();
-
-	
-	Log->log(log.str());
 }
 
 void Offline_Renderer::renderTriWire() {
 	for (Tri tri : Triangle_Buffer) {
-		Vertex v1 = Vertex_Buffer[tri.I1-1];
-		Vertex v2 = Vertex_Buffer[tri.I2-1];
-		Vertex v3 = Vertex_Buffer[tri.I3-1];
+		if (tri.I1 > 0 && tri.I1 < Vertex_Buffer.size() && tri.I2 > 0 && tri.I2 < Vertex_Buffer.size() && tri.I3 > 0 && tri.I3 < Vertex_Buffer.size()) {
+			Vertex v1 = Vertex_Buffer[tri.I1];
+			Vertex v2 = Vertex_Buffer[tri.I2];
+			Vertex v3 = Vertex_Buffer[tri.I3];
+			int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResY);
+			int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResX);
+			int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResY);
+			int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResX);
+			int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResY);
+			int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResX);
 
-		int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResY);
-		int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResX);
-		int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResY);
-		int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResX);
-		int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResY);
-		int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResX);
-
-		renderLine(x1, y1, x2, y2);
-		renderLine(x2, y2, x3, y3);
-		renderLine(x3, y3, x1, y1);
+			renderLine(x1, y1, x2, y2);
+			renderLine(x2, y2, x3, y3);
+			renderLine(x3, y3, x1, y1);
+		}
 	}
 }
 
