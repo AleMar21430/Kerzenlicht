@@ -3,11 +3,7 @@
 #include "QT_Core.h"
 #include "Core.h"
 
-#include <QOpenGLFunctions>
-#include <gl/GLU.h>
-#include <gl/GL.h>
 #include <vector>
-
 #include <iostream>
 #include <fstream>
 
@@ -37,22 +33,12 @@ struct Offline_Renderer {
 	void storeBmp(std::string P_File);
 };
 
-struct OpenGL_Preview : public QOpenGLWidget, protected QOpenGLFunctions {
+struct R_Workspace_Offline_Viewport : QGraphicsView {
 	QT_Text_Stream* Log;
-	bool Render;
 
 	Offline_Renderer* Renderer;
-
-	OpenGL_Preview(QT_Text_Stream* P_Log);
-
-	void resizeGL(int width, int height) override;
-	void initializeGL() override;
-	void paintGL() override;
-};
-
-struct R_Workspace_Offline_Viewport : QT_Linear_Contents {
-	QT_Text_Stream* Log;
-	OpenGL_Preview* Preview;
+	QGraphicsScene* Scene;
 
 	R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log);
+	void setImage(std::string P_File);
 };
