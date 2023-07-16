@@ -7,10 +7,11 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	setScene(Scene);
 
 	Renderer = new Offline_Renderer(Log, 256, 256);
-	//Renderer->renderTriWire("D:/UVG/Kerzenlicht/resources/Head.obj");
+	Renderer->loadObj("D:/UVG/Kerzenlicht/resources/Head.obj");
+	Renderer->renderTriWire();
 	//Renderer->renderLine(0, 0, 250, 250);
 	//Renderer->storeBmp("Output.bmp");
-	setImage("D:/UVG/Kerzenlicht/Output.bmp");
+	//setImage("D:/UVG/Kerzenlicht/Output.bmp");
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
@@ -89,8 +90,10 @@ void Offline_Renderer::renderLine(int32_t P_Start_X, int32_t P_Start_Y, int32_t 
 	renderPixel(P_End_X, P_End_Y);
 }
 
-void Offline_Renderer::renderTriWire(std::string P_File) {
+void Offline_Renderer::loadObj(std::string P_File) {
 	std::ifstream file(P_File);
+
+	std::stringstream log;
 
 	std::string line;
 	while (std::getline(file, line)) {
@@ -99,23 +102,34 @@ void Offline_Renderer::renderTriWire(std::string P_File) {
 		iss >> prefix;
 
 		if (prefix == "v") {
-			Vertex vertex;
-			iss >> vertex.Pos.X >> vertex.Pos.Y >> vertex.Pos.Z;
+			double x, y, z;
+			iss >> x;
+			iss >> y;
+			iss >> z;
+			Vertex vertex(Vec3(x,y,z));
+			log << "v" << "|" << x << "|" << y << "|" << z << std::endl;
 			Vertex_Buffer.push_back(vertex);
 		}
 		else if (prefix == "f") {
-			Tri face;
-			iss >> face.I1 >> face.I2 >> face.I3;
-			Triangle_Buffer.push_back(face);
+			std::string Value;
+			iss >> Value;
+			std::vector<std::string> Values = splitString(Value,"/");
+			Tri triangle(std::stoi(Values[0]), std::stoi(Values[1]), std::stoi(Values[2]));
+			log << "f" << "|" << Values[0] << "|" << Values[1] << "|" << Values[2] << std::endl;
+			Triangle_Buffer.push_back(triangle);
 		}
 	}
-
 	file.close();
 
-	for (const Tri& tri : Triangle_Buffer) {
-		const Vertex& v1 = Vertex_Buffer[tri.I1 - 1];
-		const Vertex& v2 = Vertex_Buffer[tri.I2 - 1];
-		const Vertex& v3 = Vertex_Buffer[tri.I3 - 1];
+	
+	Log->log(log.str());
+}
+
+void Offline_Renderer::renderTriWire() {
+	for (Tri tri : Triangle_Buffer) {
+		Vertex v1 = Vertex_Buffer[tri.I1-1];
+		Vertex v2 = Vertex_Buffer[tri.I2-1];
+		Vertex v3 = Vertex_Buffer[tri.I3-1];
 
 		int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResY);
 		int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResX);

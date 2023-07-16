@@ -106,13 +106,15 @@
     <ClInclude Include="src\R_Workspace_Offline_Viewport.h" />
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h" />
     <ClInclude Include="src\QT_Core.h" />
-    <ClInclude Include="src\R_Math.h" />
+    <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\R_Render_Settings.h" />
     <ClInclude Include="src\R_Settings.h" />
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h" />
     <QtMoc Include="src\R_Main_Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core.cpp" />
+    <ClCompile Include="src\Math.cpp" />
     <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp" />
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp" />
     <ClCompile Include="src\main.cpp" />

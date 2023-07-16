@@ -1,11 +1,6 @@
 #pragma once
 
 #include "QT_Core.h"
-#include "Core.h"
-
-#include <vector>
-#include <iostream>
-#include <fstream>
 
 struct Offline_Renderer {
 	QT_Text_Stream* Log;
@@ -25,7 +20,8 @@ struct Offline_Renderer {
 	void renderPixel(uint32_t P_X, uint32_t P_Y);
 	void renderLine(int32_t P_Start_X, int32_t P_Start_Y, int32_t P_End_X, int32_t P_End_Y);
 
-	void renderTriWire(std::string File);
+	void renderTriWire();
+	void loadObj(std::string P_File);
 
 	void renderTris();
 	void renderQuad();

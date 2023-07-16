@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Math.h"
+
 struct Rgba {
 	float R, G, B, A;
 
@@ -33,9 +35,9 @@ struct Vertex {
 struct Tri {
 	uint32_t I1, I2, I3;
 
-	Tri() {
-		I1 = 0;
-		I2 = 0;
-		I3 = 0;
+	Tri(uint32_t P_I1, uint32_t P_I2, uint32_t P_I3) {
+		I1 = P_I1;
+		I2 = P_I2;
+		I3 = P_I3;
 	}
 };

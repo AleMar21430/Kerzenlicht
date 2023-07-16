@@ -5,8 +5,7 @@
 #include <QtWidgets>
 #include <QtOpenGLWidgets>
 
-#include <sstream>
-#include <fstream>
+#include "Core.h"
 
 struct QT_Application;		// Application
 struct QT_Button;			// Push Button
