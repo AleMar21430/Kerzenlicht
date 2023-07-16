@@ -53,7 +53,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	renderWire();
 	renderDirect();
-	storeBmp("Output.bmp");
+	//storeBmp("Output.bmp");
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
@@ -182,9 +182,11 @@ void R_Workspace_Offline_Viewport::createObject(std::string P_Name) {
 
 void R_Workspace_Offline_Viewport::loadModel(std::string P_Name) {
 	Object& Ref = Object_Array[P_Name];
-	Ref.Vertices = Vertex_Buffer;
-	Ref.Triangles = Triangle_Buffer;
-	Ref.renderPass();
+	if (Ref.Type == MESH) {
+		Ref.MeshData.Vertices = Vertex_Buffer;
+		Ref.MeshData.Triangles = Triangle_Buffer;
+		Ref.renderPass();
+	}
 }
 
 void R_Workspace_Offline_Viewport::clearBuffers() {
@@ -194,25 +196,27 @@ void R_Workspace_Offline_Viewport::clearBuffers() {
 
 void R_Workspace_Offline_Viewport::renderWire() {
 	for (auto& Data : Object_Array) {
-		for (Tri tri : Data.second.Triangle_Buffer) {
-			if (tri.I1 > 0 && tri.I1 < Data.second.Vertex_Buffer.size() &&
-				tri.I2 > 0 && tri.I2 < Data.second.Vertex_Buffer.size() &&
-				tri.I3 > 0 && tri.I3 < Data.second.Vertex_Buffer.size()) {
-				Vertex v1 = Data.second.Vertex_Buffer[tri.I1];
-				Vertex v2 = Data.second.Vertex_Buffer[tri.I2];
-				Vertex v3 = Data.second.Vertex_Buffer[tri.I3];
-				int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResY);
-				int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResX);
-				int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResY);
-				int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResX);
-				int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResY);
-				int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResX);
+		if (Data.second.Type == MESH){
+			for (Tri tri : Data.second.MeshData.Triangle_Buffer) {
+				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Buffer.size() &&
+					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Buffer.size() &&
+					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Buffer.size()) {
+					Vertex v1 = Data.second.MeshData.Vertex_Buffer[tri.I1];
+					Vertex v2 = Data.second.MeshData.Vertex_Buffer[tri.I2];
+					Vertex v3 = Data.second.MeshData.Vertex_Buffer[tri.I3];
+					int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResY);
+					int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResX);
+					int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResY);
+					int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResX);
+					int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResY);
+					int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResX);
 
-				setPenColor(Rgba::random());
+					setPenColor(Rgba::random());
 
-				renderLine(x1, y1, x2, y2);
-				renderLine(x2, y2, x3, y3);
-				renderLine(x3, y3, x1, y1);
+					renderLine(x1, y1, x2, y2);
+					renderLine(x2, y2, x3, y3);
+					renderLine(x3, y3, x1, y1);
+				}
 			}
 		}
 	}
