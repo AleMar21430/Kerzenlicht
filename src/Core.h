@@ -11,6 +11,10 @@ struct Rgba {
 		B = P_B;
 		A = P_A;
 	}
+
+	static Rgba random() {
+		return Rgba(rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), 1);
+	}
 };
 
 struct Vec3 {

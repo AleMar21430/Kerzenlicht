@@ -14,26 +14,75 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	setRenderHint(QPainter::RenderHint::SmoothPixmapTransform);
 	setRenderHint(QPainter::RenderHint::Antialiasing);
 
-	Renderer = new Offline_Renderer(Log, 4096, 4096);
-	
-	Renderer->createObject("Paimon");
-	Renderer->loadObj("./Paimon.obj");
-	Renderer->loadModel("Paimon");
-	Renderer->clearBuffers();
+	ResX = 4096;
+	ResY = 4096;
+	Pen_Color = Rgba();
+	Pen_Opacity = 1.0f;
 
-	Renderer->Object_Array["Paimon"].scale(0.175);
-	Renderer->Object_Array["Paimon"].translate(Vec3(0,-0.95,0));
+	Pixmap = std::vector(ResY, std::vector<Rgba>(ResX));
 
-	Renderer->renderWire();
-	//Renderer->renderLine(0, 0, 250, 250);
-	Renderer->storeBmp("Output.bmp");
-	setImage("./Output.bmp");
+	Object_Array = std::map<std::string, Object>();
+
+	Vertex_Buffer = std::vector<Vertex>();
+	Triangle_Buffer = std::vector<Tri>();
+
+	for (int y = 0; y < ResY; y++) {
+		for (int x = 0; x < ResX; x++) {
+			Pixmap[y][x] = Rgba(0.1, 0.1, 0.1, 1);
+		}
+	}
+
+	std::stringstream log;
+	log << "Renderer Settings" << std::endl;
+	log << "Res X: " << Pixmap[0].size() << std::endl;
+	log << "Res Y: " << Pixmap.size() << std::endl;
+	Log->log(log.str());
+	///////////
+	// Scene //
+	///////////
+	createObject("Paimon");
+	loadObj("./Paimon.obj");
+	loadModel("Paimon");
+	clearBuffers();
+
+	Object_Array["Paimon"].scale(0.175);
+	Object_Array["Paimon"].translate(Vec3(0,-0.95,0));
+
+	renderWire();
+	renderDirect();
+	//storeBmp("Output.bmp");
+	//setImage("./Output.bmp");
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
 	Scene->clear();
 	QPixmap Image(QString::fromStdString(P_File));
 	QGraphicsPixmapItem* Item = new QGraphicsPixmapItem(Image);
+	Scene->addItem(Item);
+	centerOn(Item->boundingRect().center());
+	fitInView(Item->boundingRect(), Qt::KeepAspectRatio);
+}
+
+void R_Workspace_Offline_Viewport::renderDirect() {
+	Scene->clear();
+	QImage image(ResX, ResY, QImage::Format_RGBA8888);
+
+	for (int y = 0; y < ResY; y++) {
+		for (int x = 0; x < ResX; x++) {
+			Rgba& pixel = Pixmap[ResY - y - 1][x];
+			QRgb rgba = qRgba(
+				static_cast<uint8_t>(pixel.R*255),
+				static_cast<uint8_t>(pixel.G*255),
+				static_cast<uint8_t>(pixel.B*255),
+				static_cast<uint8_t>(pixel.A*255)
+			);
+			image.setPixel(x, y, rgba);
+		}
+	}
+
+	QPixmap Image = QPixmap::fromImage(image);
+	QGraphicsPixmapItem* Item = new QGraphicsPixmapItem(Image);
+	//Item->setTransformationMode(Qt::TransformationMode::SmoothTransformation);
 	Scene->addItem(Item);
 	centerOn(Item->boundingRect().center());
 	fitInView(Item->boundingRect(), Qt::KeepAspectRatio);
@@ -58,53 +107,21 @@ void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
 	translate(delta.x(), delta.y());
 }
 
-//////////////
-// Renderer //
-//////////////
-
-Offline_Renderer::Offline_Renderer(QT_Text_Stream* P_Log, uint32_t P_ResX, uint32_t P_ResY) {
-	Log = P_Log;
-
-	ResX = P_ResX;
-	ResY = P_ResY;
-	Pen_Color = Rgba();
-	Pen_Opacity = 1.0f;
-
-	Pixmap = std::vector(ResY,std::vector<Rgba>(ResX));
-
-	Object_Array = std::map<std::string, Object>();
-
-	Vertex_Buffer = std::vector<Vertex>();
-	Triangle_Buffer = std::vector<Tri>();
-
-	for (int y = 0; y < P_ResY; y++) {
-		for (int x = 0; x < P_ResX; x++) {
-			Pixmap[y][x] = Rgba(0.1,0.1,0.1,1);
-		}
-	}
-
-	std::stringstream log;
-	log << "Renderer Settings" << std::endl;
-	log << "Res X: " << Pixmap[0].size() << std::endl;
-	log << "Res Y: " << Pixmap.size() << std::endl;
-	Log->log(log.str());
-}
-
-void Offline_Renderer::setPenColor(Rgba P_Color) {
+void R_Workspace_Offline_Viewport::setPenColor(Rgba P_Color) {
 	Pen_Color = P_Color;
 }
 
-void Offline_Renderer::setPenOpacity(float P_Opacity) {
+void R_Workspace_Offline_Viewport::setPenOpacity(float P_Opacity) {
 	Pen_Opacity = P_Opacity;
 }
 
-void Offline_Renderer::renderPixel(uint32_t P_X, uint32_t P_Y) {
+void R_Workspace_Offline_Viewport::renderPixel(uint32_t P_X, uint32_t P_Y) {
 	if (P_X < ResX && P_X >= 0 && P_Y < ResY && P_Y >= 0) {
 		Pixmap[P_Y][P_X] = Pen_Color;
 	}
 }
 
-void Offline_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y) {
+void R_Workspace_Offline_Viewport::renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y) {
 	int dx = std::abs(P_End_X - P_Start_X);
 	int dy = std::abs(P_End_Y - P_Start_Y);
 	int err = dx - dy;
@@ -127,7 +144,7 @@ void Offline_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int
 	renderPixel(P_End_X, P_End_Y);
 }
 
-void Offline_Renderer::loadObj(std::string P_File) {
+void R_Workspace_Offline_Viewport::loadObj(std::string P_File) {
 	std::ifstream file(P_File);
 	std::string line;
 	while (std::getline(file, line)) {
@@ -156,24 +173,24 @@ void Offline_Renderer::loadObj(std::string P_File) {
 	file.close();
 }
 
-void Offline_Renderer::createObject(std::string P_Name) {
+void R_Workspace_Offline_Viewport::createObject(std::string P_Name) {
 	Object Temp(P_Name);
 	Object_Array[P_Name] = Temp;
 }
 
-void Offline_Renderer::loadModel(std::string P_Name) {
+void R_Workspace_Offline_Viewport::loadModel(std::string P_Name) {
 	Object& Ref = Object_Array[P_Name];
 	Ref.Vertices = Vertex_Buffer;
 	Ref.Triangles = Triangle_Buffer;
 	Ref.renderPass();
 }
 
-void Offline_Renderer::clearBuffers() {
+void R_Workspace_Offline_Viewport::clearBuffers() {
 	Vertex_Buffer = std::vector<Vertex>();
 	Triangle_Buffer = std::vector<Tri>();
 }
 
-void Offline_Renderer::renderWire() {
+void R_Workspace_Offline_Viewport::renderWire() {
 	for (auto& Data : Object_Array) {
 		for (Tri tri : Data.second.Triangle_Buffer) {
 			if (tri.I1 > 0 && tri.I1 < Data.second.Vertex_Buffer.size() &&
@@ -189,6 +206,8 @@ void Offline_Renderer::renderWire() {
 				int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResY);
 				int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResX);
 
+				setPenColor(Rgba::random());
+
 				renderLine(x1, y1, x2, y2);
 				renderLine(x2, y2, x3, y3);
 				renderLine(x3, y3, x1, y1);
@@ -197,7 +216,7 @@ void Offline_Renderer::renderWire() {
 	}
 }
 
-void Offline_Renderer::storeBmp(std::string P_File) {
+void R_Workspace_Offline_Viewport::storeBmp(std::string P_File) {
 	std::ofstream file(P_File, std::ios::binary);
 	if (!file.is_open()) {
 		return;
