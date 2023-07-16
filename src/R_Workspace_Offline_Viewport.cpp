@@ -14,11 +14,16 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	setRenderHint(QPainter::RenderHint::SmoothPixmapTransform);
 	setRenderHint(QPainter::RenderHint::Antialiasing);
 
-	Renderer = new Offline_Renderer(Log, 1024, 1024);
+	Renderer = new Offline_Renderer(Log, 4096, 4096);
+	
 	Renderer->createObject("Paimon");
 	Renderer->loadObj("./Paimon.obj");
 	Renderer->loadModel("Paimon");
 	Renderer->clearBuffers();
+
+	Renderer->Object_Array["Paimon"].scale(0.25);
+	Renderer->Object_Array["Paimon"].translate(Vec3(0,-0.5,0));
+
 	Renderer->renderWire();
 	//Renderer->renderLine(0, 0, 250, 250);
 	Renderer->storeBmp("Output.bmp");
@@ -158,8 +163,9 @@ void Offline_Renderer::createObject(std::string P_Name) {
 
 void Offline_Renderer::loadModel(std::string P_Name) {
 	Object& Ref = Object_Array[P_Name];
-	Ref.Vertex_Buffer = Vertex_Buffer;
-	Ref.Triangle_Buffer = Triangle_Buffer;
+	Ref.Vertices = Vertex_Buffer;
+	Ref.Triangles = Triangle_Buffer;
+	Ref.renderPass();
 }
 
 void Offline_Renderer::clearBuffers() {

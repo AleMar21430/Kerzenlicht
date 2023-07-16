@@ -48,6 +48,9 @@ struct Object {
 	Vec3 Rot_Euler;
 	Vec3 Scale;
 
+	std::vector<Vertex> Vertices;
+	std::vector<Tri> Triangles;
+
 	std::vector<Vertex> Vertex_Buffer;
 	std::vector<Tri> Triangle_Buffer;
 
@@ -57,7 +60,31 @@ struct Object {
 		Rot_Euler = Vec3();
 		Scale = Vec3(1, 1, 1);
 
+		Vertices = std::vector<Vertex>();
+		Triangles = std::vector<Tri>();
+
 		Vertex_Buffer = std::vector<Vertex>();
 		Triangle_Buffer = std::vector<Tri>();
+	}
+
+	void renderPass() {
+		Vertex_Buffer = Vertices;
+		Triangle_Buffer = Triangles;
+	}
+
+	void scale(double P_Scale = 1) {
+		for (Vertex& vert : Vertex_Buffer) {
+			vert.Pos.X *= P_Scale;
+			vert.Pos.Y *= P_Scale;
+			vert.Pos.Z *= P_Scale;
+		}
+	}
+
+	void translate(Vec3 P_Pos = Vec3()) {
+		for (Vertex& vert : Vertex_Buffer) {
+			vert.Pos.X += P_Pos.X;
+			vert.Pos.Y += P_Pos.Y;
+			vert.Pos.Z += P_Pos.Z;
+		}
 	}
 };
