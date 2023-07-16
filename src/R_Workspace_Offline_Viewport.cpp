@@ -3,10 +3,18 @@
 R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log) : QGraphicsView() {
 	Log = P_Log;
 
+	currentScale = 1;
 	Scene = new QGraphicsScene();
 	setScene(Scene);
+	setMouseTracking(true);
+	setTransformationAnchor(QGraphicsView::ViewportAnchor::AnchorViewCenter);
+	setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
+	setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
+	setResizeAnchor(QGraphicsView::ViewportAnchor::AnchorUnderMouse);
+	setRenderHint(QPainter::RenderHint::SmoothPixmapTransform);
+	setRenderHint(QPainter::RenderHint::Antialiasing);
 
-	Renderer = new Offline_Renderer(Log, 256, 256);
+	Renderer = new Offline_Renderer(Log, 1024, 1024);
 	Renderer->loadObj("D:/UVG/Kerzenlicht/resources/Head.obj");
 	Renderer->renderTriWire();
 	//Renderer->renderLine(0, 0, 250, 250);
@@ -21,6 +29,25 @@ void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
 	Scene->addItem(Item);
 	centerOn(Item->boundingRect().center());
 	fitInView(Item->boundingRect(), Qt::KeepAspectRatio);
+}
+
+void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
+	float zoomFactor = 1.25;
+
+	QPointF oldPos = mapToScene(P_Event->position().toPoint());
+	if (P_Event->angleDelta().y() > 0) {
+		scale(zoomFactor, zoomFactor);
+		currentScale *= zoomFactor;
+	}
+	
+	else if (currentScale > 0.1) {
+		scale(1 / zoomFactor, 1 / zoomFactor);
+		currentScale /= zoomFactor;
+	}
+
+	QPointF newPos = mapToScene(P_Event->position().toPoint());
+	QPointF delta = newPos - oldPos;
+	translate(delta.x(), delta.y());
 }
 
 //////////////
@@ -42,7 +69,7 @@ Offline_Renderer::Offline_Renderer(QT_Text_Stream* P_Log, uint32_t P_ResX, uint3
 
 	for (int y = 0; y < P_ResY; y++) {
 		for (int x = 0; x < P_ResX; x++) {
-			Pixmap[y][x] = Rgba(1,0,0,1);
+			Pixmap[y][x] = Rgba(0.1,0.1,0.1,1);
 		}
 	}
 
@@ -119,7 +146,9 @@ void Offline_Renderer::loadObj(std::string P_File) {
 
 void Offline_Renderer::renderTriWire() {
 	for (Tri tri : Triangle_Buffer) {
-		if (tri.I1 > 0 && tri.I1 < Vertex_Buffer.size() && tri.I2 > 0 && tri.I2 < Vertex_Buffer.size() && tri.I3 > 0 && tri.I3 < Vertex_Buffer.size()) {
+		if (tri.I1 > 0 && tri.I1 < Vertex_Buffer.size() &&
+			tri.I2 > 0 && tri.I2 < Vertex_Buffer.size() &&
+			tri.I3 > 0 && tri.I3 < Vertex_Buffer.size()) {
 			Vertex v1 = Vertex_Buffer[tri.I1];
 			Vertex v2 = Vertex_Buffer[tri.I2];
 			Vertex v3 = Vertex_Buffer[tri.I3];
@@ -140,7 +169,6 @@ void Offline_Renderer::renderTriWire() {
 void Offline_Renderer::storeBmp(std::string P_File) {
 	std::ofstream file(P_File, std::ios::binary);
 	if (!file.is_open()) {
-		// Handle file creation error
 		return;
 	}
 

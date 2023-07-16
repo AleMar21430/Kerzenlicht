@@ -34,7 +34,9 @@ struct R_Workspace_Offline_Viewport : QGraphicsView {
 
 	Offline_Renderer* Renderer;
 	QGraphicsScene* Scene;
+	float currentScale;
 
 	R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log);
 	void setImage(std::string P_File);
+	void wheelEvent(QWheelEvent* P_Event) override;
 };
