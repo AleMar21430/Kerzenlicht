@@ -17,8 +17,10 @@ struct R_Workspace_Offline_Viewport : QGraphicsView {
 
 	std::map<std::string, Object> Object_Array;
 
-	std::vector<Vertex> Vertex_Buffer;
-	std::vector<Tri> Triangle_Buffer;
+	std::vector<Vec3> Vertex_Positions_Buffer;
+	std::map<std::string, std::vector<Rgb>> Vertex_Colors_Buffer;
+	std::map<std::string, std::map<std::string, double>> Vertex_Weights_Buffer;
+	std::vector<Tri> Face_Buffer;
 
 	R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log);
 

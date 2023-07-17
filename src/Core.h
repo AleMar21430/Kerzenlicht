@@ -3,7 +3,7 @@
 #include "Math.h"
 
 struct Rgb {
-	float R, G, B, A;
+	float R, G, B;
 	Rgb() {
 		R = 1;
 		G = 1;
@@ -224,18 +224,20 @@ struct Tri {
 };
 
 struct Mesh {
-	std::vector<Vertex> Vertices;
-	std::vector<Tri> Triangles;
+	std::vector<Tri> Faces;
+	std::vector<Vec3> Vertex_Positions;
+	std::map<std::string, std::vector<Rgb>> Vertex_Colors;
+	std::map<std::string, std::map<std::string, double>> Vertex_Weights;
 
-	std::vector<Vertex> Vertex_Buffer;
-	std::vector<Tri> Triangle_Buffer;
+	std::vector<Vertex> Vertex_Output;
 
 	Mesh() {
-		Vertices = std::vector<Vertex>();
-		Triangles = std::vector<Tri>();
+		Faces = std::vector<Tri>();
+		Vertex_Positions = std::vector<Vec3>();
+		Vertex_Colors = std::map<std::string, std::vector<Rgb>>() ;
+		Vertex_Weights = std::map<std::string, std::map<std::string, double>>() ;
 
-		Vertex_Buffer = std::vector<Vertex>();
-		Triangle_Buffer = std::vector<Tri>();
+		Vertex_Output = std::vector<Vertex>();
 	}
 };
 
@@ -269,15 +271,18 @@ struct Object {
 
 	void renderPass() {
 		if (Type == MESH) {
-			MeshData.Vertex_Buffer = MeshData.Vertices;
-			MeshData.Triangle_Buffer = MeshData.Triangles;
+			MeshData.Vertex_Output = std::vector<Vertex>();
+			for (const Vec3 &Pos : MeshData.Vertex_Positions) {
+				MeshData.Vertex_Output.push_back(Vertex(Pos));
+			}
+			MeshData.Faces = MeshData.Faces;
 		}
 		
 	}
 
 	void scale(double P_Scale = 1) {
 		if (Type == MESH) {
-			for (Vertex& vert : MeshData.Vertex_Buffer) {
+			for (Vertex& vert : MeshData.Vertex_Output) {
 				vert.Pos.X *= P_Scale;
 				vert.Pos.Y *= P_Scale;
 				vert.Pos.Z *= P_Scale;
@@ -287,7 +292,7 @@ struct Object {
 
 	void translate(Vec3 P_Pos = Vec3()) {
 		if (Type == MESH) {
-			for (Vertex& vert : MeshData.Vertex_Buffer) {
+			for (Vertex& vert : MeshData.Vertex_Output) {
 				vert.Pos.X += P_Pos.X;
 				vert.Pos.Y += P_Pos.Y;
 				vert.Pos.Z += P_Pos.Z;

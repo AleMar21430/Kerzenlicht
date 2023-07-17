@@ -8,6 +8,7 @@
 #include <variant>
 #include <cstdlib>
 #include <vector>
+#include <map>
 
 #define PI          3.1415926535897932384626433832795
 #define TWO_PI      6.2831853071795864769252867665590

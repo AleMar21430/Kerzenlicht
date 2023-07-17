@@ -24,8 +24,11 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	Object_Array = std::map<std::string, Object>();
 
-	Vertex_Buffer = std::vector<Vertex>();
-	Triangle_Buffer = std::vector<Tri>();
+	Vertex_Positions_Buffer = std::vector<Vec3>();
+	Vertex_Colors_Buffer = std::map<std::string, std::vector<Rgb>>();
+	Vertex_Weights_Buffer = std::map<std::string, std::map<std::string, double>>();
+
+	Face_Buffer = std::vector<Tri>();
 
 	for (int x = 0; x < ResX; x++) {
 		for (int y = 0; y < ResY; y++) {
@@ -43,7 +46,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	// Scene //
 	///////////
 
-	/*createObject("Paimon");
+	createObject("Paimon");
 
 	loadObj("./Paimon.obj", false, true, true);
 	loadModel("Paimon");
@@ -54,9 +57,9 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	
 	renderWire();
 	drawToSurface();
-	storeBmp("Paimon.bmp");*/
+	//storeBmp("Paimon.bmp");
 
-	createObject("Dino");
+	/*createObject("Dino");
 
 	loadObj("./Dino.obj", true, false, false);
 	loadModel("Dino");
@@ -64,7 +67,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	renderPointCloud();
 	drawToSurface();
-	storeBmp("Dino.bmp");
+	storeBmp("Dino.bmp")*/;
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
@@ -158,6 +161,11 @@ void R_Workspace_Offline_Viewport::renderLine(int P_Start_X, int P_Start_Y, int 
 }
 
 void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Colors, bool P_Textured, bool P_Normals) {
+	
+	if (!P_Vert_Colors) {
+		Vertex_Colors_Buffer["Col"] = std::vector<Rgb>();
+	}
+	
 	std::ifstream file(P_File);
 	std::string line;
 	while (std::getline(file, line)) {
@@ -165,29 +173,26 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 		if (!Tokens.empty()) {
 			if (Tokens[0] == "v") {
 				if (!P_Vert_Colors) {
-					Vertex vertex(
-						Vec3(
-							std::stod(Tokens[1]),
-							std::stod(Tokens[2]),
-							std::stod(Tokens[3])
-						)
+					Vec3 Pos(
+						std::stod(Tokens[1]),
+						std::stod(Tokens[2]),
+						std::stod(Tokens[3])
 					);
-					Vertex_Buffer.push_back(vertex);
+					Vertex_Positions_Buffer.push_back(Pos);
 				}
 				else {
-					Vertex vertex(
-						Vec3(
-							std::stod(Tokens[1]),
-							std::stod(Tokens[2]),
-							std::stod(Tokens[3])
-						),
-						Rgb(
-							std::stod(Tokens[4]),
-							std::stod(Tokens[5]),
-							std::stod(Tokens[6])
-						)
+					Vec3 Pos(
+						std::stod(Tokens[1]),
+						std::stod(Tokens[2]),
+						std::stod(Tokens[3])
 					);
-					Vertex_Buffer.push_back(vertex);
+					Rgb Color(
+						std::stod(Tokens[4]),
+						std::stod(Tokens[5]),
+						std::stod(Tokens[6])
+					);
+					Vertex_Positions_Buffer.push_back(Pos);
+					Vertex_Colors_Buffer["Col"].push_back(Color);
 				}
 			}
 			else if (Tokens[0] == "f") {
@@ -197,7 +202,7 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 						std::stoi(Tokens[2]) - 1,
 						std::stoi(Tokens[3]) - 1
 					);
-					Triangle_Buffer.push_back(triangle);
+					Face_Buffer.push_back(triangle);
 				}
 				else {
 					Tri triangle(
@@ -205,7 +210,7 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 						std::stoi(Math::splitString(Tokens[2], "/")[0]) - 1,
 						std::stoi(Math::splitString(Tokens[3], "/")[0]) - 1
 					);
-					Triangle_Buffer.push_back(triangle);
+					Face_Buffer.push_back(triangle);
 				}
 			}
 		}
@@ -221,28 +226,28 @@ void R_Workspace_Offline_Viewport::createObject(std::string P_Name) {
 void R_Workspace_Offline_Viewport::loadModel(std::string P_Name) {
 	Object& Ref = Object_Array[P_Name];
 	if (Ref.Type == MESH) {
-		Ref.MeshData.Vertices = Vertex_Buffer;
-		Ref.MeshData.Triangles = Triangle_Buffer;
+		Ref.MeshData.Vertex_Positions = Vertex_Positions_Buffer;
+		Ref.MeshData.Faces = Face_Buffer;
 		Ref.renderPass();
 	}
 }
 
 void R_Workspace_Offline_Viewport::clearBuffers() {
-	Vertex_Buffer = std::vector<Vertex>();
-	Triangle_Buffer = std::vector<Tri>();
+	Vertex_Positions_Buffer = std::vector<Vec3>();
+	Face_Buffer = std::vector<Tri>();
 }
 
 void R_Workspace_Offline_Viewport::renderWire() {
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH){
-			for (Tri tri : Data.second.MeshData.Triangle_Buffer) {
-				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Buffer.size() &&
-					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Buffer.size() &&
-					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Buffer.size()) {
+			for (Tri tri : Data.second.MeshData.Faces) {
+				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
+					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
+					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
 
-					Vertex v1 = Data.second.MeshData.Vertex_Buffer[tri.I1];
-					Vertex v2 = Data.second.MeshData.Vertex_Buffer[tri.I2];
-					Vertex v3 = Data.second.MeshData.Vertex_Buffer[tri.I3];
+					Vertex v1 = Data.second.MeshData.Vertex_Output[tri.I1];
+					Vertex v2 = Data.second.MeshData.Vertex_Output[tri.I2];
+					Vertex v3 = Data.second.MeshData.Vertex_Output[tri.I3];
 
 					if (Aspect_Ratio >= 1.0) {
 						int x1 = static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
@@ -279,45 +284,46 @@ void R_Workspace_Offline_Viewport::renderWire() {
 void R_Workspace_Offline_Viewport::renderPointCloud() {
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH) {
-			for (Tri tri : Data.second.MeshData.Triangle_Buffer) {
-				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Buffer.size() &&
-					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Buffer.size() &&
-					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Buffer.size()) {
+			for (Tri tri : Data.second.MeshData.Faces) {
+				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
+					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
+					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
 
-					Vertex v1 = Data.second.MeshData.Vertex_Buffer[tri.I1];
-					Vertex v2 = Data.second.MeshData.Vertex_Buffer[tri.I2];
-					Vertex v3 = Data.second.MeshData.Vertex_Buffer[tri.I3];
+					Vertex v1 = Data.second.MeshData.Vertex_Output[tri.I1];
+					Vertex v2 = Data.second.MeshData.Vertex_Output[tri.I2];
+					Vertex v3 = Data.second.MeshData.Vertex_Output[tri.I3];
+					
 					if (Aspect_Ratio >= 1) {
-						setPenColor(Rgba::fromRgb(v1.Color));
+						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I1]));
 						renderPixel(
 							static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
 						);
-						setPenColor(Rgba::fromRgb(v2.Color));
+						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I2]));
 						renderPixel(
 							static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
 						);
-						setPenColor(Rgba::fromRgb(v3.Color));
+						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I3]));
 						renderPixel(
 							static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
 						);
 					}
 					else {
-						setPenColor(Rgba::fromRgb(v1.Color));
+						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I1]));
 						renderPixel(
 							static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
 						);
 
-						setPenColor(Rgba::fromRgb(v2.Color));
+						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I2]));
 						renderPixel(
 							static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
 						);
 
-						setPenColor(Rgba::fromRgb(v3.Color));
+						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I3]));
 						renderPixel(
 							static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
