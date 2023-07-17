@@ -376,13 +376,27 @@ void R_Workspace_Offline_Viewport::storeBmp(std::string P_File) {
 Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear_Contents(true) {
 	Parent = P_Parent;
 
-	QPushButton* Load_File_Button = new QPushButton("Load File", this);
-	connect(Load_File_Button, &QPushButton::clicked, this, &Renderer_Menu::openFile);
+	Vertex_Colors_Obj_Import = false;
+	Textured_Obj_Import = false;
+	Normals_Obj_Import = false;
+
+	Obj_Vertex_Colors = new QCheckBox("Obj Vertex Colors");
+	connect(Obj_Vertex_Colors, &QCheckBox::stateChanged, [this](int State) {Vertex_Colors_Obj_Import = State; });
+	Obj_Textured = new QCheckBox("Obj Textured");
+	connect(Obj_Textured, &QCheckBox::stateChanged, [this](int State) {Textured_Obj_Import = State; });
+	Obj_Normals = new QCheckBox("Obj Normals");
+	connect(Obj_Normals, &QCheckBox::stateChanged, [this](int State) {Normals_Obj_Import = State; });
+
+	QPushButton* Load_File_Button = new QPushButton("Load Obj File", this);
+	connect(Load_File_Button, &QPushButton::clicked, this, &Renderer_Menu::openObjFile);
 	QPushButton* Render_Button = new QPushButton("Render", this);
 	connect(Render_Button, &QPushButton::clicked, this, &Renderer_Menu::render);
 	QPushButton* Save_Button = new QPushButton("Save to .Bmp", this);
 	connect(Save_Button, &QPushButton::clicked, this, &Renderer_Menu::save);
 
+	Layout->addWidget(Obj_Vertex_Colors);
+	Layout->addWidget(Obj_Textured);
+	Layout->addWidget(Obj_Normals);
 	Layout->addWidget(Load_File_Button);
 	Layout->addWidget(Render_Button);
 	Layout->addWidget(Save_Button);
@@ -391,14 +405,14 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 	show();
 }
 
-void Renderer_Menu::openFile() {
+void Renderer_Menu::openObjFile() {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("All Files (*.*)"));
 	if (!fileName.isEmpty()) {
 		std::string File_Path = fileName.toStdString();
 
 		Parent->createObject(File_Path);
 
-		Parent->loadObj(File_Path, false, true, true);
+		Parent->loadObj(File_Path, Vertex_Colors_Obj_Import, Textured_Obj_Import, Normals_Obj_Import);
 		Parent->loadModel(File_Path);
 		Parent->clearBuffers();
 

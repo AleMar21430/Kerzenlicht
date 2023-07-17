@@ -52,8 +52,16 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 struct Renderer_Menu : QT_Linear_Contents {
 	R_Workspace_Offline_Viewport* Parent;
 
+	QCheckBox* Obj_Vertex_Colors;
+	QCheckBox* Obj_Textured;
+	QCheckBox* Obj_Normals;
+
+	bool Vertex_Colors_Obj_Import;
+	bool Textured_Obj_Import;
+	bool Normals_Obj_Import;
+
 	Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent);
-	void openFile();
+	void openObjFile();
 	void render();
 	void save();
 };
