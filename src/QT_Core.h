@@ -13,6 +13,7 @@ struct QT_Dock;				// Dock Widget
 struct QT_Drop_Down;		// Button Switch That Expands And Collapses Contents
 struct QT_File_Browser;		// Popup Window To Select File
 struct QT_Grid_Layout;		// Layout
+struct QT_Graphics_View;
 struct QT_Label;			// Widget With Text
 struct QT_Linear_Layout;	// Linear Layout
 struct QT_Linear_Contents;	// Widget With Linear Layout
@@ -51,6 +52,10 @@ struct QT_Dock : QDockWidget {
 
 struct QT_File_Browser : QFileDialog {
 	QT_File_Browser(std::string P_Style = "_Default_File_Browser");
+};
+
+struct QT_Graphics_View : QGraphicsView {
+	QT_Graphics_View();
 };
 
 struct QT_Grid_Layout : QGridLayout {

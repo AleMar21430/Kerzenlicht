@@ -28,6 +28,16 @@ QT_File_Browser::QT_File_Browser(std::string P_Style) {
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
+QT_Graphics_View::QT_Graphics_View() {
+	setMouseTracking(true);
+	setTransformationAnchor(QGraphicsView::ViewportAnchor::AnchorUnderMouse);
+	setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
+	setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
+	setResizeAnchor(QGraphicsView::ViewportAnchor::AnchorUnderMouse);
+	setRenderHint(QPainter::RenderHint::SmoothPixmapTransform);
+	setRenderHint(QPainter::RenderHint::Antialiasing);
+}
+
 QT_Grid_Layout::QT_Grid_Layout(std::string P_Style) {
 	setObjectName(P_Style);
 	setContentsMargins(1, 1, 1, 1);

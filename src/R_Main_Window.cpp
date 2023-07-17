@@ -12,7 +12,7 @@ Main_Window::Main_Window(QT_Application* P_App) : QT_Main_Window() {
 	//setCentralWidget(OpenGL_Renderer);
 	R_Workspace_Offline_Viewport* Offline_Renderer = new R_Workspace_Offline_Viewport(Log);
 	setCentralWidget(Offline_Renderer);
-	readStyle();
+	//readStyle();
 
 	Log->log("Kerzenlicht Version 1.0 Initialized Succesfully");
 }

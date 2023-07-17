@@ -2,11 +2,11 @@
 
 #include "QT_Core.h"
 
-struct R_Workspace_Offline_Viewport : QGraphicsView {
+struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	QT_Text_Stream* Log;
 
 	QGraphicsScene* Scene;
-	float currentScale;
+	float Viewport_Scale;
 
 	uint32_t ResX;
 	uint32_t ResY;
@@ -47,4 +47,13 @@ struct R_Workspace_Offline_Viewport : QGraphicsView {
 	void setImage(std::string P_File);
 	
 	void wheelEvent(QWheelEvent* P_Event) override;
+};
+
+struct Renderer_Menu : QT_Linear_Contents {
+	R_Workspace_Offline_Viewport* Parent;
+
+	Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent);
+	void openFile();
+	void render();
+	void save();
 };

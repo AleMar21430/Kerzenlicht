@@ -1,21 +1,15 @@
 #include "R_Workspace_Offline_Viewport.h"
 
-R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log) : QGraphicsView() {
+R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log) : QT_Graphics_View() {
 	Log = P_Log;
 
-	currentScale = 1;
+	Viewport_Scale = 1;
 	Scene = new QGraphicsScene();
 	setScene(Scene);
-	setMouseTracking(true);
-	setTransformationAnchor(QGraphicsView::ViewportAnchor::AnchorViewCenter);
-	setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-	setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-	setResizeAnchor(QGraphicsView::ViewportAnchor::AnchorUnderMouse);
-	setRenderHint(QPainter::RenderHint::SmoothPixmapTransform);
-	setRenderHint(QPainter::RenderHint::Antialiasing);
+	Renderer_Menu* Menu = new Renderer_Menu(this);
 
-	ResX = 1920;
-	ResY = 1080;
+	ResX = 3840;
+	ResY = 2160;
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
@@ -46,17 +40,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	// Scene //
 	///////////
 
-	createObject("Paimon");
-
-	loadObj("./Paimon.obj", false, true, true);
-	loadModel("Paimon");
-	clearBuffers();
-
-	Object_Array["Paimon"].scale(0.175);
-	Object_Array["Paimon"].translate(Vec3(0,-0.95,0));
 	
-	renderWire();
-	drawToSurface();
 	//storeBmp("Paimon.bmp");
 
 	/*createObject("Dino");
@@ -110,12 +94,12 @@ void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
 	QPointF oldPos = mapToScene(P_Event->position().toPoint());
 	if (P_Event->angleDelta().y() > 0) {
 		scale(zoomFactor, zoomFactor);
-		currentScale *= zoomFactor;
+		Viewport_Scale *= zoomFactor;
 	}
 	
-	else if (currentScale > 0.1) {
+	else if (Viewport_Scale > 0.1) {
 		scale(1 / zoomFactor, 1 / zoomFactor);
-		currentScale /= zoomFactor;
+		Viewport_Scale /= zoomFactor;
 	}
 
 	QPointF newPos = mapToScene(P_Event->position().toPoint());
@@ -387,4 +371,54 @@ void R_Workspace_Offline_Viewport::storeBmp(std::string P_File) {
 	}
 
 	file.close();
+}
+
+Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear_Contents(true) {
+	Parent = P_Parent;
+
+	QPushButton* Load_File_Button = new QPushButton("Load File", this);
+	connect(Load_File_Button, &QPushButton::clicked, this, &Renderer_Menu::openFile);
+	QPushButton* Render_Button = new QPushButton("Render", this);
+	connect(Render_Button, &QPushButton::clicked, this, &Renderer_Menu::render);
+	QPushButton* Save_Button = new QPushButton("Save to .Bmp", this);
+	connect(Save_Button, &QPushButton::clicked, this, &Renderer_Menu::save);
+
+	Layout->addWidget(Load_File_Button);
+	Layout->addWidget(Render_Button);
+	Layout->addWidget(Save_Button);
+
+	setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowStaysOnTopHint);
+	show();
+}
+
+void Renderer_Menu::openFile() {
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("All Files (*.*)"));
+	if (!fileName.isEmpty()) {
+		std::string File_Path = fileName.toStdString();
+
+		Parent->createObject(File_Path);
+
+		Parent->loadObj(File_Path, false, true, true);
+		Parent->loadModel(File_Path);
+		Parent->clearBuffers();
+
+		Parent->Object_Array[File_Path].scale(0.175);
+		Parent->Object_Array[File_Path].translate(Vec3(0, -0.95, 0));
+	}
+}
+
+void Renderer_Menu::render() {
+	Parent->renderWire();
+	Parent->drawToSurface();
+}
+
+void Renderer_Menu::save() {
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Create New File"), "", tr("Text Files (*.txt)"));
+	if (!fileName.isEmpty()) {
+		std::ofstream log;
+		log.open(fileName.toStdString());
+		log.close();
+		Parent->storeBmp(fileName.toStdString());
+	}
+
 }
