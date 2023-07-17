@@ -53,6 +53,7 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	void mousePressEvent(QMouseEvent* P_Event) override;
 	void mouseMoveEvent(QMouseEvent* P_Event) override;
 	void mouseReleaseEvent(QMouseEvent* P_Event) override;
+	void resizeEvent(QResizeEvent* P_Event) override;
 };
 
 struct Renderer_Menu : QT_Linear_Contents {
@@ -70,4 +71,5 @@ struct Renderer_Menu : QT_Linear_Contents {
 	void openObjFile();
 	void render();
 	void save();
+	void clearScene();
 };

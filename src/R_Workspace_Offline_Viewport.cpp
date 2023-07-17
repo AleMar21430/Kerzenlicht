@@ -10,8 +10,8 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	setScene(Scene);
 	Renderer_Menu* Menu = new Renderer_Menu(this);
 
-	ResX = 3840;
-	ResY = 2160;
+	ResX = 1920;
+	ResY = 1080;
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
@@ -85,7 +85,7 @@ void R_Workspace_Offline_Viewport::drawToSurface() {
 
 	QPixmap Image = QPixmap::fromImage(image);
 	QGraphicsPixmapItem* Item = new QGraphicsPixmapItem(Image);
-	//Item->setTransformationMode(Qt::TransformationMode::SmoothTransformation);
+	Item->setTransformationMode(Qt::TransformationMode::SmoothTransformation);
 	Scene->addItem(Item);
 	centerOn(Item->boundingRect().center());
 	fitInView(Item->boundingRect(), Qt::KeepAspectRatio);
@@ -93,7 +93,7 @@ void R_Workspace_Offline_Viewport::drawToSurface() {
 
 void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
 	for (std::pair<const std::string, Object>& Obj : Object_Array) {
-		float Delta = P_Event->angleDelta().y()*0.00001;
+		float Delta = P_Event->angleDelta().y()*0.00005;
 		renderClear();
 		Obj.second.scale(Vec3(Delta, Delta, Delta));
 		Obj.second.processTransform();
@@ -122,6 +122,11 @@ void R_Workspace_Offline_Viewport::mouseMoveEvent(QMouseEvent* P_Event) {
 
 void R_Workspace_Offline_Viewport::mouseReleaseEvent(QMouseEvent* P_Event) {
 	Mouse_Pressed = false;
+}
+
+void R_Workspace_Offline_Viewport::resizeEvent(QResizeEvent* P_Event) {
+	centerOn(scene()->items()[0]->boundingRect().center());
+	fitInView(scene()->items()[0]->boundingRect(), Qt::KeepAspectRatio);
 }
 
 void R_Workspace_Offline_Viewport::setPenColor(Rgba P_Color) {
@@ -265,7 +270,6 @@ void R_Workspace_Offline_Viewport::renderWire() {
 						int x3 = static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
 						int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY);
 
-						setPenColor(Rgba::random());
 						renderLine(x1, y1, x2, y2);
 						renderLine(x2, y2, x3, y3);
 						renderLine(x3, y3, x1, y1);
@@ -278,7 +282,6 @@ void R_Workspace_Offline_Viewport::renderWire() {
 						int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX);
 						int y3 = static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
 
-						setPenColor(Rgba::random());
 						renderLine(x1, y1, x2, y2);
 						renderLine(x2, y2, x3, y3);
 						renderLine(x3, y3, x1, y1);
@@ -413,6 +416,8 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 
 	QPushButton* Load_File_Button = new QPushButton("Load Obj File", this);
 	connect(Load_File_Button, &QPushButton::clicked, this, &Renderer_Menu::openObjFile);
+	QPushButton* Clear_Button = new QPushButton("Clear Scene", this);
+	connect(Clear_Button, &QPushButton::clicked, this, &Renderer_Menu::clearScene);
 	QPushButton* Render_Button = new QPushButton("Render", this);
 	connect(Render_Button, &QPushButton::clicked, this, &Renderer_Menu::render);
 	QPushButton* Save_Button = new QPushButton("Save to .Bmp", this);
@@ -422,6 +427,7 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 	Layout->addWidget(Obj_Textured);
 	Layout->addWidget(Obj_Normals);
 	Layout->addWidget(Load_File_Button);
+	Layout->addWidget(Clear_Button);
 	Layout->addWidget(Render_Button);
 	Layout->addWidget(Save_Button);
 
@@ -457,4 +463,9 @@ void Renderer_Menu::save() {
 		log.close();
 		Parent->storeBmp(fileName.toStdString());
 	}
+}
+void Renderer_Menu::clearScene() {
+	Parent->Object_Array = std::map<std::string, Object>();
+	Parent->renderClear();
+	Parent->drawToSurface();
 }
