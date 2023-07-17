@@ -2,10 +2,33 @@
 
 #include "Math.h"
 
+struct Rgb {
+	float R, G, B, A;
+	Rgb() {
+		R = 1;
+		G = 1;
+		B = 1;
+	}
+	Rgb(float P_R, float P_G, float P_B) {
+		R = P_R;
+		G = P_G;
+		B = P_B;
+	}
+
+	static Rgb random() {
+		return Rgb(rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX));
+	}
+};
+
 struct Rgba {
 	float R, G, B, A;
-
-	Rgba(float P_R = 1.0f, float P_G = 1.0f, float P_B = 1.0f, float P_A = 1.0f) {
+	Rgba() {
+		R = 1;
+		G = 1;
+		B = 1;
+		A = 1;
+	}
+	Rgba(float P_R, float P_G, float P_B, float P_A) {
 		R = P_R;
 		G = P_G;
 		B = P_B;
@@ -20,7 +43,11 @@ struct Rgba {
 struct Vec2 {
 	double X, Y;
 
-	Vec2(double P_X = 0.0f, double P_Y = 0.0f) {
+	Vec2() {
+		X = 0;
+		Y = 0;
+	}
+	Vec2(double P_X, double P_Y) {
 		X = P_X;
 		Y = P_Y;
 	}
@@ -87,7 +114,12 @@ struct Vec2 {
 struct Vec3 {
 	double X, Y, Z;
 
-	Vec3(double P_X = 0.0f, double P_Y = 0.0f, double P_Z = 0.0f) {
+	Vec3() {
+		X = 0;
+		Y = 0;
+		Z = 0;
+	}
+	Vec3(double P_X, double P_Y, double P_Z) {
 		X = P_X;
 		Y = P_Y;
 		Z = P_Z;
@@ -161,10 +193,19 @@ struct Vec3 {
 
 struct Vertex {
 	Vec3 Pos;
-	Rgba Color;
+	Rgb Color;
 
-	Vertex(Vec3 P_Pos = Vec3()) {
+	Vertex() {
+		Pos = Vec3();
+		Color = Rgb();
+	}
+	Vertex(Vec3 P_Pos) {
 		Pos = P_Pos;
+		Color = Rgb();
+	}
+	Vertex(Vec3 P_Pos, Rgb P_Color) {
+		Pos = P_Pos;
+		Color = P_Color;
 	}
 };
 

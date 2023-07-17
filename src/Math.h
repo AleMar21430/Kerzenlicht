@@ -13,5 +13,8 @@
 #define TWO_PI      6.2831853071795864769252867665590
 #define INVERTED_PI 0.3183098861837906715377675267450
 
-float fastInvSqrt(float number);
-std::vector<std::string> splitString(const std::string& input, std::string delimiter);
+
+struct Math {
+	static float fastInvSqrt(float number);
+	static std::vector<std::string> splitString(std::string& input, std::string delimiter);
+};

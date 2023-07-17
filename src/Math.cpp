@@ -1,6 +1,6 @@
 #include "Math.h"
 
-float fastInvSqrt(float number) {
+float Math::fastInvSqrt(float number) {
 	long i;
 	float x2, y;
 	const float threehalfs = 1.5F;
@@ -16,7 +16,7 @@ float fastInvSqrt(float number) {
 	return y;
 }
 
-std::vector<std::string> splitString(const std::string& input, std::string delimiter) {
+std::vector<std::string> Math::splitString(std::string& input, std::string delimiter) {
 	std::vector<std::string> tokens;
 	std::string::size_type start = 0;
 	std::string::size_type end = input.find(delimiter);
@@ -26,7 +26,6 @@ std::vector<std::string> splitString(const std::string& input, std::string delim
 		start = end + 1;
 		end = input.find(delimiter, start);
 	}
-
 	tokens.push_back(input.substr(start));
 
 	return tokens;
