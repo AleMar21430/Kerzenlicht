@@ -26,6 +26,12 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	Face_Buffer = std::vector<Tri>();
 
+	for (int x = 0; x < ResX; x++) {
+		for (int y = 0; y < ResY; y++) {
+			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
+		}
+	}
+
 	std::stringstream log;
 	log << "Renderer Settings" << std::endl;
 	log << "Res X: " << Pixmap[0].size() << std::endl;
@@ -40,11 +46,12 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	loadObj("./Paimon.obj", false, true, true);
 	loadModel("Paimon");
-	Object_Array["Paimon"].renderPass();
+	Object_Array["Paimon"].loadBuffers();
 	clearBuffers();
 
-	Object_Array["Paimon"].scale(Vec3(0.175, 0.175, 0.175));
+	Object_Array["Paimon"].setScale(Vec3(0.175, 0.175, 0.175));
 	Object_Array["Paimon"].translate(Vec3(0, -0.95, 0));
+	Object_Array["Paimon"].processTransform();
 
 	renderWire();
 	drawToSurface();
@@ -86,10 +93,10 @@ void R_Workspace_Offline_Viewport::drawToSurface() {
 
 void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
 	for (std::pair<const std::string, Object>& Obj : Object_Array) {
-		double Delta = P_Event->angleDelta().y()*0.0001;
+		float Delta = P_Event->angleDelta().y()*0.00001;
 		renderClear();
 		Obj.second.scale(Vec3(Delta, Delta, Delta));
-		Obj.second.preProcess();
+		Obj.second.processTransform();
 		renderWire();
 		drawToSurface();
 	}
@@ -106,7 +113,7 @@ void R_Workspace_Offline_Viewport::mouseMoveEvent(QMouseEvent* P_Event) {
 		for (std::pair<const std::string, Object>& Obj : Object_Array) {
 			renderClear();
 			Obj.second.rotate(Vec3(0,Delta*0.001,0));
-			Obj.second.preProcess();
+			Obj.second.processTransform();
 			renderWire();
 			drawToSurface();
 		}
@@ -126,7 +133,11 @@ void R_Workspace_Offline_Viewport::setPenOpacity(float P_Opacity) {
 }
 
 void R_Workspace_Offline_Viewport::renderClear() {
-	Pixmap = std::vector(ResX, std::vector<Rgba>(ResY));
+	for (int x = 0; x < ResX; x++) {
+		for (int y = 0; y < ResY; y++) {
+			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
+		}
+	}
 }
 
 void R_Workspace_Offline_Viewport::renderPixel(uint32_t P_X, uint32_t P_Y) {
@@ -427,12 +438,13 @@ void Renderer_Menu::openObjFile() {
 
 		Parent->loadObj(File_Path, Vertex_Colors_Obj_Import, Textured_Obj_Import, Normals_Obj_Import);
 		Parent->loadModel(File_Path);
+		Parent->Object_Array[File_Path].loadBuffers();
 		Parent->clearBuffers();
-		Parent->Object_Array[File_Path].renderPass();
 	}
 }
 
 void Renderer_Menu::render() {
+	Parent->renderClear();
 	Parent->renderWire();
 	Parent->drawToSurface();
 }

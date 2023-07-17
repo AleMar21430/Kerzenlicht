@@ -5,9 +5,9 @@
 struct Rgb {
 	float R, G, B;
 	Rgb() {
-		R = 0;
-		G = 0;
-		B = 0;
+		R = 1;
+		G = 1;
+		B = 1;
 	}
 	Rgb(float P_R, float P_G, float P_B) {
 		R = P_R;
@@ -321,60 +321,38 @@ struct Object {
 		}
 	}
 
-	void renderPass() {
+	void loadBuffers() {
 		if (Type == MESH) {
 			MeshData.Vertex_Output = std::vector<Vertex>();
-			for (const Vec3& Pos : MeshData.Vertex_Positions) {
+			for (const Vec3 Pos : MeshData.Vertex_Positions) {
 				MeshData.Vertex_Output.push_back(Vertex(Pos));
 			}
-			MeshData.Faces = MeshData.Faces;
 		}
-
 	}
 
 	void scale(Vec3 P_Scale) {
 		Scale = Scale + P_Scale;
-		if (Type == MESH) {
-			for (Vertex& vert : MeshData.Vertex_Output) {
-				vert.Pos.X *= Scale.X;
-				vert.Pos.Y *= Scale.Y;
-				vert.Pos.Z *= Scale.Z;
-			}
-		}
+	}
+
+	void setScale(Vec3 P_Scale) {
+		Scale = P_Scale;
 	}
 
 	void rotate(Vec3 P_Rot) {
 		Rot_Euler = Rot_Euler + P_Rot;
-		if (Type == MESH) {
-			for (Vertex& vert : MeshData.Vertex_Output) {
-				vert.Pos.rotate(Anchor, Rot_Euler);
-			}
-		}
 	}
 
 	void translate(Vec3 P_Pos = Vec3()) {
 		Pos = Pos + P_Pos;
-		if (Type == MESH) {
-			for (Vertex& vert : MeshData.Vertex_Output) {
-				vert.Pos.X += Pos.X;
-				vert.Pos.Y += Pos.Y;
-				vert.Pos.Z += Pos.Z;
-			}
-		}
 	}
 
-	void preProcess() {
+	void processTransform() {
 		if (Type == MESH) {
-			MeshData.Vertex_Output = std::vector<Vertex>();
-			for (Vec3 pos : MeshData.Vertex_Positions) {
-				//Scale
-				Vec3 Processed = pos * Scale;
-				//Rotate
-				Processed.rotate(Anchor, Rot_Euler);
-				//Translate
-				Processed + Pos;
-				//Store
-				MeshData.Vertex_Output.push_back(Vertex(Pos));
+			for (int x = 0; x < MeshData.Vertex_Positions.size(); x++) {
+				Vertex& vert = MeshData.Vertex_Output[x];
+				vert.Pos = MeshData.Vertex_Positions[x] * Scale;
+				vert.Pos.rotate(Anchor, Rot_Euler);
+				vert.Pos = vert.Pos + Pos;
 			}
 		}
 	}
