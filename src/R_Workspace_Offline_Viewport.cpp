@@ -42,14 +42,20 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	// Scene //
 	///////////
 
-	createObject("Paimon");
+	/*createObject("Paimon");
 
-	loadObj("./Paimon.obj");
+	loadObj("./Paimon.obj", false, true, true);
 	loadModel("Paimon");
 	clearBuffers();
 
 	Object_Array["Paimon"].scale(0.175);
-	Object_Array["Paimon"].translate(Vec3(0,-0.95,0));
+	Object_Array["Paimon"].translate(Vec3(0,-0.95,0));*/
+
+	createObject("Dino");
+
+	loadObj("./Dino.obj", true, false, false);
+	loadModel("Dino");
+	clearBuffers();
 
 	renderWire();
 	renderDirect();
@@ -146,14 +152,14 @@ void R_Workspace_Offline_Viewport::renderLine(int P_Start_X, int P_Start_Y, int 
 	renderPixel(P_End_X, P_End_Y);
 }
 
-void R_Workspace_Offline_Viewport::loadBlenderObj(std::string P_File) {
+void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Colors, bool P_Textured, bool P_Normals) {
 	std::ifstream file(P_File);
 	std::string line;
 	while (std::getline(file, line)) {
-		std::vector<std::string> Tokens = Math::splitString(line, " ");
+		std::vector<std::string> Tokens = Math::splitString(line);
 		if (!Tokens.empty()) {
 			if (Tokens[0] == "v") {
-				if (Tokens.size() == 4) {
+				if (!P_Vert_Colors) {
 					Vertex vertex(
 						Vec3(
 							std::stod(Tokens[1]),
@@ -163,7 +169,7 @@ void R_Workspace_Offline_Viewport::loadBlenderObj(std::string P_File) {
 					);
 					Vertex_Buffer.push_back(vertex);
 				}
-				else if (Tokens.size() == 7) {
+				else {
 					Vertex vertex(
 						Vec3(
 							std::stod(Tokens[1]),
@@ -180,42 +186,23 @@ void R_Workspace_Offline_Viewport::loadBlenderObj(std::string P_File) {
 				}
 			}
 			else if (Tokens[0] == "f") {
-				Tri triangle(
-					std::stoi(Tokens[1]) - 1,
-					std::stoi(Tokens[2]) - 1,
-					std::stoi(Tokens[3]) - 1
-				);
-				Triangle_Buffer.push_back(triangle);
+				if (!P_Textured && !P_Normals) {
+					Tri triangle(
+						std::stoi(Tokens[1]) - 1,
+						std::stoi(Tokens[2]) - 1,
+						std::stoi(Tokens[3]) - 1
+					);
+					Triangle_Buffer.push_back(triangle);
+				}
+				else {
+					Tri triangle(
+						std::stoi(Math::splitString(Tokens[1], "/")[0]) - 1,
+						std::stoi(Math::splitString(Tokens[2], "/")[0]) - 1,
+						std::stoi(Math::splitString(Tokens[3], "/")[0]) - 1
+					);
+					Triangle_Buffer.push_back(triangle);
+				}
 			}
-		}
-	}
-	file.close();
-}
-
-void R_Workspace_Offline_Viewport::loadObj(std::string P_File) {
-	std::ifstream file(P_File);
-	std::string line;
-	while (std::getline(file, line)) {
-		std::istringstream iss(line);
-		std::string prefix;
-		iss >> prefix;
-
-		if (prefix == "v") {
-			double x, y, z;
-			iss >> x;
-			iss >> y;
-			iss >> z;
-			Vertex vertex(Vec3(x, y, z));
-			Vertex_Buffer.push_back(vertex);
-		}
-		else if (prefix == "f") {
-			std::string V1, V2, V3;
-			iss >> V1 >> V2 >> V3;
-			int I1 = std::stoi(Math::splitString(V1, "/")[0]) - 1;
-			int I2 = std::stoi(Math::splitString(V2, "/")[0]) - 1;
-			int I3 = std::stoi(Math::splitString(V3, "/")[0]) - 1;
-			Tri triangle(I1, I2, I3);
-			Triangle_Buffer.push_back(triangle);
 		}
 	}
 	file.close();

@@ -33,8 +33,7 @@ struct R_Workspace_Offline_Viewport : QGraphicsView {
 	void loadModel(std::string P_Name);
 	void clearBuffers();
 
-	void loadBlenderObj(std::string P_File);
-	void loadObj(std::string P_File);
+	void loadObj(std::string P_File, bool P_Vert_Colors = false, bool P_Textured = false, bool P_Normals = false);
 
 	void renderTris();
 	void renderQuad();

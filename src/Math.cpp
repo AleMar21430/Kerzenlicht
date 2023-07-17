@@ -30,3 +30,15 @@ std::vector<std::string> Math::splitString(std::string& input, std::string delim
 
 	return tokens;
 }
+
+std::vector<std::string> Math::splitString(std::string& input) {
+	std::vector<std::string> result;
+	std::istringstream iss(input);
+	std::string token;
+
+	while (iss >> token) {
+		result.push_back(token);
+	}
+
+	return result;
+}

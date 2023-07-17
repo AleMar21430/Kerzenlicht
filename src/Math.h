@@ -17,4 +17,5 @@
 struct Math {
 	static float fastInvSqrt(float number);
 	static std::vector<std::string> splitString(std::string& input, std::string delimiter);
+	static std::vector<std::string> splitString(std::string& input);
 };
