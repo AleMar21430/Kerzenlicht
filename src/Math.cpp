@@ -7,10 +7,10 @@ float Math::fastInvSqrt(float number) {
 
 	x2 = number * 0.5F;
 	y = number;
-	i = *(long*)&y;           // get bits for floating value
-	i = 0x5f3759df - (i >> 1); // gives initial guess y0
-	y = *(float*)&i;          // convert bits back to float
-	y = y * (threehalfs - (x2 * y * y)); // Newton step, repeating increases accuracy
+	i = *(long*)&y;							// get bits for floating value
+	i = 0x5f3759df - (i >> 1);				// gives initial guess y0
+	y = *(float*)&i;						// convert bits back to float
+	y = y * (threehalfs - (x2 * y * y));	// Newton step, repeating increases accuracy
 	y = y * (threehalfs - (x2 * y * y));
 	y = y * (threehalfs - (x2 * y * y));
 	return y;

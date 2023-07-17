@@ -6,7 +6,9 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	QT_Text_Stream* Log;
 
 	QGraphicsScene* Scene;
-	float Viewport_Scale;
+
+	bool Mouse_Pressed;
+	QPoint Mouse_Down_Pos;
 
 	uint32_t ResX;
 	uint32_t ResY;
@@ -27,6 +29,7 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	void setPenColor(Rgba P_Color);
 	void setPenOpacity(float P_Opacity);
 
+	void renderClear();
 	void renderPixel(uint32_t P_X, uint32_t P_Y);
 	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
 	void renderWire();
@@ -47,6 +50,9 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	void setImage(std::string P_File);
 	
 	void wheelEvent(QWheelEvent* P_Event) override;
+	void mousePressEvent(QMouseEvent* P_Event) override;
+	void mouseMoveEvent(QMouseEvent* P_Event) override;
+	void mouseReleaseEvent(QMouseEvent* P_Event) override;
 };
 
 struct Renderer_Menu : QT_Linear_Contents {

@@ -3,7 +3,9 @@
 R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log) : QT_Graphics_View() {
 	Log = P_Log;
 
-	Viewport_Scale = 1;
+	Mouse_Pressed = false;
+	Mouse_Down_Pos = QPoint(0, 0);
+
 	Scene = new QGraphicsScene();
 	setScene(Scene);
 	Renderer_Menu* Menu = new Renderer_Menu(this);
@@ -24,12 +26,6 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	Face_Buffer = std::vector<Tri>();
 
-	for (int x = 0; x < ResX; x++) {
-		for (int y = 0; y < ResY; y++) {
-			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
-		}
-	}
-
 	std::stringstream log;
 	log << "Renderer Settings" << std::endl;
 	log << "Res X: " << Pixmap[0].size() << std::endl;
@@ -40,18 +36,18 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	// Scene //
 	///////////
 
-	
-	//storeBmp("Paimon.bmp");
+	createObject("Paimon");
 
-	/*createObject("Dino");
-
-	loadObj("./Dino.obj", true, false, false);
-	loadModel("Dino");
+	loadObj("./Paimon.obj", false, true, true);
+	loadModel("Paimon");
+	Object_Array["Paimon"].renderPass();
 	clearBuffers();
 
-	renderPointCloud();
+	Object_Array["Paimon"].scale(Vec3(0.175, 0.175, 0.175));
+	Object_Array["Paimon"].translate(Vec3(0, -0.95, 0));
+
+	renderWire();
 	drawToSurface();
-	storeBmp("Dino.bmp")*/;
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
@@ -89,22 +85,36 @@ void R_Workspace_Offline_Viewport::drawToSurface() {
 }
 
 void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
-	float zoomFactor = 1.25;
-
-	QPointF oldPos = mapToScene(P_Event->position().toPoint());
-	if (P_Event->angleDelta().y() > 0) {
-		scale(zoomFactor, zoomFactor);
-		Viewport_Scale *= zoomFactor;
+	for (std::pair<const std::string, Object>& Obj : Object_Array) {
+		double Delta = P_Event->angleDelta().y()*0.0001;
+		renderClear();
+		Obj.second.scale(Vec3(Delta, Delta, Delta));
+		Obj.second.preProcess();
+		renderWire();
+		drawToSurface();
 	}
-	
-	else if (Viewport_Scale > 0.1) {
-		scale(1 / zoomFactor, 1 / zoomFactor);
-		Viewport_Scale /= zoomFactor;
-	}
+}
 
-	QPointF newPos = mapToScene(P_Event->position().toPoint());
-	QPointF delta = newPos - oldPos;
-	translate(delta.x(), delta.y());
+void R_Workspace_Offline_Viewport::mousePressEvent(QMouseEvent* P_Event) {
+	Mouse_Pressed = true;
+	Mouse_Down_Pos = P_Event->pos();
+}
+
+void R_Workspace_Offline_Viewport::mouseMoveEvent(QMouseEvent* P_Event) {
+	if (Mouse_Pressed) {
+		double Delta = P_Event->pos().x() - Mouse_Down_Pos.x();
+		for (std::pair<const std::string, Object>& Obj : Object_Array) {
+			renderClear();
+			Obj.second.rotate(Vec3(0,Delta*0.001,0));
+			Obj.second.preProcess();
+			renderWire();
+			drawToSurface();
+		}
+	}
+}
+
+void R_Workspace_Offline_Viewport::mouseReleaseEvent(QMouseEvent* P_Event) {
+	Mouse_Pressed = false;
 }
 
 void R_Workspace_Offline_Viewport::setPenColor(Rgba P_Color) {
@@ -113,6 +123,10 @@ void R_Workspace_Offline_Viewport::setPenColor(Rgba P_Color) {
 
 void R_Workspace_Offline_Viewport::setPenOpacity(float P_Opacity) {
 	Pen_Opacity = P_Opacity;
+}
+
+void R_Workspace_Offline_Viewport::renderClear() {
+	Pixmap = std::vector(ResX, std::vector<Rgba>(ResY));
 }
 
 void R_Workspace_Offline_Viewport::renderPixel(uint32_t P_X, uint32_t P_Y) {
@@ -212,7 +226,6 @@ void R_Workspace_Offline_Viewport::loadModel(std::string P_Name) {
 	if (Ref.Type == MESH) {
 		Ref.MeshData.Vertex_Positions = Vertex_Positions_Buffer;
 		Ref.MeshData.Faces = Face_Buffer;
-		Ref.renderPass();
 	}
 }
 
@@ -415,9 +428,7 @@ void Renderer_Menu::openObjFile() {
 		Parent->loadObj(File_Path, Vertex_Colors_Obj_Import, Textured_Obj_Import, Normals_Obj_Import);
 		Parent->loadModel(File_Path);
 		Parent->clearBuffers();
-
-		Parent->Object_Array[File_Path].scale(0.175);
-		Parent->Object_Array[File_Path].translate(Vec3(0, -0.95, 0));
+		Parent->Object_Array[File_Path].renderPass();
 	}
 }
 
@@ -434,5 +445,4 @@ void Renderer_Menu::save() {
 		log.close();
 		Parent->storeBmp(fileName.toStdString());
 	}
-
 }

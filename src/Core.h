@@ -5,9 +5,9 @@
 struct Rgb {
 	float R, G, B;
 	Rgb() {
-		R = 1;
-		G = 1;
-		B = 1;
+		R = 0;
+		G = 0;
+		B = 0;
 	}
 	Rgb(float P_R, float P_G, float P_B) {
 		R = P_R;
@@ -186,12 +186,62 @@ struct Vec3 {
 	}
 
 	Vec3 normalize() {
-		Vec3 Result = Vec3();
 		double Length = 1L / this->len();
 		X = X * Length;
 		Y = Y * Length;
 		Z = Z * Length;
 		return *this;
+	}
+
+	Vec3 rotate(Vec3 P_Pos, const Vec3 P_Anchor, const Vec3 P_Rotation) {
+		Vec3 Result = Vec3(P_Pos);
+
+		Result.X -= P_Anchor.X;
+		Result.Y -= P_Anchor.Y;
+		Result.Z -= P_Anchor.Z;
+
+		float cosX = std::cos(P_Rotation.X);
+		float sinX = std::sin(P_Rotation.X);
+		float newY = Result.Y * cosX - Result.Z * sinX;
+		float newZ = Result.Y * sinX + Result.Z * cosX;
+
+		float cosY = std::cos(P_Rotation.Y);
+		float sinY = std::sin(P_Rotation.Y);
+		float newX = Result.X * cosY + newZ * sinY;
+		newZ = -Result.X * sinY + newZ * cosY;
+
+		float cosZ = std::cos(P_Rotation.Z);
+		float sinZ = std::sin(P_Rotation.Z);
+		float finalX = newX * cosZ - newY * sinZ;
+		float finalY = newX * sinZ + newY * cosZ;
+
+		Result.X = finalX + P_Anchor.X;
+		Result.Y = finalY + P_Anchor.Y;
+		Result.Z = newZ + P_Anchor.Z;
+	}
+	void rotate(const Vec3 P_Anchor, const Vec3 P_Rotation) {
+		X -= P_Anchor.X;
+		Y -= P_Anchor.Y;
+		Z -= P_Anchor.Z;
+
+		float cosX = std::cos(P_Rotation.X);
+		float sinX = std::sin(P_Rotation.X);
+		float newY = Y * cosX - Z * sinX;
+		float newZ = Y * sinX + Z * cosX;
+
+		float cosY = std::cos(P_Rotation.Y);
+		float sinY = std::sin(P_Rotation.Y);
+		float newX = X * cosY + newZ * sinY;
+		newZ = -X * sinY + newZ * cosY;
+
+		float cosZ = std::cos(P_Rotation.Z);
+		float sinZ = std::sin(P_Rotation.Z);
+		float finalX = newX * cosZ - newY * sinZ;
+		float finalY = newX * sinZ + newY * cosZ;
+
+		X = finalX + P_Anchor.X;
+		Y = finalY + P_Anchor.Y;
+		Z = newZ + P_Anchor.Z;
 	}
 };
 
@@ -251,6 +301,7 @@ enum Object_Type {
 struct Object {
 	std::string Name;
 	Vec3 Pos;
+	Vec3 Anchor;
 	Vec3 Rot_Euler;
 	Vec3 Scale;
 
@@ -261,6 +312,7 @@ struct Object {
 		Name = P_Name;
 		Type = P_Type;
 		Pos = Vec3();
+		Anchor = Vec3();
 		Rot_Euler = Vec3();
 		Scale = Vec3(1, 1, 1);
 
@@ -272,30 +324,57 @@ struct Object {
 	void renderPass() {
 		if (Type == MESH) {
 			MeshData.Vertex_Output = std::vector<Vertex>();
-			for (const Vec3 &Pos : MeshData.Vertex_Positions) {
+			for (const Vec3& Pos : MeshData.Vertex_Positions) {
 				MeshData.Vertex_Output.push_back(Vertex(Pos));
 			}
 			MeshData.Faces = MeshData.Faces;
 		}
-		
+
 	}
 
-	void scale(double P_Scale = 1) {
+	void scale(Vec3 P_Scale) {
+		Scale = Scale + P_Scale;
 		if (Type == MESH) {
 			for (Vertex& vert : MeshData.Vertex_Output) {
-				vert.Pos.X *= P_Scale;
-				vert.Pos.Y *= P_Scale;
-				vert.Pos.Z *= P_Scale;
+				vert.Pos.X *= Scale.X;
+				vert.Pos.Y *= Scale.Y;
+				vert.Pos.Z *= Scale.Z;
+			}
+		}
+	}
+
+	void rotate(Vec3 P_Rot) {
+		Rot_Euler = Rot_Euler + P_Rot;
+		if (Type == MESH) {
+			for (Vertex& vert : MeshData.Vertex_Output) {
+				vert.Pos.rotate(Anchor, Rot_Euler);
 			}
 		}
 	}
 
 	void translate(Vec3 P_Pos = Vec3()) {
+		Pos = Pos + P_Pos;
 		if (Type == MESH) {
 			for (Vertex& vert : MeshData.Vertex_Output) {
-				vert.Pos.X += P_Pos.X;
-				vert.Pos.Y += P_Pos.Y;
-				vert.Pos.Z += P_Pos.Z;
+				vert.Pos.X += Pos.X;
+				vert.Pos.Y += Pos.Y;
+				vert.Pos.Z += Pos.Z;
+			}
+		}
+	}
+
+	void preProcess() {
+		if (Type == MESH) {
+			MeshData.Vertex_Output = std::vector<Vertex>();
+			for (Vec3 pos : MeshData.Vertex_Positions) {
+				//Scale
+				Vec3 Processed = pos * Scale;
+				//Rotate
+				Processed.rotate(Anchor, Rot_Euler);
+				//Translate
+				Processed + Pos;
+				//Store
+				MeshData.Vertex_Output.push_back(Vertex(Pos));
 			}
 		}
 	}
