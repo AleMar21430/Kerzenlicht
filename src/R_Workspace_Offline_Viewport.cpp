@@ -14,21 +14,22 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	setRenderHint(QPainter::RenderHint::SmoothPixmapTransform);
 	setRenderHint(QPainter::RenderHint::Antialiasing);
 
-	ResX = 4096;
-	ResY = 4096;
+	ResX = 1920;
+	ResY = 1080;
+	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
 
-	Pixmap = std::vector(ResY, std::vector<Rgba>(ResX));
+	Pixmap = std::vector(ResX, std::vector<Rgba>(ResY));
 
 	Object_Array = std::map<std::string, Object>();
 
 	Vertex_Buffer = std::vector<Vertex>();
 	Triangle_Buffer = std::vector<Tri>();
 
-	for (int y = 0; y < ResY; y++) {
-		for (int x = 0; x < ResX; x++) {
-			Pixmap[y][x] = Rgba(0.1, 0.1, 0.1, 1);
+	for (int x = 0; x < ResX; x++) {
+		for (int y = 0; y < ResY; y++) {
+			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
 		}
 	}
 
@@ -42,24 +43,27 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	// Scene //
 	///////////
 
-	/*createObject("Paimon");
+	createObject("Paimon");
 
 	loadObj("./Paimon.obj", false, true, true);
 	loadModel("Paimon");
 	clearBuffers();
 
 	Object_Array["Paimon"].scale(0.175);
-	Object_Array["Paimon"].translate(Vec3(0,-0.95,0));*/
+	Object_Array["Paimon"].translate(Vec3(0,-0.95,0));
+	
+	renderWire();
+	drawToSurface();
 
-	createObject("Dino");
+	/*createObject("Dino");
 
 	loadObj("./Dino.obj", true, false, false);
 	loadModel("Dino");
 	clearBuffers();
 
-	renderWire();
-	renderDirect();
-	//storeBmp("Output.bmp");
+	renderPointCloud();
+	drawToSurface();
+	storeBmp("Dino.bmp");*/
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
@@ -71,13 +75,13 @@ void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
 	fitInView(Item->boundingRect(), Qt::KeepAspectRatio);
 }
 
-void R_Workspace_Offline_Viewport::renderDirect() {
+void R_Workspace_Offline_Viewport::drawToSurface() {
 	Scene->clear();
 	QImage image(ResX, ResY, QImage::Format_RGBA8888);
 
-	for (int y = 0; y < ResY; y++) {
-		for (int x = 0; x < ResX; x++) {
-			Rgba& pixel = Pixmap[ResY - y - 1][x];
+	for (int x = 0; x < ResX; x++) {
+		for (int y = 0; y < ResY; y++) {
+			Rgba& pixel = Pixmap[x][ResY - y - 1];
 			QRgb rgba = qRgba(
 				static_cast<uint8_t>(pixel.R*255),
 				static_cast<uint8_t>(pixel.G*255),
@@ -125,7 +129,7 @@ void R_Workspace_Offline_Viewport::setPenOpacity(float P_Opacity) {
 
 void R_Workspace_Offline_Viewport::renderPixel(uint32_t P_X, uint32_t P_Y) {
 	if (P_X < ResX && P_X >= 0 && P_Y < ResY && P_Y >= 0) {
-		Pixmap[P_Y][P_X] = Pen_Color;
+		Pixmap[P_X][P_Y] = Pen_Color;
 	}
 }
 
@@ -239,18 +243,85 @@ void R_Workspace_Offline_Viewport::renderWire() {
 					Vertex v2 = Data.second.MeshData.Vertex_Buffer[tri.I2];
 					Vertex v3 = Data.second.MeshData.Vertex_Buffer[tri.I3];
 
-					int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResY);
-					int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResX);
-					int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResY);
-					int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResX);
-					int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResY);
-					int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResX);
+					if (Aspect_Ratio >= 1.0) {
+						int x1 = static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
+						int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY);
+						int x2 = static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
+						int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY);
+						int x3 = static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
+						int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY);
 
-					setPenColor(Rgba::random());
+						setPenColor(Rgba::random());
+						renderLine(x1, y1, x2, y2);
+						renderLine(x2, y2, x3, y3);
+						renderLine(x3, y3, x1, y1);
+					}
+					else {
+						int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX);
+						int y1 = static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+						int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX);
+						int y2 = static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+						int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX);
+						int y3 = static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
 
-					renderLine(x1, y1, x2, y2);
-					renderLine(x2, y2, x3, y3);
-					renderLine(x3, y3, x1, y1);
+						setPenColor(Rgba::random());
+						renderLine(x1, y1, x2, y2);
+						renderLine(x2, y2, x3, y3);
+						renderLine(x3, y3, x1, y1);
+					}
+				}
+			}
+		}
+	}
+}
+
+void R_Workspace_Offline_Viewport::renderPointCloud() {
+	for (auto& Data : Object_Array) {
+		if (Data.second.Type == MESH) {
+			for (Tri tri : Data.second.MeshData.Triangle_Buffer) {
+				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Buffer.size() &&
+					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Buffer.size() &&
+					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Buffer.size()) {
+
+					Vertex v1 = Data.second.MeshData.Vertex_Buffer[tri.I1];
+					Vertex v2 = Data.second.MeshData.Vertex_Buffer[tri.I2];
+					Vertex v3 = Data.second.MeshData.Vertex_Buffer[tri.I3];
+					if (Aspect_Ratio >= 1) {
+						setPenColor(Rgba::fromRgb(v1.Color));
+						renderPixel(
+							static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
+						);
+						setPenColor(Rgba::fromRgb(v2.Color));
+						renderPixel(
+							static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
+						);
+						setPenColor(Rgba::fromRgb(v3.Color));
+						renderPixel(
+							static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
+						);
+					}
+					else {
+						setPenColor(Rgba::fromRgb(v1.Color));
+						renderPixel(
+							static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
+						);
+
+						setPenColor(Rgba::fromRgb(v2.Color));
+						renderPixel(
+							static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
+						);
+
+						setPenColor(Rgba::fromRgb(v3.Color));
+						renderPixel(
+							static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
+						);
+					}
 				}
 			}
 		}
@@ -294,8 +365,9 @@ void R_Workspace_Offline_Viewport::storeBmp(std::string P_File) {
 	file.write(reinterpret_cast<const char*>(&importantColors), 4);			// Important colors
 
 	// Pixel data
-	for (const std::vector<Rgba>& row : Pixmap) {
-		for (const Rgba& pixel : row) {
+	for (size_t x = 0; x < ResX; x++) {
+		for (size_t y = 0; y < ResY; y++) {
+			const Rgba& pixel = Pixmap[x][y];
 			uint8_t blue = static_cast<uint8_t>(pixel.B * 255.0f);
 			uint8_t green = static_cast<uint8_t>(pixel.G * 255.0f);
 			uint8_t red = static_cast<uint8_t>(pixel.R * 255.0f);

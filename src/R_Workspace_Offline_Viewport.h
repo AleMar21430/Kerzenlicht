@@ -10,6 +10,7 @@ struct R_Workspace_Offline_Viewport : QGraphicsView {
 
 	uint32_t ResX;
 	uint32_t ResY;
+	double Aspect_Ratio;
 	Rgba Pen_Color;
 	float Pen_Opacity;
 	std::vector<std::vector<Rgba>> Pixmap;
@@ -27,7 +28,8 @@ struct R_Workspace_Offline_Viewport : QGraphicsView {
 	void renderPixel(uint32_t P_X, uint32_t P_Y);
 	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
 	void renderWire();
-	void renderDirect();
+	void renderPointCloud();
+	void drawToSurface();
 
 	void createObject(std::string P_Name);
 	void loadModel(std::string P_Name);

@@ -38,6 +38,10 @@ struct Rgba {
 	static Rgba random() {
 		return Rgba(rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), 1);
 	}
+
+	static Rgba fromRgb(Rgb P_Rgb) {
+		return Rgba(P_Rgb.R, P_Rgb.G, P_Rgb.B, 1);
+	}
 };
 
 struct Vec2 {
