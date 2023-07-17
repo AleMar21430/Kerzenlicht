@@ -43,7 +43,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	// Scene //
 	///////////
 
-	createObject("Paimon");
+	/*createObject("Paimon");
 
 	loadObj("./Paimon.obj", false, true, true);
 	loadModel("Paimon");
@@ -54,8 +54,9 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	
 	renderWire();
 	drawToSurface();
+	storeBmp("Paimon.bmp");*/
 
-	/*createObject("Dino");
+	createObject("Dino");
 
 	loadObj("./Dino.obj", true, false, false);
 	loadModel("Dino");
@@ -63,7 +64,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	renderPointCloud();
 	drawToSurface();
-	storeBmp("Dino.bmp");*/
+	storeBmp("Dino.bmp");
 }
 
 void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
@@ -365,8 +366,8 @@ void R_Workspace_Offline_Viewport::storeBmp(std::string P_File) {
 	file.write(reinterpret_cast<const char*>(&importantColors), 4);			// Important colors
 
 	// Pixel data
-	for (size_t x = 0; x < ResX; x++) {
-		for (size_t y = 0; y < ResY; y++) {
+	for (size_t y = 0; y < ResY; y++) {
+		for (size_t x = 0; x < ResX; x++) {
 			const Rgba& pixel = Pixmap[x][y];
 			uint8_t blue = static_cast<uint8_t>(pixel.B * 255.0f);
 			uint8_t green = static_cast<uint8_t>(pixel.G * 255.0f);
