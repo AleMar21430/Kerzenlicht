@@ -21,7 +21,7 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 
 	std::map<std::string, Object> Object_Array;
 
-	std::vector<Tri> Face_Buffer;
+	std::vector<Mesh_Face> Face_Buffer;
 	std::vector<Rgb> Vertex_Colors_Buffer;
 	std::vector<Vec3> Vertex_Positions_Buffer;
 	std::map<std::string, std::map<std::string, double>> Vertex_Weights_Buffer;

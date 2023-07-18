@@ -45,12 +45,6 @@
     <ClInclude Include="src\Math.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\R_Render_Settings.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\R_Settings.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
@@ -79,12 +73,6 @@
     <ClCompile Include="src\QT_Core.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\R_Settings.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\R_Render_Settings.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\R_Main_Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,35 +85,18 @@
     <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp">
       <Filter>Source Files\Offline</Filter>
     </ClCompile>
-    <ClCompile Include="src\Math.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\color.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="src\color_frag.spv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="src\color_vert.spv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="src\color.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="src\Style.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="resources\Icon.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Default Scene.krz">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	Object_Array = std::map<std::string, Object>();
 
-	Face_Buffer = std::vector<Tri>();
+	Face_Buffer = std::vector<Mesh_Face>();
 	Vertex_Colors_Buffer = std::vector<Rgb>();
 	Vertex_Positions_Buffer = std::vector<Vec3>();
 	Vertex_Weights_Buffer = std::map<std::string, std::map<std::string, double>>();
@@ -210,7 +210,7 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 			}
 			else if (Tokens[0] == "f") {
 				if (!P_Textured && !P_Normals) {
-					Tri triangle(
+					Mesh_Face triangle(
 						std::stoi(Tokens[1]) - 1,
 						std::stoi(Tokens[2]) - 1,
 						std::stoi(Tokens[3]) - 1
@@ -218,7 +218,7 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 					Face_Buffer.push_back(triangle);
 				}
 				else {
-					Tri triangle(
+					Mesh_Face triangle(
 						std::stoi(Math::splitString(Tokens[1], "/")[0]) - 1,
 						std::stoi(Math::splitString(Tokens[2], "/")[0]) - 1,
 						std::stoi(Math::splitString(Tokens[3], "/")[0]) - 1
@@ -232,7 +232,7 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 }
 
 void R_Workspace_Offline_Viewport::createObject(std::string P_Name) {
-	Object Temp(P_Name);
+	Object Temp(P_Name, Object_Type::MESH);
 	Object_Array[P_Name] = Temp;
 }
 
@@ -250,14 +250,14 @@ void R_Workspace_Offline_Viewport::loadModel(std::string P_Name) {
 void R_Workspace_Offline_Viewport::clearBuffers() {
 	Vertex_Colors_Buffer = std::vector<Rgb>();
 	Vertex_Positions_Buffer = std::vector<Vec3>();
-	Face_Buffer = std::vector<Tri>();
+	Face_Buffer = std::vector<Mesh_Face>();
 }
 
 void R_Workspace_Offline_Viewport::renderWireframe() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH){
-			for (Tri tri : Data.second.MeshData.Faces) {
+			for (Mesh_Face tri : Data.second.MeshData.Faces) {
 				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
 					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
 					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
@@ -299,7 +299,7 @@ void R_Workspace_Offline_Viewport::renderWireframe() {
 void R_Workspace_Offline_Viewport::renderEdgeVisualizer() {
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH) {
-			for (Tri tri : Data.second.MeshData.Faces) {
+			for (Mesh_Face tri : Data.second.MeshData.Faces) {
 				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
 					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
 					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
@@ -344,7 +344,7 @@ void R_Workspace_Offline_Viewport::renderPointCloud() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH) {
-			for (Tri tri : Data.second.MeshData.Faces) {
+			for (Mesh_Face tri : Data.second.MeshData.Faces) {
 				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
 					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
 					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
@@ -435,7 +435,7 @@ void R_Workspace_Offline_Viewport::renderFrame() {
 	else if (View_Mode == Render_Mode::POINTCLOUD) {
 		renderPointCloud();
 	}
-	else if (View_Mode == Render_Mode::RAINBOW) {
+	else if (View_Mode == Render_Mode::VISUALIZER) {
 		renderEdgeVisualizer();
 	}
 	drawToSurface();
@@ -581,7 +581,7 @@ void Renderer_Menu::renderPointCloud() {
 	Parent->drawToSurface();
 }
 void Renderer_Menu::renderEdgeVisualizer() {
-	Parent->View_Mode = Render_Mode::RAINBOW;
+	Parent->View_Mode = Render_Mode::VISUALIZER;
 	Parent->renderClear();
 	Parent->renderEdgeVisualizer();
 	Parent->drawToSurface();

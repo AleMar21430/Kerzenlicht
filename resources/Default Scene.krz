@@ -1,0 +1,63 @@
+#Header {
+	Name Default Scene
+	Version 0.1.0
+}
+
+#Objects [2] {
+	@Object {
+		Name Default Cube
+		Type MESH
+		Data Cube
+		Pos 0 0 0
+		Anchor 0 0 0
+		Rot-Euler 0 0 0
+		Scale 1 1 1
+	}
+	@Object {
+		Name Camera
+		Type CAMERA
+		Data Camera
+		Pos 0 0 1.5
+		Anchor 0 0 0
+		Rot-Euler 0 0 0
+		Scale 1 1 1
+	}
+}
+
+#Meshes [1] {
+	@Mesh [28 60] {
+		Name Cube
+		#Vertices [8] {
+			-0.5 -0.5 -0.5
+			+0.5 -0.5 -0.5
+			+0.5 +0.5 -0.5
+			-0.5 +0.5 -0.5
+			-0.5 -0.5 +0.5
+			+0.5 -0.5 +0.5
+			+0.5 +0.5 +0.5
+			-0.5 +0.5 +0.5
+		}
+		#Colors [1] {
+			#Col [8] {
+			// Rgb Float Colors
+				0 0 0
+				1 1 1
+				1 0 0
+				0 1 0
+				0 0 1
+				1 0 1
+				1 1 0
+				0 0 1
+			}
+		}
+		#Weights [0] {}
+		#UV-Maps [0] {}
+		#Faces [6] {
+		// Face size, vertex indices
+			4 0 1 2 3
+			4 4 5 6 7
+		}
+	}
+}
+
+#Code:

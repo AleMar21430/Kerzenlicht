@@ -111,6 +111,7 @@
     <QtMoc Include="src\R_Main_Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core.cpp" />
     <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp" />
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -120,6 +121,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\Icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Default Scene.krz" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
