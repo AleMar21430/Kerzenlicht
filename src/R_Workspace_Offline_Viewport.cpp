@@ -15,6 +15,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
+	View_Mode = Render_Mode::WIREFRAME;
 
 	Pixmap = std::vector(ResX, std::vector<Rgba>(ResY));
 
@@ -53,7 +54,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Object_Array["Paimon"].translate(Vec3(0, -0.95, 0));
 	Object_Array["Paimon"].processTransform();
 
-	renderWire();
+	renderWireframe();
 	drawToSurface();
 }
 
@@ -94,11 +95,9 @@ void R_Workspace_Offline_Viewport::drawToSurface() {
 void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
 	for (std::pair<const std::string, Object>& Obj : Object_Array) {
 		float Delta = P_Event->angleDelta().y()*0.00005;
-		renderClear();
 		Obj.second.scale(Vec3(Delta, Delta, Delta));
 		Obj.second.processTransform();
-		renderWire();
-		drawToSurface();
+		renderFrame();
 	}
 }
 
@@ -111,11 +110,9 @@ void R_Workspace_Offline_Viewport::mouseMoveEvent(QMouseEvent* P_Event) {
 	if (Mouse_Pressed) {
 		double Delta = P_Event->pos().x() - Mouse_Down_Pos.x();
 		for (std::pair<const std::string, Object>& Obj : Object_Array) {
-			renderClear();
 			Obj.second.rotate(Vec3(0,Delta*0.001,0));
 			Obj.second.processTransform();
-			renderWire();
-			drawToSurface();
+			renderFrame();
 		}
 	}
 }
@@ -193,6 +190,7 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 						std::stod(Tokens[3])
 					);
 					Vertex_Positions_Buffer.push_back(Pos);
+					Vertex_Colors_Buffer["Col"].push_back(Rgb());
 				}
 				else {
 					Vec3 Pos(
@@ -250,7 +248,7 @@ void R_Workspace_Offline_Viewport::clearBuffers() {
 	Face_Buffer = std::vector<Tri>();
 }
 
-void R_Workspace_Offline_Viewport::renderWire() {
+void R_Workspace_Offline_Viewport::renderWireframe() {
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH){
 			for (Tri tri : Data.second.MeshData.Faces) {
@@ -262,7 +260,7 @@ void R_Workspace_Offline_Viewport::renderWire() {
 					Vertex v2 = Data.second.MeshData.Vertex_Output[tri.I2];
 					Vertex v3 = Data.second.MeshData.Vertex_Output[tri.I3];
 
-					if (Aspect_Ratio >= 1.0) {
+					if (Aspect_Ratio >= 1) {
 						int x1 = static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
 						int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY);
 						int x2 = static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
@@ -307,17 +305,17 @@ void R_Workspace_Offline_Viewport::renderPointCloud() {
 					if (Aspect_Ratio >= 1) {
 						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I1]));
 						renderPixel(
-							static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
 						);
 						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I2]));
 						renderPixel(
-							static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
 						);
 						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I3]));
 						renderPixel(
-							static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
+							static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
 							static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
 						);
 					}
@@ -325,25 +323,36 @@ void R_Workspace_Offline_Viewport::renderPointCloud() {
 						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I1]));
 						renderPixel(
 							static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
+							static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 						);
 
 						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I2]));
 						renderPixel(
 							static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
+							static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 						);
 
 						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I3]));
 						renderPixel(
 							static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
+							static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 						);
 					}
 				}
 			}
 		}
 	}
+}
+
+void R_Workspace_Offline_Viewport::renderFrame() {
+	renderClear();
+	if (View_Mode == Render_Mode::WIREFRAME) {
+		renderWireframe();
+	}
+	else if (View_Mode == Render_Mode::POINTCLOUD) {
+		renderPointCloud();
+	}
+	drawToSurface();
 }
 
 void R_Workspace_Offline_Viewport::storeBmp(std::string P_File) {
@@ -418,8 +427,10 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 	connect(Load_File_Button, &QPushButton::clicked, this, &Renderer_Menu::openObjFile);
 	QPushButton* Clear_Button = new QPushButton("Clear Scene", this);
 	connect(Clear_Button, &QPushButton::clicked, this, &Renderer_Menu::clearScene);
-	QPushButton* Render_Button = new QPushButton("Render", this);
-	connect(Render_Button, &QPushButton::clicked, this, &Renderer_Menu::render);
+	QPushButton* Render_Wire_Button = new QPushButton("Render Wireframe", this);
+	connect(Render_Wire_Button, &QPushButton::clicked, this, &Renderer_Menu::renderWireframe);
+	QPushButton* Render_Points_Button = new QPushButton("Render Points", this);
+	connect(Render_Points_Button, &QPushButton::clicked, this, &Renderer_Menu::renderPointCloud);
 	QPushButton* Save_Button = new QPushButton("Save to .Bmp", this);
 	connect(Save_Button, &QPushButton::clicked, this, &Renderer_Menu::save);
 
@@ -428,7 +439,8 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 	Layout->addWidget(Obj_Normals);
 	Layout->addWidget(Load_File_Button);
 	Layout->addWidget(Clear_Button);
-	Layout->addWidget(Render_Button);
+	Layout->addWidget(Render_Wire_Button);
+	Layout->addWidget(Render_Points_Button);
 	Layout->addWidget(Save_Button);
 
 	setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowStaysOnTopHint);
@@ -449,9 +461,16 @@ void Renderer_Menu::openObjFile() {
 	}
 }
 
-void Renderer_Menu::render() {
+void Renderer_Menu::renderWireframe() {
+	Parent->View_Mode = Render_Mode::WIREFRAME;
 	Parent->renderClear();
-	Parent->renderWire();
+	Parent->renderWireframe();
+	Parent->drawToSurface();
+}
+void Renderer_Menu::renderPointCloud() {
+	Parent->View_Mode = Render_Mode::POINTCLOUD;
+	Parent->renderClear();
+	Parent->renderPointCloud();
 	Parent->drawToSurface();
 }
 

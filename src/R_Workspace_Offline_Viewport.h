@@ -17,6 +17,8 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	float Pen_Opacity;
 	std::vector<std::vector<Rgba>> Pixmap;
 
+	Render_Mode View_Mode;
+
 	std::map<std::string, Object> Object_Array;
 
 	std::vector<Vec3> Vertex_Positions_Buffer;
@@ -32,8 +34,9 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	void renderClear();
 	void renderPixel(uint32_t P_X, uint32_t P_Y);
 	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
-	void renderWire();
+	void renderWireframe();
 	void renderPointCloud();
+	void renderFrame();
 	void drawToSurface();
 
 	void createObject(std::string P_Name);
@@ -41,9 +44,6 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	void clearBuffers();
 
 	void loadObj(std::string P_File, bool P_Vert_Colors = false, bool P_Textured = false, bool P_Normals = false);
-
-	void renderTris();
-	void renderQuad();
 
 	void storeBmp(std::string P_File);
 
@@ -69,7 +69,8 @@ struct Renderer_Menu : QT_Linear_Contents {
 
 	Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent);
 	void openObjFile();
-	void render();
+	void renderWireframe();
+	void renderPointCloud();
 	void save();
 	void clearScene();
 };

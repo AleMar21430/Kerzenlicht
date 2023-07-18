@@ -2,6 +2,21 @@
 
 #include "Math.h"
 
+enum Object_Type {
+	CAMERA,
+	CURVE,
+	MESH,
+	PIVOT
+};
+
+
+enum Render_Mode {
+	WIREFRAME,
+	POINTCLOUD,
+	RAINBOW
+};
+
+
 struct Rgb {
 	float R, G, B;
 	Rgb() {
@@ -289,13 +304,6 @@ struct Mesh {
 
 		Vertex_Output = std::vector<Vertex>();
 	}
-};
-
-enum Object_Type {
-	CAMERA,
-	CURVE,
-	MESH,
-	PIVOT
 };
 
 struct Object {
