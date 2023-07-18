@@ -332,8 +332,9 @@ struct Object {
 	void loadBuffers() {
 		if (Type == MESH) {
 			MeshData.Vertex_Output = std::vector<Vertex>();
-			for (const Vec3 Pos : MeshData.Vertex_Positions) {
-				MeshData.Vertex_Output.push_back(Vertex(Pos));
+			for (int i = 0; i < MeshData.Vertex_Positions.size(); i++) {
+				Vertex vert = Vertex(MeshData.Vertex_Positions[i]);
+				MeshData.Vertex_Output.push_back(vert);
 			}
 		}
 	}
@@ -356,9 +357,9 @@ struct Object {
 
 	void processTransform() {
 		if (Type == MESH) {
-			for (int x = 0; x < MeshData.Vertex_Positions.size(); x++) {
-				Vertex& vert = MeshData.Vertex_Output[x];
-				vert.Pos = MeshData.Vertex_Positions[x] * Scale;
+			for (int i = 0; i < MeshData.Vertex_Positions.size(); i++) {
+				Vertex& vert = MeshData.Vertex_Output[i];
+				vert.Pos = MeshData.Vertex_Positions[i] * Scale;
 				vert.Pos.rotate(Anchor, Rot_Euler);
 				vert.Pos = vert.Pos + Pos;
 			}

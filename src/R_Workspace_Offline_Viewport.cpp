@@ -15,17 +15,17 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
-	View_Mode = Render_Mode::WIREFRAME;
-
 	Pixmap = std::vector(ResX, std::vector<Rgba>(ResY));
+
+	View_Mode = Render_Mode::WIREFRAME;
 
 	Object_Array = std::map<std::string, Object>();
 
+	Face_Buffer = std::vector<Tri>();
+	Vertex_Colors_Buffer = std::vector<Rgb>();
 	Vertex_Positions_Buffer = std::vector<Vec3>();
-	Vertex_Colors_Buffer = std::map<std::string, std::vector<Rgb>>();
 	Vertex_Weights_Buffer = std::map<std::string, std::map<std::string, double>>();
 
-	Face_Buffer = std::vector<Tri>();
 
 	for (int x = 0; x < ResX; x++) {
 		for (int y = 0; y < ResY; y++) {
@@ -172,10 +172,7 @@ void R_Workspace_Offline_Viewport::renderLine(int P_Start_X, int P_Start_Y, int 
 }
 
 void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Colors, bool P_Textured, bool P_Normals) {
-	
-	if (!P_Vert_Colors) {
-		Vertex_Colors_Buffer["Col"] = std::vector<Rgb>();
-	}
+	clearBuffers();
 	
 	std::ifstream file(P_File);
 	std::string line;
@@ -190,7 +187,6 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 						std::stod(Tokens[3])
 					);
 					Vertex_Positions_Buffer.push_back(Pos);
-					Vertex_Colors_Buffer["Col"].push_back(Rgb());
 				}
 				else {
 					Vec3 Pos(
@@ -204,7 +200,7 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 						std::stod(Tokens[6])
 					);
 					Vertex_Positions_Buffer.push_back(Pos);
-					Vertex_Colors_Buffer["Col"].push_back(Color);
+					Vertex_Colors_Buffer.push_back(Color);
 				}
 			}
 			else if (Tokens[0] == "f") {
@@ -240,15 +236,20 @@ void R_Workspace_Offline_Viewport::loadModel(std::string P_Name) {
 	if (Ref.Type == MESH) {
 		Ref.MeshData.Vertex_Positions = Vertex_Positions_Buffer;
 		Ref.MeshData.Faces = Face_Buffer;
+		if (Vertex_Colors_Buffer.size() == Vertex_Positions_Buffer.size()) {
+			Ref.MeshData.Vertex_Colors["Col"] = Vertex_Colors_Buffer;
+		}
 	}
 }
 
 void R_Workspace_Offline_Viewport::clearBuffers() {
+	Vertex_Colors_Buffer = std::vector<Rgb>();
 	Vertex_Positions_Buffer = std::vector<Vec3>();
 	Face_Buffer = std::vector<Tri>();
 }
 
 void R_Workspace_Offline_Viewport::renderWireframe() {
+	setPenColor(Rgba(1, 1, 1, 1));
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH){
 			for (Tri tri : Data.second.MeshData.Faces) {
@@ -335,6 +336,7 @@ void R_Workspace_Offline_Viewport::renderEdgeVisualizer() {
 }
 
 void R_Workspace_Offline_Viewport::renderPointCloud() {
+	setPenColor(Rgba(1, 1, 1, 1));
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH) {
 			for (Tri tri : Data.second.MeshData.Faces) {
@@ -347,40 +349,72 @@ void R_Workspace_Offline_Viewport::renderPointCloud() {
 					Vertex v3 = Data.second.MeshData.Vertex_Output[tri.I3];
 					
 					if (Aspect_Ratio >= 1) {
-						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I1]));
-						renderPixel(
-							static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
-						);
-						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I2]));
-						renderPixel(
-							static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
-						);
-						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I3]));
-						renderPixel(
-							static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
-						);
+						if (Data.second.MeshData.Vertex_Colors.size() > 0) {
+							setPenColor(Rgba::fromRgb(v1.Color));
+							renderPixel(
+								static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+							setPenColor(Rgba::fromRgb(v2.Color));
+							renderPixel(
+								static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+							setPenColor(Rgba::fromRgb(v3.Color));
+							renderPixel(
+								static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+						}
+						else {
+							renderPixel(
+								static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+							renderPixel(
+								static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+							renderPixel(
+								static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+						}
 					}
 					else {
-						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I1]));
-						renderPixel(
-							static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-						);
+						if (Data.second.MeshData.Vertex_Colors.size() > 0) {
+							setPenColor(Rgba::fromRgb(v1.Color));
+							renderPixel(
+								static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+							);
 
-						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I2]));
-						renderPixel(
-							static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-						);
+							setPenColor(Rgba::fromRgb(v2.Color));
+							renderPixel(
+								static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+							);
 
-						setPenColor(Rgba::fromRgb(Vertex_Colors_Buffer["Col"][tri.I3]));
-						renderPixel(
-							static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
-							static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-						);
+							setPenColor(Rgba::fromRgb(v3.Color));
+							renderPixel(
+								static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+							);
+						}
+						else {
+							renderPixel(
+								static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+							renderPixel(
+								static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+							renderPixel(
+								static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
+							);
+						}
 					}
 				}
 			}
@@ -463,14 +497,14 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 	Textured_Obj_Import = false;
 	Normals_Obj_Import = false;
 
-	Obj_Vertex_Colors = new QCheckBox("Obj Vertex Colors");
+	Obj_Vertex_Colors = new QCheckBox("Import Obj Vertex Colors");
 	connect(Obj_Vertex_Colors, &QCheckBox::stateChanged, [this](int State) {Vertex_Colors_Obj_Import = State; });
-	Obj_Textured = new QCheckBox("Obj Textured");
+	Obj_Textured = new QCheckBox("Import Obj Textured");
 	connect(Obj_Textured, &QCheckBox::stateChanged, [this](int State) {Textured_Obj_Import = State; });
-	Obj_Normals = new QCheckBox("Obj Normals");
+	Obj_Normals = new QCheckBox("Import Obj Normals");
 	connect(Obj_Normals, &QCheckBox::stateChanged, [this](int State) {Normals_Obj_Import = State; });
 
-	QPushButton* Load_File_Button = new QPushButton("Load Obj File", this);
+	QPushButton* Load_File_Button = new QPushButton("Import Obj File", this);
 	connect(Load_File_Button, &QPushButton::clicked, this, &Renderer_Menu::openObjFile);
 	QPushButton* Clear_Button = new QPushButton("Clear Scene", this);
 	connect(Clear_Button, &QPushButton::clicked, this, &Renderer_Menu::clearScene);
