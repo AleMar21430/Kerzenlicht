@@ -6,10 +6,6 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Mouse_Pressed = false;
 	Mouse_Down_Pos = QPoint(0, 0);
 
-	Scene = new QGraphicsScene();
-	setScene(Scene);
-	Menu = new Renderer_Menu(this);
-
 	ResX = 1920;
 	ResY = 1080;
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
@@ -26,12 +22,15 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Vertex_Positions_Buffer = std::vector<Vec3>();
 	Vertex_Weights_Buffer = std::map<std::string, std::map<std::string, double>>();
 
-
 	for (int x = 0; x < ResX; x++) {
 		for (int y = 0; y < ResY; y++) {
 			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
 		}
 	}
+
+	Scene = new QGraphicsScene();
+	setScene(Scene);
+	Menu = new Renderer_Menu(this);
 
 	std::stringstream log;
 	log << "Renderer Settings" << std::endl;
@@ -499,21 +498,40 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 
 	Obj_Vertex_Colors = new QCheckBox("Import Obj Vertex Colors");
 	connect(Obj_Vertex_Colors, &QCheckBox::stateChanged, [this](int State) {Vertex_Colors_Obj_Import = State; });
+
 	Obj_Textured = new QCheckBox("Import Obj Textured");
 	connect(Obj_Textured, &QCheckBox::stateChanged, [this](int State) {Textured_Obj_Import = State; });
+
 	Obj_Normals = new QCheckBox("Import Obj Normals");
 	connect(Obj_Normals, &QCheckBox::stateChanged, [this](int State) {Normals_Obj_Import = State; });
 
-	QPushButton* Load_File_Button = new QPushButton("Import Obj File", this);
+	QPushButton* Load_File_Button = new QPushButton("Import Obj File");
 	connect(Load_File_Button, &QPushButton::clicked, this, &Renderer_Menu::openObjFile);
+
 	QPushButton* Clear_Button = new QPushButton("Clear Scene", this);
 	connect(Clear_Button, &QPushButton::clicked, this, &Renderer_Menu::clearScene);
-	QPushButton* Render_Wire_Button = new QPushButton("Render Wireframe", this);
+
+	QPushButton* Render_Wire_Button = new QPushButton("Render Wireframe");
 	connect(Render_Wire_Button, &QPushButton::clicked, this, &Renderer_Menu::renderWireframe);
-	QPushButton* Render_Points_Button = new QPushButton("Render Points", this);
+
+	QPushButton* Render_Points_Button = new QPushButton("Render Points");
 	connect(Render_Points_Button, &QPushButton::clicked, this, &Renderer_Menu::renderPointCloud);
-	QPushButton* Render_Visualizer_Button = new QPushButton("Render Visualizer", this);
+
+	QPushButton* Render_Visualizer_Button = new QPushButton("Render Visualizer");
 	connect(Render_Visualizer_Button, &QPushButton::clicked, this, &Renderer_Menu::renderEdgeVisualizer);
+
+	QLineEdit* ResX_Input = new QLineEdit("Width");
+	QIntValidator* ValidatorX = new QIntValidator();
+	ResX_Input->setValidator(ValidatorX);
+	ResX_Input->setText(QString::fromStdString(std::to_string(Parent->ResX)));
+	connect(ResX_Input, &QLineEdit::textChanged, [this](QString text) {changeXResolution(text.toInt()); });
+
+	QLineEdit* ResY_Input = new QLineEdit("Height");
+	QIntValidator* ValidatorY = new QIntValidator();
+	ResY_Input->setValidator(ValidatorY);
+	ResY_Input->setText(QString::fromStdString(std::to_string(Parent->ResY)));
+	connect(ResY_Input, &QLineEdit::textChanged, [this](QString text) {changeYResolution(text.toInt()); });
+
 	QPushButton* Save_Button = new QPushButton("Save to .Bmp", this);
 	connect(Save_Button, &QPushButton::clicked, this, &Renderer_Menu::save);
 
@@ -525,11 +543,13 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 	Layout->addWidget(Render_Wire_Button);
 	Layout->addWidget(Render_Points_Button);
 	Layout->addWidget(Render_Visualizer_Button);
+	Layout->addWidget(ResX_Input);
+	Layout->addWidget(ResY_Input);
 	Layout->addWidget(Save_Button);
 }
 
 void Renderer_Menu::openObjFile() {
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("All Files (*.*)"));
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Object (*.obj)"));
 	if (!fileName.isEmpty()) {
 		std::string File_Path = fileName.toStdString();
 
@@ -561,8 +581,32 @@ void Renderer_Menu::renderEdgeVisualizer() {
 	Parent->drawToSurface();
 }
 
+void Renderer_Menu::changeXResolution(int value) {
+	Parent->ResX = value;
+	Parent->Aspect_Ratio = static_cast<double>(Parent->ResX) / static_cast<double>(Parent->ResY);
+	Parent->Pixmap = std::vector(Parent->ResX, std::vector<Rgba>(Parent->ResY));
+	for (int x = 0; x < Parent->ResX; x++) {
+		for (int y = 0; y < Parent->ResY; y++) {
+			Parent->Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
+		}
+	}
+	Parent->renderFrame();
+}
+
+void Renderer_Menu::changeYResolution(int value) {
+	Parent->ResY = value;
+	Parent->Aspect_Ratio = static_cast<double>(Parent->ResX) / static_cast<double>(Parent->ResY);
+	Parent->Pixmap = std::vector(Parent->ResX, std::vector<Rgba>(Parent->ResY));
+	for (int x = 0; x < Parent->ResX; x++) {
+		for (int y = 0; y < Parent->ResY; y++) {
+			Parent->Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
+		}
+	}
+	Parent->renderFrame();
+}
+
 void Renderer_Menu::save() {
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Create New File"), "", tr("Text Files (*.txt)"));
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Create New File"), "", tr("BitMap (*.bmp)"));
 	if (!fileName.isEmpty()) {
 		std::ofstream log;
 		log.open(fileName.toStdString());

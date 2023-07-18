@@ -7,9 +7,6 @@ struct Renderer_Menu;
 struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	QT_Text_Stream* Log;
 
-	QGraphicsScene* Scene;
-	Renderer_Menu* Menu;
-
 	bool Mouse_Pressed;
 	QPoint Mouse_Down_Pos;
 
@@ -28,6 +25,9 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	std::vector<Rgb> Vertex_Colors_Buffer;
 	std::vector<Vec3> Vertex_Positions_Buffer;
 	std::map<std::string, std::map<std::string, double>> Vertex_Weights_Buffer;
+
+	QGraphicsScene* Scene;
+	Renderer_Menu* Menu;
 
 	R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log);
 
@@ -73,9 +73,11 @@ struct Renderer_Menu : QT_Linear_Contents {
 
 	Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent);
 	void openObjFile();
+	void clearScene();
 	void renderWireframe();
 	void renderPointCloud();
 	void renderEdgeVisualizer();
+	void changeXResolution(int value);
+	void changeYResolution(int value);
 	void save();
-	void clearScene();
 };
