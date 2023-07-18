@@ -6,8 +6,10 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	Mouse_Pressed = false;
 	Mouse_Down_Pos = QPoint(0, 0);
 
-	ResX = 1920;
-	ResY = 1080;
+	QSettings settings("Raylight", "KerzenLicht");
+
+	ResX = settings.value("ResX", 1920).toInt();
+	ResY = settings.value("ResY", 1080).toInt();
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
@@ -123,6 +125,10 @@ void R_Workspace_Offline_Viewport::mouseReleaseEvent(QMouseEvent* P_Event) {
 void R_Workspace_Offline_Viewport::resizeEvent(QResizeEvent* P_Event) {
 	centerOn(scene()->items()[0]->boundingRect().center());
 	fitInView(scene()->items()[0]->boundingRect(), Qt::KeepAspectRatio);
+}
+
+void R_Workspace_Offline_Viewport::closeEvent(QCloseEvent* P_Event) {
+	P_Event->accept();
 }
 
 void R_Workspace_Offline_Viewport::setPenColor(Rgba P_Color) {
@@ -583,25 +589,19 @@ void Renderer_Menu::renderEdgeVisualizer() {
 
 void Renderer_Menu::changeXResolution(int value) {
 	Parent->ResX = value;
+	QSettings("Raylight", "KerzenLicht").setValue("ResX", value);
 	Parent->Aspect_Ratio = static_cast<double>(Parent->ResX) / static_cast<double>(Parent->ResY);
 	Parent->Pixmap = std::vector(Parent->ResX, std::vector<Rgba>(Parent->ResY));
-	for (int x = 0; x < Parent->ResX; x++) {
-		for (int y = 0; y < Parent->ResY; y++) {
-			Parent->Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
-		}
-	}
+	Parent->renderClear();
 	Parent->renderFrame();
 }
 
 void Renderer_Menu::changeYResolution(int value) {
 	Parent->ResY = value;
 	Parent->Aspect_Ratio = static_cast<double>(Parent->ResX) / static_cast<double>(Parent->ResY);
+	QSettings("Raylight", "KerzenLicht").setValue("ResY", value);
 	Parent->Pixmap = std::vector(Parent->ResX, std::vector<Rgba>(Parent->ResY));
-	for (int x = 0; x < Parent->ResX; x++) {
-		for (int y = 0; y < Parent->ResY; y++) {
-			Parent->Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
-		}
-	}
+	Parent->renderClear();
 	Parent->renderFrame();
 }
 

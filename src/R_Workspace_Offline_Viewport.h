@@ -58,6 +58,7 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	void mouseMoveEvent(QMouseEvent* P_Event) override;
 	void mouseReleaseEvent(QMouseEvent* P_Event) override;
 	void resizeEvent(QResizeEvent* P_Event) override;
+	void closeEvent(QCloseEvent* P_Event) override;
 };
 
 struct Renderer_Menu : QT_Linear_Contents {
