@@ -101,6 +101,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\R_String.h" />
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\R_Workspace_Offline_Viewport.h" />
@@ -111,7 +114,10 @@
     <QtMoc Include="src\R_Main_Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Object.cpp" />
+    <ClCompile Include="src\Math.cpp" />
     <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp" />
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp" />
     <ClCompile Include="src\main.cpp" />

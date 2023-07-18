@@ -2,6 +2,12 @@
 
 #include "QT_Core.h"
 
+enum Render_Mode {
+	WIREFRAME,
+	POINTCLOUD,
+	VISUALIZER
+};
+
 struct Renderer_Menu;
 
 struct R_Workspace_Offline_Viewport : QT_Graphics_View {

@@ -39,12 +39,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\QT_Core.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Math.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
@@ -55,6 +49,21 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\R_String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QT_Core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Object.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -70,9 +79,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\QT_Core.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\R_Main_Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -85,7 +91,19 @@
     <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp">
       <Filter>Source Files\Offline</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core.cpp">
+    <ClCompile Include="src\QT_Core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Math.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
