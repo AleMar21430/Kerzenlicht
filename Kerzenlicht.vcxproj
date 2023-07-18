@@ -107,31 +107,16 @@
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h" />
     <ClInclude Include="src\QT_Core.h" />
     <ClInclude Include="src\Math.h" />
-    <ClInclude Include="src\R_Render_Settings.h" />
-    <ClInclude Include="src\R_Settings.h" />
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h" />
     <QtMoc Include="src\R_Main_Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core.cpp" />
-    <ClCompile Include="src\Math.cpp" />
     <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp" />
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\QT_Core.cpp" />
     <ClCompile Include="src\R_Main_Window.cpp" />
-    <ClCompile Include="src\R_Render_Settings.cpp" />
-    <ClCompile Include="src\R_Settings.cpp" />
     <ClCompile Include="src\R_Workspace_Vulkan_Viewport.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\color.frag" />
-    <None Include="src\color.vert" />
-    <None Include="src\color_frag.spv" />
-    <None Include="src\color_vert.spv" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="src\Style.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\Icon.png" />
