@@ -2,10 +2,13 @@
 
 #include "QT_Core.h"
 
+struct Renderer_Menu;
+
 struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	QT_Text_Stream* Log;
 
 	QGraphicsScene* Scene;
+	Renderer_Menu* Menu;
 
 	bool Mouse_Pressed;
 	QPoint Mouse_Down_Pos;
@@ -36,6 +39,7 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
 	void renderWireframe();
 	void renderPointCloud();
+	void renderEdgeVisualizer();
 	void renderFrame();
 	void drawToSurface();
 
@@ -71,6 +75,7 @@ struct Renderer_Menu : QT_Linear_Contents {
 	void openObjFile();
 	void renderWireframe();
 	void renderPointCloud();
+	void renderEdgeVisualizer();
 	void save();
 	void clearScene();
 };

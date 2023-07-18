@@ -8,7 +8,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 
 	Scene = new QGraphicsScene();
 	setScene(Scene);
-	Renderer_Menu* Menu = new Renderer_Menu(this);
+	Menu = new Renderer_Menu(this);
 
 	ResX = 1920;
 	ResY = 1080;
@@ -290,6 +290,50 @@ void R_Workspace_Offline_Viewport::renderWireframe() {
 	}
 }
 
+void R_Workspace_Offline_Viewport::renderEdgeVisualizer() {
+	for (auto& Data : Object_Array) {
+		if (Data.second.Type == MESH) {
+			for (Tri tri : Data.second.MeshData.Faces) {
+				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
+					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
+					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
+
+					Vertex v1 = Data.second.MeshData.Vertex_Output[tri.I1];
+					Vertex v2 = Data.second.MeshData.Vertex_Output[tri.I2];
+					Vertex v3 = Data.second.MeshData.Vertex_Output[tri.I3];
+
+					if (Aspect_Ratio >= 1) {
+						int x1 = static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
+						int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY);
+						int x2 = static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
+						int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY);
+						int x3 = static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
+						int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY);
+
+						setPenColor(Rgba::random());
+						renderLine(x1, y1, x2, y2);
+						renderLine(x2, y2, x3, y3);
+						renderLine(x3, y3, x1, y1);
+					}
+					else {
+						int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX);
+						int y1 = static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+						int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX);
+						int y2 = static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+						int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX);
+						int y3 = static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+
+						setPenColor(Rgba::random());
+						renderLine(x1, y1, x2, y2);
+						renderLine(x2, y2, x3, y3);
+						renderLine(x3, y3, x1, y1);
+					}
+				}
+			}
+		}
+	}
+}
+
 void R_Workspace_Offline_Viewport::renderPointCloud() {
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH) {
@@ -351,6 +395,9 @@ void R_Workspace_Offline_Viewport::renderFrame() {
 	}
 	else if (View_Mode == Render_Mode::POINTCLOUD) {
 		renderPointCloud();
+	}
+	else if (View_Mode == Render_Mode::RAINBOW) {
+		renderEdgeVisualizer();
 	}
 	drawToSurface();
 }
@@ -431,6 +478,8 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 	connect(Render_Wire_Button, &QPushButton::clicked, this, &Renderer_Menu::renderWireframe);
 	QPushButton* Render_Points_Button = new QPushButton("Render Points", this);
 	connect(Render_Points_Button, &QPushButton::clicked, this, &Renderer_Menu::renderPointCloud);
+	QPushButton* Render_Visualizer_Button = new QPushButton("Render Visualizer", this);
+	connect(Render_Visualizer_Button, &QPushButton::clicked, this, &Renderer_Menu::renderEdgeVisualizer);
 	QPushButton* Save_Button = new QPushButton("Save to .Bmp", this);
 	connect(Save_Button, &QPushButton::clicked, this, &Renderer_Menu::save);
 
@@ -441,10 +490,8 @@ Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear
 	Layout->addWidget(Clear_Button);
 	Layout->addWidget(Render_Wire_Button);
 	Layout->addWidget(Render_Points_Button);
+	Layout->addWidget(Render_Visualizer_Button);
 	Layout->addWidget(Save_Button);
-
-	setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowStaysOnTopHint);
-	show();
 }
 
 void Renderer_Menu::openObjFile() {
@@ -471,6 +518,12 @@ void Renderer_Menu::renderPointCloud() {
 	Parent->View_Mode = Render_Mode::POINTCLOUD;
 	Parent->renderClear();
 	Parent->renderPointCloud();
+	Parent->drawToSurface();
+}
+void Renderer_Menu::renderEdgeVisualizer() {
+	Parent->View_Mode = Render_Mode::RAINBOW;
+	Parent->renderClear();
+	Parent->renderEdgeVisualizer();
 	Parent->drawToSurface();
 }
 
