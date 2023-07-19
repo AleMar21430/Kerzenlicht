@@ -9,14 +9,14 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 
 	QSettings settings("Raylight", "KerzenLicht");
 
-	ResX = settings.value("ResX", 1920).toInt();
-	ResY = settings.value("ResY", 1080).toInt();
+	ResX = settings.value("ResX", 1600).toInt();
+	ResY = settings.value("ResY", 1220).toInt();
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
 	Pixmap = std::vector(ResX, std::vector<Rgba>(ResY));
 
-	View_Mode = Render_Mode::WIREFRAME;
+	View_Mode = Render_Mode::POINTCLOUD;
 
 	Thread_Storage = std::vector<QThread*>();
 	Object_Array = std::map<std::string, Object>();
@@ -36,7 +36,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	renderClear();
 	drawToSurface();
-	loadObj("./Paimon.obj");
+	loadObj("./Monke.obj");
 }
 
 void Kerzenlicht_Renderer::setImage(std::string P_File) {
