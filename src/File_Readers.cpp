@@ -5,6 +5,7 @@ Obj_File_Loader::Obj_File_Loader(QObject* parent, std::string P_File_Path) : QTh
 }
 
 void Obj_File_Loader::run() {
+	emit updateProgress_Signal(0);
 	std::ifstream file(File_Path);
 	std::ifstream fileTemp(File_Path);
 
@@ -15,7 +16,14 @@ void Obj_File_Loader::run() {
 	}
 
 	int linesRead = 0;
-	const int linesPerUpdate = 128;
+	int Temp = 0;
+	if (static_cast<int>(lineCount / 1000) > 2) {
+		Temp = static_cast<int>(lineCount / 1000);
+	}
+	else {
+		Temp = 2;
+	}
+	const int linesPerUpdate = Temp;
 
 	Object Imported_Mesh = Object("Imported", Object_Type::MESH);
 
@@ -51,15 +59,12 @@ void Obj_File_Loader::run() {
 
 		// Update progress every linesPerUpdate lines read
 		if (++linesRead == linesPerUpdate) {
-			emit updateProgress_Signal(static_cast<int>((linesRead * 100) / lineCount));
+			emit updateProgress_Signal(static_cast<int>(linesRead / lineCount * 100));
 			linesRead = 0;
 		}
 	}
 
-	// Update progress for the remaining lines
-	if (linesRead > 0) {
-		emit updateProgress_Signal(100);
-	}
+	emit updateProgress_Signal(100);
 
 	file.close();
 	Imported_Mesh.loadBuffers();

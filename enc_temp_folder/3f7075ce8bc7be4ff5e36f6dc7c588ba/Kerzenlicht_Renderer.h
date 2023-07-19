@@ -72,6 +72,7 @@ struct Renderer_Menu : QT_Linear_Contents {
 
 	Renderer_Menu(Kerzenlicht_Renderer* P_Parent);
 	void openObjFile();
+	void clearScene();
 	void renderWireframe();
 	void renderPointCloud();
 	void renderEdgeVisualizer();

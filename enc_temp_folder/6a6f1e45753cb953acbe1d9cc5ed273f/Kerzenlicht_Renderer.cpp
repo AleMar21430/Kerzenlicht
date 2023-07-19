@@ -461,6 +461,10 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Load_File_Button->setText("Import Obj File");
 	connect(Load_File_Button, &QT_Button::clicked, this, &Renderer_Menu::openObjFile);
 
+	QT_Button* Clear_Button = new QT_Button();
+	Clear_Button->setText("Clear Scene");
+	connect(Clear_Button, &QT_Button::clicked, this, &Renderer_Menu::clearScene);
+
 	QT_Button* Render_Wire_Button = new QT_Button();
 	Render_Wire_Button->setText("Render Wireframe");
 	connect(Render_Wire_Button, &QT_Button::clicked, this, &Renderer_Menu::renderWireframe);
@@ -490,6 +494,7 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	connect(Save_Button, &QT_Button::clicked, this, &Renderer_Menu::save);
 
 	Layout->addWidget(Load_File_Button);
+	Layout->addWidget(Clear_Button);
 	Layout->addWidget(Render_Wire_Button);
 	Layout->addWidget(Render_Points_Button);
 	Layout->addWidget(Render_Visualizer_Button);
@@ -544,4 +549,9 @@ void Renderer_Menu::changeYResolution(int value) {
 void Renderer_Menu::save() {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Create New File"), "", tr("BitMap (*.bmp)"));
 	Parent->storeBmp(fileName.toStdString());
+}
+void Renderer_Menu::clearScene() {
+	Parent->Object_Array.clear();
+	Parent->renderClear();
+	Parent->drawToSurface();
 }
