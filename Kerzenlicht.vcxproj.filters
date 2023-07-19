@@ -19,39 +19,45 @@
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{aa4aabad-7c7c-495b-b79c-16e1814c31e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Vulkan">
+    <Filter Include="Source Files\Workspaces">
+      <UniqueIdentifier>{bb764ffe-a5c4-433e-8e98-e2fd5eb8a6f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Workspaces">
+      <UniqueIdentifier>{5f8fb5b0-2fa0-48b6-895c-c57b58bae0af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Icons">
+      <UniqueIdentifier>{203c940b-72bd-4c3d-a26b-6cfe6f47226e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Workspaces\Vulkan">
       <UniqueIdentifier>{a5f99faa-c4bd-4f5e-ad31-2a60b308ccc1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\OpenGL">
+    <Filter Include="Source Files\Workspaces\OpenGL">
       <UniqueIdentifier>{db54f0bb-7711-45a6-9f28-53bc347be53a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Vulkan">
+    <Filter Include="Header Files\Workspaces\Vulkan">
       <UniqueIdentifier>{21054336-f1aa-4204-84d5-e9457ef98113}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\OpenGL">
+    <Filter Include="Header Files\Workspaces\OpenGL">
       <UniqueIdentifier>{22c9b08b-1e77-4f54-a2e0-886a9da1c780}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Offline">
+    <Filter Include="Source Files\Workspaces\Renderer">
       <UniqueIdentifier>{37f49562-e950-4963-8232-61163fb566d7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Offline">
+    <Filter Include="Header Files\Workspaces\Renderer">
       <UniqueIdentifier>{2be8f611-2ece-4c43-83f8-72ab75a56887}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
-      <Filter>Header Files\OpenGL</Filter>
+      <Filter>Header Files\Workspaces\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\R_Workspace_Offline_Viewport.h">
-      <Filter>Header Files\Offline</Filter>
+    <ClInclude Include="src\Workspace_Kerzenlicht_Renderer.h">
+      <Filter>Header Files\Workspaces\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Core.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\R_String.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\QT_Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Math.h">
@@ -66,33 +72,39 @@
     <ClInclude Include="src\Object.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Main_Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Workspace_Manager.h">
+      <Filter>Header Files\Workspaces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QT_Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Workspace_Log.h">
+      <Filter>Header Files\Workspaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="src\R_Main_Window.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h">
-      <Filter>Header Files\Vulkan</Filter>
+      <Filter>Header Files\Workspaces\Vulkan</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\R_Main_Window.cpp">
+    <ClCompile Include="src\Main_Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\R_Workspace_Vulkan_Viewport.cpp">
-      <Filter>Source Files\Vulkan</Filter>
+      <Filter>Source Files\Workspaces\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp">
-      <Filter>Source Files\OpenGL</Filter>
+      <Filter>Source Files\Workspaces\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp">
-      <Filter>Source Files\Offline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\QT_Core.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Workspace_Kerzenlicht_Renderer.cpp">
+      <Filter>Source Files\Workspaces\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Math.cpp">
       <Filter>Source Files\Core</Filter>
@@ -106,10 +118,49 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Workspace_Manager.cpp">
+      <Filter>Source Files\Workspaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QT_Core.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Workspace_Log.cpp">
+      <Filter>Source Files\Workspaces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\Icon.png">
       <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\icons\Add.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Add_Tab.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Close.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Collapse.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Expand.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Float_Dock.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Maximize.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Minimize.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Redock_Dock.png">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="resources\icons\Settings.png">
+      <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

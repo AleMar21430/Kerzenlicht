@@ -1,6 +1,6 @@
-#include "R_Workspace_Offline_Viewport.h"
+#include "Workspace_Kerzenlicht_Renderer.h"
 
-R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log) : QT_Graphics_View() {
+Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_View() {
 	Log = P_Log;
 
 	Mouse_Pressed = false;
@@ -59,7 +59,7 @@ R_Workspace_Offline_Viewport::R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log
 	drawToSurface();
 }
 
-void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
+void Kerzenlicht_Renderer::setImage(std::string P_File) {
 	Scene->clear();
 	QPixmap Image(QString::fromStdString(P_File));
 	QGraphicsPixmapItem* Item = new QGraphicsPixmapItem(Image);
@@ -68,7 +68,7 @@ void R_Workspace_Offline_Viewport::setImage(std::string P_File) {
 	fitInView(Item->boundingRect(), Qt::KeepAspectRatio);
 }
 
-void R_Workspace_Offline_Viewport::drawToSurface() {
+void Kerzenlicht_Renderer::drawToSurface() {
 	Scene->clear();
 	QImage image(ResX, ResY, QImage::Format_RGBA8888);
 
@@ -93,7 +93,7 @@ void R_Workspace_Offline_Viewport::drawToSurface() {
 	fitInView(Item->boundingRect(), Qt::KeepAspectRatio);
 }
 
-void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
+void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
 	for (std::pair<const std::string, Object>& Obj : Object_Array) {
 		float Delta = P_Event->angleDelta().y()*0.00005;
 		Obj.second.scale(Vec3(Delta, Delta, Delta));
@@ -102,12 +102,12 @@ void R_Workspace_Offline_Viewport::wheelEvent(QWheelEvent* P_Event) {
 	}
 }
 
-void R_Workspace_Offline_Viewport::mousePressEvent(QMouseEvent* P_Event) {
+void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
 	Mouse_Pressed = true;
 	Mouse_Down_Pos = P_Event->pos();
 }
 
-void R_Workspace_Offline_Viewport::mouseMoveEvent(QMouseEvent* P_Event) {
+void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
 	if (Mouse_Pressed) {
 		double Delta = P_Event->pos().x() - Mouse_Down_Pos.x();
 		for (std::pair<const std::string, Object>& Obj : Object_Array) {
@@ -118,28 +118,28 @@ void R_Workspace_Offline_Viewport::mouseMoveEvent(QMouseEvent* P_Event) {
 	}
 }
 
-void R_Workspace_Offline_Viewport::mouseReleaseEvent(QMouseEvent* P_Event) {
+void Kerzenlicht_Renderer::mouseReleaseEvent(QMouseEvent* P_Event) {
 	Mouse_Pressed = false;
 }
 
-void R_Workspace_Offline_Viewport::resizeEvent(QResizeEvent* P_Event) {
+void Kerzenlicht_Renderer::resizeEvent(QResizeEvent* P_Event) {
 	centerOn(scene()->items()[0]->boundingRect().center());
 	fitInView(scene()->items()[0]->boundingRect(), Qt::KeepAspectRatio);
 }
 
-void R_Workspace_Offline_Viewport::closeEvent(QCloseEvent* P_Event) {
+void Kerzenlicht_Renderer::closeEvent(QCloseEvent* P_Event) {
 	P_Event->accept();
 }
 
-void R_Workspace_Offline_Viewport::setPenColor(Rgba P_Color) {
+void Kerzenlicht_Renderer::setPenColor(Rgba P_Color) {
 	Pen_Color = P_Color;
 }
 
-void R_Workspace_Offline_Viewport::setPenOpacity(float P_Opacity) {
+void Kerzenlicht_Renderer::setPenOpacity(float P_Opacity) {
 	Pen_Opacity = P_Opacity;
 }
 
-void R_Workspace_Offline_Viewport::renderClear() {
+void Kerzenlicht_Renderer::renderClear() {
 	for (int x = 0; x < ResX; x++) {
 		for (int y = 0; y < ResY; y++) {
 			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
@@ -147,13 +147,13 @@ void R_Workspace_Offline_Viewport::renderClear() {
 	}
 }
 
-void R_Workspace_Offline_Viewport::renderPixel(uint32_t P_X, uint32_t P_Y) {
+void Kerzenlicht_Renderer::renderPixel(uint32_t P_X, uint32_t P_Y) {
 	if (P_X < ResX && P_X >= 0 && P_Y < ResY && P_Y >= 0) {
 		Pixmap[P_X][P_Y] = Pen_Color;
 	}
 }
 
-void R_Workspace_Offline_Viewport::renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y) {
+void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y) {
 	int dx = std::abs(P_End_X - P_Start_X);
 	int dy = std::abs(P_End_Y - P_Start_Y);
 	int err = dx - dy;
@@ -176,7 +176,7 @@ void R_Workspace_Offline_Viewport::renderLine(int P_Start_X, int P_Start_Y, int 
 	renderPixel(P_End_X, P_End_Y);
 }
 
-void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Colors, bool P_Textured, bool P_Normals) {
+void Kerzenlicht_Renderer::loadObj(std::string P_File, bool P_Vert_Colors, bool P_Textured, bool P_Normals) {
 	clearBuffers();
 	
 	std::ifstream file(P_File);
@@ -231,12 +231,12 @@ void R_Workspace_Offline_Viewport::loadObj(std::string P_File, bool P_Vert_Color
 	file.close();
 }
 
-void R_Workspace_Offline_Viewport::createObject(std::string P_Name) {
+void Kerzenlicht_Renderer::createObject(std::string P_Name) {
 	Object Temp(P_Name, Object_Type::MESH);
 	Object_Array[P_Name] = Temp;
 }
 
-void R_Workspace_Offline_Viewport::loadModel(std::string P_Name) {
+void Kerzenlicht_Renderer::loadModel(std::string P_Name) {
 	Object& Ref = Object_Array[P_Name];
 	if (Ref.Type == MESH) {
 		Ref.MeshData.Vertex_Positions = Vertex_Positions_Buffer;
@@ -247,13 +247,13 @@ void R_Workspace_Offline_Viewport::loadModel(std::string P_Name) {
 	}
 }
 
-void R_Workspace_Offline_Viewport::clearBuffers() {
+void Kerzenlicht_Renderer::clearBuffers() {
 	Vertex_Colors_Buffer = std::vector<Rgb>();
 	Vertex_Positions_Buffer = std::vector<Vec3>();
 	Face_Buffer = std::vector<Mesh_Face>();
 }
 
-void R_Workspace_Offline_Viewport::renderWireframe() {
+void Kerzenlicht_Renderer::renderWireframe() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH){
@@ -296,7 +296,7 @@ void R_Workspace_Offline_Viewport::renderWireframe() {
 	}
 }
 
-void R_Workspace_Offline_Viewport::renderEdgeVisualizer() {
+void Kerzenlicht_Renderer::renderEdgeVisualizer() {
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH) {
 			for (Mesh_Face tri : Data.second.MeshData.Faces) {
@@ -340,7 +340,7 @@ void R_Workspace_Offline_Viewport::renderEdgeVisualizer() {
 	}
 }
 
-void R_Workspace_Offline_Viewport::renderPointCloud() {
+void Kerzenlicht_Renderer::renderPointCloud() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	for (auto& Data : Object_Array) {
 		if (Data.second.Type == MESH) {
@@ -427,7 +427,7 @@ void R_Workspace_Offline_Viewport::renderPointCloud() {
 	}
 }
 
-void R_Workspace_Offline_Viewport::renderFrame() {
+void Kerzenlicht_Renderer::renderFrame() {
 	renderClear();
 	if (View_Mode == Render_Mode::WIREFRAME) {
 		renderWireframe();
@@ -441,7 +441,7 @@ void R_Workspace_Offline_Viewport::renderFrame() {
 	drawToSurface();
 }
 
-void R_Workspace_Offline_Viewport::storeBmp(std::string P_File) {
+void Kerzenlicht_Renderer::storeBmp(std::string P_File) {
 	std::ofstream file(P_File, std::ios::binary);
 	if (!file.is_open()) {
 		return;
@@ -495,7 +495,7 @@ void R_Workspace_Offline_Viewport::storeBmp(std::string P_File) {
 	file.close();
 }
 
-Renderer_Menu::Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent) : QT_Linear_Contents(true) {
+Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Contents(true) {
 	Parent = P_Parent;
 
 	Vertex_Colors_Obj_Import = false;

@@ -10,7 +10,7 @@ enum Render_Mode {
 
 struct Renderer_Menu;
 
-struct R_Workspace_Offline_Viewport : QT_Graphics_View {
+struct Kerzenlicht_Renderer : QT_Graphics_View {
 	QT_Text_Stream* Log;
 
 	bool Mouse_Pressed;
@@ -35,7 +35,7 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 	QGraphicsScene* Scene;
 	Renderer_Menu* Menu;
 
-	R_Workspace_Offline_Viewport(QT_Text_Stream* P_Log);
+	Kerzenlicht_Renderer(QT_Text_Stream* P_Log);
 
 	void setPenColor(Rgba P_Color);
 	void setPenOpacity(float P_Opacity);
@@ -68,7 +68,7 @@ struct R_Workspace_Offline_Viewport : QT_Graphics_View {
 };
 
 struct Renderer_Menu : QT_Linear_Contents {
-	R_Workspace_Offline_Viewport* Parent;
+	Kerzenlicht_Renderer* Parent;
 
 	QCheckBox* Obj_Vertex_Colors;
 	QCheckBox* Obj_Textured;
@@ -78,7 +78,7 @@ struct Renderer_Menu : QT_Linear_Contents {
 	bool Textured_Obj_Import;
 	bool Normals_Obj_Import;
 
-	Renderer_Menu(R_Workspace_Offline_Viewport* P_Parent);
+	Renderer_Menu(Kerzenlicht_Renderer* P_Parent);
 	void openObjFile();
 	void clearScene();
 	void renderWireframe();

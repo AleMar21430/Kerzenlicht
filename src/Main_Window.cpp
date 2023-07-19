@@ -1,16 +1,16 @@
-#include "R_Main_Window.h"
+#include "Main_Window.h"
 
 Main_Window::Main_Window(QT_Application* P_App) : QT_Main_Window() {
 	setWindowIcon(QPixmap("./resources/Icon.png"));
+	readStyle();
+
 	Log = new QT_Text_Stream();
 	App = P_App;
 
-	R_Workspace_Offline_Viewport* Offline_Renderer = new R_Workspace_Offline_Viewport(Log);
-	QT_Splitter* Splitter = new QT_Splitter(false);
-	Splitter->addWidget(Offline_Renderer->Menu);
-	Splitter->addWidget(Offline_Renderer);
-	setCentralWidget(Splitter);
-	//readStyle();
+	Workspace_Manager* workspace_manager = new Workspace_Manager(Log, this);
+	//Workspace_Toolbar* Toolbar = new Workspace_Toolbar(Log, this);
+	addDockWidget(Qt::BottomDockWidgetArea, workspace_manager);
+	//addToolBar(Toolbar);
 	showMaximized();
 
 	Log->log("Kerzenlicht Version 0.1.0 Initialized Succesfully");

@@ -1,5 +1,5 @@
 #include "QT_Core.h"
-#include "R_Main_Window.h"
+#include "Main_Window.h"
 
 int main(int argc, char *argv[]) {
 	std::ofstream log;

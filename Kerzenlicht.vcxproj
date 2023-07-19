@@ -106,27 +106,41 @@
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\R_String.h" />
     <ClInclude Include="src\Core.h" />
-    <ClInclude Include="src\R_Workspace_Offline_Viewport.h" />
+    <ClInclude Include="src\Workspace_Log.h" />
+    <ClInclude Include="src\Workspace_Manager.h" />
+    <ClInclude Include="src\Workspace_Kerzenlicht_Renderer.h" />
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h" />
     <ClInclude Include="src\QT_Core.h" />
     <ClInclude Include="src\Math.h" />
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h" />
-    <QtMoc Include="src\R_Main_Window.h" />
+    <ClInclude Include="src\Main_Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Math.cpp" />
-    <ClCompile Include="src\R_Workspace_Offline_Viewport.cpp" />
+    <ClCompile Include="src\Workspace_Log.cpp" />
+    <ClCompile Include="src\Workspace_Manager.cpp" />
+    <ClCompile Include="src\Workspace_Kerzenlicht_Renderer.cpp" />
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\QT_Core.cpp" />
-    <ClCompile Include="src\R_Main_Window.cpp" />
+    <ClCompile Include="src\Main_Window.cpp" />
     <ClCompile Include="src\R_Workspace_Vulkan_Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\Icon.png" />
+    <Image Include="resources\icons\Add.png" />
+    <Image Include="resources\icons\Add_Tab.png" />
+    <Image Include="resources\icons\Close.png" />
+    <Image Include="resources\icons\Collapse.png" />
+    <Image Include="resources\icons\Expand.png" />
+    <Image Include="resources\icons\Float_Dock.png" />
+    <Image Include="resources\icons\Maximize.png" />
+    <Image Include="resources\icons\Minimize.png" />
+    <Image Include="resources\icons\Redock_Dock.png" />
+    <Image Include="resources\icons\Settings.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Default Scene.krz" />
