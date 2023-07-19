@@ -36,19 +36,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	renderClear();
 	drawToSurface();
-	loadObj("./Cube.obj");
-
-	//createObject("Paimon");
-
-	//loadObj("./Cube.obj", true, false, false);
-	//loadModel("Paimon");
-
-	//Object_Array["Paimon"].setScale(Vec3(0.175, 0.175, 0.175));
-	//Object_Array["Paimon"].translate(Vec3(0, -0.95, 0));
-	//Object_Array["Paimon"].processTransform();
-
-	//renderPointCloud();
-	//drawToSurface();
+	loadObj("./Paimon.obj");
 }
 
 void Kerzenlicht_Renderer::setImage(std::string P_File) {
@@ -87,7 +75,7 @@ void Kerzenlicht_Renderer::drawToSurface() {
 
 void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
 	for (std::pair<const std::string, Object>& Obj : Object_Array) {
-		float Delta = P_Event->angleDelta().y()*0.0001;
+		float Delta = P_Event->angleDelta().y()*0.00005;
 		Obj.second.scale(Vec3(Delta, Delta, Delta));
 		Obj.second.processTransform();
 		renderFrame();
@@ -143,6 +131,15 @@ void Kerzenlicht_Renderer::closeEvent(QCloseEvent* P_Event) {
 	P_Event->accept();
 }
 
+void Kerzenlicht_Renderer::updateProgress(int P_Progress) {
+	Menu->Progress->setValue(P_Progress);
+}
+
+void Kerzenlicht_Renderer::loadObject(Object P_Object) {
+	Object_Array["Imported_Obj"] = P_Object;
+	renderFrame();
+}
+
 void Kerzenlicht_Renderer::setPenColor(Rgba P_Color) {
 	Pen_Color = P_Color;
 }
@@ -193,9 +190,20 @@ void Kerzenlicht_Renderer::loadObj(std::string P_File) {
 	log << "Loading Obj Model, File: " << P_File << ".";
 	Log->append(QString::fromStdString(log.write()));
 
-	std::future<Object> loadedObj = loadObjThread(P_File);
-	Object_Array["Imported_Obj"] = loadedObj.get();
-	renderFrame();
+	Obj_File_Loader* thread = new Obj_File_Loader(this, P_File);
+	
+	connect(thread, SIGNAL( loadingFinished_Signal(Object) ), SLOT( loadObject(Object) ));
+	connect(thread, SIGNAL( updateProgress_Signal(int) ), SLOT( updateProgress(int) ));
+	connect(thread, &Obj_File_Loader::finished, thread, &Obj_File_Loader::deleteLater);
+	/*Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [objLoader, thread, this]() {
+		objLoader->deleteLater();
+		thread->quit();
+		thread->wait();
+		thread->deleteLater();
+		Thread_Storage.erase(std::remove(Thread_Storage.begin(), Thread_Storage.end(), thread), Thread_Storage.end());
+		}
+	);*/ // TODO Threads can be destroyed while creatingObject after finished if file is too large
+	thread->start();
 }
 
 void Kerzenlicht_Renderer::renderWireframe() {

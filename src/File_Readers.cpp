@@ -1,11 +1,12 @@
 #include "File_Readers.h"
 
-std::future<Object> loadObjThread(const std::string P_File_Path) {
-	std::promise<Object> promise;
-	std::future<Object> future = promise.get_future();
+Obj_File_Loader::Obj_File_Loader(QObject* parent, std::string P_File_Path) : QThread(parent) {
+	File_Path = P_File_Path;
+}
 
-	std::ifstream file(P_File_Path);
-	std::ifstream fileTemp(P_File_Path);
+void Obj_File_Loader::run() {
+	std::ifstream file(File_Path);
+	std::ifstream fileTemp(File_Path);
 
 	int lineCount = 0;
 	std::string file_line;
@@ -47,11 +48,20 @@ std::future<Object> loadObjThread(const std::string P_File_Path) {
 				Imported_Mesh.MeshData.Faces.push_back(triangle);
 			}
 		}
+
+		// Update progress every linesPerUpdate lines read
+		if (++linesRead == linesPerUpdate) {
+			emit updateProgress_Signal(static_cast<int>((linesRead * 100) / lineCount));
+			linesRead = 0;
+		}
+	}
+
+	// Update progress for the remaining lines
+	if (linesRead > 0) {
+		emit updateProgress_Signal(100);
 	}
 
 	file.close();
 	Imported_Mesh.loadBuffers();
-	promise.set_value(Imported_Mesh);
-
-	return future;
+	emit loadingFinished_Signal(Imported_Mesh);
 }
