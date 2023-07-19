@@ -1,4 +1,4 @@
-#include "Workspace_Kerzenlicht_Renderer.h"
+#include "Kerzenlicht_Renderer.h"
 
 Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_View() {
 	Log = P_Log;
@@ -511,35 +511,40 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Obj_Normals = new QCheckBox("Import Obj Normals");
 	connect(Obj_Normals, &QCheckBox::stateChanged, [this](int State) {Normals_Obj_Import = State; });
 
-	QPushButton* Load_File_Button = new QPushButton("Import Obj File");
-	connect(Load_File_Button, &QPushButton::clicked, this, &Renderer_Menu::openObjFile);
+	QT_Button* Load_File_Button = new QT_Button("Import Obj File");
+	connect(Load_File_Button, &QT_Button::clicked, this, &Renderer_Menu::openObjFile);
 
-	QPushButton* Clear_Button = new QPushButton("Clear Scene", this);
-	connect(Clear_Button, &QPushButton::clicked, this, &Renderer_Menu::clearScene);
+	QT_Button* Clear_Button = new QT_Button();
+	Clear_Button->setText("Clear Scene");
+	connect(Clear_Button, &QT_Button::clicked, this, &Renderer_Menu::clearScene);
 
-	QPushButton* Render_Wire_Button = new QPushButton("Render Wireframe");
-	connect(Render_Wire_Button, &QPushButton::clicked, this, &Renderer_Menu::renderWireframe);
+	QT_Button* Render_Wire_Button = new QT_Button();
+	Render_Wire_Button->setText("Render Wireframe");
+	connect(Render_Wire_Button, &QT_Button::clicked, this, &Renderer_Menu::renderWireframe);
 
-	QPushButton* Render_Points_Button = new QPushButton("Render Points");
-	connect(Render_Points_Button, &QPushButton::clicked, this, &Renderer_Menu::renderPointCloud);
+	QT_Button* Render_Points_Button = new QT_Button();
+	Render_Points_Button->setText("Render Points");
+	connect(Render_Points_Button, &QT_Button::clicked, this, &Renderer_Menu::renderPointCloud);
 
-	QPushButton* Render_Visualizer_Button = new QPushButton("Render Visualizer");
-	connect(Render_Visualizer_Button, &QPushButton::clicked, this, &Renderer_Menu::renderEdgeVisualizer);
+	QT_Button* Render_Visualizer_Button = new QT_Button();
+	Render_Visualizer_Button->setText("Render Visualizer");
+	connect(Render_Visualizer_Button, &QT_Button::clicked, this, &Renderer_Menu::renderEdgeVisualizer);
 
-	QLineEdit* ResX_Input = new QLineEdit("Width");
+	QT_Value_Input* ResX_Input = new QT_Value_Input();
 	QIntValidator* ValidatorX = new QIntValidator();
 	ResX_Input->setValidator(ValidatorX);
 	ResX_Input->setText(QString::fromStdString(std::to_string(Parent->ResX)));
-	connect(ResX_Input, &QLineEdit::textChanged, [this](QString text) {changeXResolution(text.toInt()); });
+	connect(ResX_Input, &QT_Value_Input::textChanged, [this](QString text) {changeXResolution(text.toInt()); });
 
-	QLineEdit* ResY_Input = new QLineEdit("Height");
+	QT_Value_Input* ResY_Input = new QT_Value_Input();
 	QIntValidator* ValidatorY = new QIntValidator();
 	ResY_Input->setValidator(ValidatorY);
 	ResY_Input->setText(QString::fromStdString(std::to_string(Parent->ResY)));
-	connect(ResY_Input, &QLineEdit::textChanged, [this](QString text) {changeYResolution(text.toInt()); });
+	connect(ResY_Input, &QT_Value_Input::textChanged, [this](QString text) {changeYResolution(text.toInt()); });
 
-	QPushButton* Save_Button = new QPushButton("Save to .Bmp", this);
-	connect(Save_Button, &QPushButton::clicked, this, &Renderer_Menu::save);
+	QT_Button* Save_Button = new QT_Button;
+	Save_Button->setText("Save to .Bmp");
+	connect(Save_Button, &QT_Button::clicked, this, &Renderer_Menu::save);
 
 	Layout->addWidget(Obj_Vertex_Colors);
 	Layout->addWidget(Obj_Textured);

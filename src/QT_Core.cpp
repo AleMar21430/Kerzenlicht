@@ -75,6 +75,8 @@ void QT_Linear_Layout::clear() {
 
 QT_Linear_Contents::QT_Linear_Contents(bool P_Vertical) {
 	setObjectName("_Default_Linear_Contents");
+	setContentsMargins(0, 0, 0, 0);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	Layout = new QT_Linear_Layout(P_Vertical);
 	setLayout(Layout);
 }
@@ -201,7 +203,7 @@ QT_Slider::QT_Slider(bool P_Vertical) {
 QT_Splitter::QT_Splitter(std::string P_Style, bool P_Vertical) {
 	setObjectName(P_Style);
 	setContentsMargins(0, 0, 0, 0);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	if (P_Vertical) { setOrientation(Qt::Vertical); }
 	else { setOrientation(Qt::Horizontal); }
 }

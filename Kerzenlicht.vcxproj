@@ -108,10 +108,11 @@
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\Workspace_Log.h" />
     <ClInclude Include="src\Workspace_Manager.h" />
-    <ClInclude Include="src\Workspace_Kerzenlicht_Renderer.h" />
+    <ClInclude Include="src\Kerzenlicht_Renderer.h" />
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h" />
     <ClInclude Include="src\QT_Core.h" />
     <ClInclude Include="src\Math.h" />
+    <ClInclude Include="src\Workspace_Renderer.h" />
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h" />
     <ClInclude Include="src\Main_Window.h" />
   </ItemGroup>
@@ -122,12 +123,13 @@
     <ClCompile Include="src\Math.cpp" />
     <ClCompile Include="src\Workspace_Log.cpp" />
     <ClCompile Include="src\Workspace_Manager.cpp" />
-    <ClCompile Include="src\Workspace_Kerzenlicht_Renderer.cpp" />
+    <ClCompile Include="src\Kerzenlicht_Renderer.cpp" />
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\QT_Core.cpp" />
     <ClCompile Include="src\Main_Window.cpp" />
     <ClCompile Include="src\R_Workspace_Vulkan_Viewport.cpp" />
+    <ClCompile Include="src\Workspace_Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\Icon.png" />

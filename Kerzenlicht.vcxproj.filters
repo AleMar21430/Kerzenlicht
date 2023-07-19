@@ -51,7 +51,7 @@
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
       <Filter>Header Files\Workspaces\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Workspace_Kerzenlicht_Renderer.h">
+    <ClInclude Include="src\Kerzenlicht_Renderer.h">
       <Filter>Header Files\Workspaces\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Core.h">
@@ -84,6 +84,9 @@
     <ClInclude Include="src\Workspace_Log.h">
       <Filter>Header Files\Workspaces</Filter>
     </ClInclude>
+    <ClInclude Include="src\Workspace_Renderer.h">
+      <Filter>Header Files\Workspaces\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h">
@@ -103,7 +106,7 @@
     <ClCompile Include="src\R_Workspace_OpenGL_Viewport.cpp">
       <Filter>Source Files\Workspaces\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Workspace_Kerzenlicht_Renderer.cpp">
+    <ClCompile Include="src\Kerzenlicht_Renderer.cpp">
       <Filter>Source Files\Workspaces\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Math.cpp">
@@ -126,6 +129,9 @@
     </ClCompile>
     <ClCompile Include="src\Workspace_Log.cpp">
       <Filter>Source Files\Workspaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Workspace_Renderer.cpp">
+      <Filter>Source Files\Workspaces\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

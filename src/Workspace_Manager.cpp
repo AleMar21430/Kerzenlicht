@@ -5,8 +5,8 @@ Workspace_Manager::Workspace_Manager(QT_Text_Stream* P_Log, Main_Window* P_Paren
 	Parent = P_Parent;
 
 	Titlebar = new Workspace_Dock_Header(Log, this);
+	Titlebar->setWorkspace("Renderer");
 	setTitleBarWidget(Titlebar);
-	setWidget(new QT_Linear_Contents("_Container", true));
 	setWindowTitle("Workspace");
 }
 
@@ -95,7 +95,7 @@ void Workspace_Dock_Header::setWorkspace(std::string P_Type) {
 	if (P_Type == "Renderer") {
 		Parent->setWindowTitle("Renderer");
 		//Workspace_Type_Button->setIcon(QIcon("resources/workspaces/Viewport_3D.png"));
-		Parent->setWidget((new Kerzenlicht_Renderer(Log)));
+		Parent->setWidget((new Workspace_Renderer(Log)));
 		Expand_Collapse_Toggle->setText("Renderer");
 	}
 	else if (P_Type == "Log") {

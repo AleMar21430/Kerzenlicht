@@ -3,15 +3,16 @@
 #include "QT_Core.h"
 
 #include "Main_Window.h"
-#include "Workspace_Kerzenlicht_Renderer.h"
+#include "Workspace_Renderer.h"
 #include "Workspace_Log.h"
 
 struct Main_Window; //Fwd Decl.
+struct Workspace_Dock_Header; //Fwd Decl.
 
 struct Workspace_Manager : QT_Dock {
 	QT_Text_Stream* Log;
 	Main_Window* Parent;
-	QT_Linear_Contents* Titlebar;
+	Workspace_Dock_Header* Titlebar;
 
 	Workspace_Manager(QT_Text_Stream* P_Log, Main_Window* P_Parent);
 };
