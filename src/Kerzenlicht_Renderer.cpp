@@ -245,7 +245,7 @@ void Kerzenlicht_Renderer::loadModel(std::string P_Name) {
 	if (Ref.Type == MESH) {
 		Ref.MeshData.Vertex_Positions = Vertex_Positions_Buffer;
 		Ref.MeshData.Faces = Face_Buffer;
-		if (Vertex_Colors_Buffer.size() == Vertex_Positions_Buffer.size()) {
+		if (Vertex_Colors_Buffer.size() > 0) {
 			Ref.MeshData.Vertex_Colors["Col"] = Vertex_Colors_Buffer;
 		}
 	}

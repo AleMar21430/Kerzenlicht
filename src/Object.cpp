@@ -31,9 +31,20 @@ Object::Object(std::string P_Name, Object_Type P_Type) {
 void Object::loadBuffers() {
 	if (Type == MESH) {
 		MeshData.Vertex_Output = std::vector<Vertex>();
-		for (int i = 0; i < MeshData.Vertex_Positions.size(); i++) {
-			Vertex vert = Vertex(MeshData.Vertex_Positions[i]);
-			MeshData.Vertex_Output.push_back(vert);
+		if (MeshData.Vertex_Colors.size() > 0) {
+			for (int i = 0; i < MeshData.Vertex_Positions.size(); i++) {
+				Vertex vert = Vertex(MeshData.Vertex_Positions[i]);
+				vert.Color = MeshData.Vertex_Colors["Col"][i];
+				MeshData.Vertex_Output.push_back(vert);
+			}
+		}
+		// TODO ///////////////////////////////////////////////////////////////////
+		// Vertex Color Were not loading to buffers, will not render properly, fix.
+		else {
+			for (int i = 0; i < MeshData.Vertex_Positions.size(); i++) {
+				Vertex vert = Vertex(MeshData.Vertex_Positions[i]);
+				MeshData.Vertex_Output.push_back(vert);
+			}
 		}
 	}
 }
