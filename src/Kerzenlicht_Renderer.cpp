@@ -19,11 +19,6 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 
 	Object_Array = std::map<std::string, Object>();
 
-	Face_Buffer = std::vector<Mesh_Face>();
-	Vertex_Colors_Buffer = std::vector<Rgb>();
-	Vertex_Positions_Buffer = std::vector<Vec3>();
-	Vertex_Weights_Buffer = std::map<std::string, std::map<std::string, double>>();
-
 	for (int x = 0; x < ResX; x++) {
 		for (int y = 0; y < ResY; y++) {
 			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
@@ -40,23 +35,24 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	log << "Res Y: " << Pixmap.size() << std::endl;
 	Log->append(QString::fromStdString(log.str()));
 
+	Thread_Storage = std::vector<QThread*>();
 	///////////
 	// Scene //
 	///////////
 
-	createObject("Paimon");
+	loadObj("./Cube.obj");
 
-	loadObj("./Cube.obj", true, false, false);
-	loadModel("Paimon");
-	Object_Array["Paimon"].loadBuffers();
-	clearBuffers();
+	//createObject("Paimon");
 
-	Object_Array["Paimon"].setScale(Vec3(0.175, 0.175, 0.175));
-	Object_Array["Paimon"].translate(Vec3(0, -0.95, 0));
-	Object_Array["Paimon"].processTransform();
+	//loadObj("./Cube.obj", true, false, false);
+	//loadModel("Paimon");
 
-	renderPointCloud();
-	drawToSurface();
+	//Object_Array["Paimon"].setScale(Vec3(0.175, 0.175, 0.175));
+	//Object_Array["Paimon"].translate(Vec3(0, -0.95, 0));
+	//Object_Array["Paimon"].processTransform();
+
+	//renderPointCloud();
+	//drawToSurface();
 }
 
 void Kerzenlicht_Renderer::setImage(std::string P_File) {
@@ -176,85 +172,34 @@ void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X,
 	renderPixel(P_End_X, P_End_Y);
 }
 
-void Kerzenlicht_Renderer::loadObj(std::string P_File, bool P_Vert_Colors, bool P_Textured, bool P_Normals) {
+void Kerzenlicht_Renderer::loadObj(std::string P_File) {
 	R_String log;
-	log << "Loading Obj Model, File: " << P_File << "With Settings [ Vert Colors:" << P_Vert_Colors << ", Textured: " << P_Textured << ", Normals: " << P_Normals, " ].";
+	log << "Loading Obj Model, File: " << P_File << ".";
 	Log->append(QString::fromStdString(log.write()));
-	clearBuffers();
-	
-	std::ifstream file(P_File);
-	std::string line;
-	while (std::getline(file, line)) {
-		std::vector<std::string> Tokens = Math::splitString(line);
-		if (!Tokens.empty()) {
-			if (Tokens[0] == "v") {
-				if (!P_Vert_Colors) {
-					Vec3 Pos(
-						std::stod(Tokens[1]),
-						std::stod(Tokens[2]),
-						std::stod(Tokens[3])
-					);
-					Vertex_Positions_Buffer.push_back(Pos);
-				}
-				else {
-					Vec3 Pos(
-						std::stod(Tokens[1]),
-						std::stod(Tokens[2]),
-						std::stod(Tokens[3])
-					);
-					Rgb Color(
-						std::stod(Tokens[4]),
-						std::stod(Tokens[5]),
-						std::stod(Tokens[6])
-					);
-					Vertex_Positions_Buffer.push_back(Pos);
-					Vertex_Colors_Buffer.push_back(Color);
-				}
-			}
-			else if (Tokens[0] == "f") {
-				if (!P_Textured && !P_Normals) {
-					Mesh_Face triangle(
-						std::stoi(Tokens[1]) - 1,
-						std::stoi(Tokens[2]) - 1,
-						std::stoi(Tokens[3]) - 1
-					);
-					Face_Buffer.push_back(triangle);
-				}
-				else {
-					Mesh_Face triangle(
-						std::stoi(Math::splitString(Tokens[1], "/")[0]) - 1,
-						std::stoi(Math::splitString(Tokens[2], "/")[0]) - 1,
-						std::stoi(Math::splitString(Tokens[3], "/")[0]) - 1
-					);
-					Face_Buffer.push_back(triangle);
-				}
-			}
+
+	QThread* thread = new QThread();
+	Thread_Storage.push_back(thread);
+	Obj_File_Loader* objLoader = new Obj_File_Loader();
+	objLoader->moveToThread(thread);
+
+	Obj_File_Loader::connect(thread, &QThread::started, [objLoader, P_File]() {objLoader->loadObjFile(P_File); });
+
+	//Obj_File_Loader::connect(objLoader, &Obj_File_Loader::progressUpdated, [this](int Progress) {Menu->Progress->setValue(Progress); });
+	Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [this](Object Mesh) {
+		Object_Array["Imported_Obj"] = Mesh;
+		renderFrame();
 		}
-		Menu->Progress->setValue(Menu->Progress->value()+1);
-	}
-	file.close();
-}
-
-void Kerzenlicht_Renderer::createObject(std::string P_Name) {
-	Object Temp(P_Name, Object_Type::MESH);
-	Object_Array[P_Name] = Temp;
-}
-
-void Kerzenlicht_Renderer::loadModel(std::string P_Name) {
-	Object& Ref = Object_Array[P_Name];
-	if (Ref.Type == MESH) {
-		Ref.MeshData.Vertex_Positions = Vertex_Positions_Buffer;
-		Ref.MeshData.Faces = Face_Buffer;
-		if (Vertex_Colors_Buffer.size() > 0) {
-			Ref.MeshData.Vertex_Colors["Col"] = Vertex_Colors_Buffer;
+	);
+	Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [objLoader, thread, this]() {
+		objLoader->deleteLater();
+		thread->quit();
+		thread->wait();
+		thread->deleteLater();
+		Thread_Storage.erase(std::remove(Thread_Storage.begin(), Thread_Storage.end(), thread), Thread_Storage.end());
 		}
-	}
-}
+	);
 
-void Kerzenlicht_Renderer::clearBuffers() {
-	Vertex_Colors_Buffer = std::vector<Rgb>();
-	Vertex_Positions_Buffer = std::vector<Vec3>();
-	Face_Buffer = std::vector<Mesh_Face>();
+	thread->start();
 }
 
 void Kerzenlicht_Renderer::renderWireframe() {
@@ -502,24 +447,11 @@ void Kerzenlicht_Renderer::storeBmp(std::string P_File) {
 Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Contents(true) {
 	Parent = P_Parent;
 
-	Vertex_Colors_Obj_Import = false;
-	Textured_Obj_Import = false;
-	Normals_Obj_Import = false;
-
 	Progress = new QProgressBar();
 	Progress->setValue(0);
 	Progress->setMaximum(1);
 	Progress->setTextVisible(true);
 	Progress->setVisible(true);
-
-	Obj_Vertex_Colors = new QCheckBox("Import Obj Vertex Colors");
-	connect(Obj_Vertex_Colors, &QCheckBox::stateChanged, [this](int State) {Vertex_Colors_Obj_Import = State; });
-
-	Obj_Textured = new QCheckBox("Import Obj Textured");
-	connect(Obj_Textured, &QCheckBox::stateChanged, [this](int State) {Textured_Obj_Import = State; });
-
-	Obj_Normals = new QCheckBox("Import Obj Normals");
-	connect(Obj_Normals, &QCheckBox::stateChanged, [this](int State) {Normals_Obj_Import = State; });
 
 	QT_Button* Load_File_Button = new QT_Button();
 	Load_File_Button->setText("Import Obj File");
@@ -557,9 +489,6 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Save_Button->setText("Save to .Bmp");
 	connect(Save_Button, &QT_Button::clicked, this, &Renderer_Menu::save);
 
-	Layout->addWidget(Obj_Vertex_Colors);
-	Layout->addWidget(Obj_Textured);
-	Layout->addWidget(Obj_Normals);
 	Layout->addWidget(Load_File_Button);
 	Layout->addWidget(Clear_Button);
 	Layout->addWidget(Render_Wire_Button);
@@ -573,25 +502,7 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 
 void Renderer_Menu::openObjFile() {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Object (*.obj)"));
-	if (!fileName.isEmpty()) {
-		std::string File_Path = fileName.toStdString();
-
-		std::ifstream file(File_Path);
-		std::string line;
-		int File_Length = 0;
-		while (std::getline(file, line)) {
-			File_Length++;
-		}
-		Progress->setValue(0);
-		Progress->setMaximum(File_Length);
-
-		Parent->createObject(File_Path);
-
-		Parent->loadObj(File_Path, Vertex_Colors_Obj_Import, Textured_Obj_Import, Normals_Obj_Import);
-		Parent->loadModel(File_Path);
-		Parent->Object_Array[File_Path].loadBuffers();
-		Parent->clearBuffers();
-	}
+	Parent->loadObj(fileName.toStdString());
 }
 
 void Renderer_Menu::renderWireframe() {
@@ -633,12 +544,10 @@ void Renderer_Menu::changeYResolution(int value) {
 
 void Renderer_Menu::save() {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Create New File"), "", tr("BitMap (*.bmp)"));
-	if (!fileName.isEmpty()) {
-		Parent->storeBmp(fileName.toStdString());
-	}
+	Parent->storeBmp(fileName.toStdString());
 }
 void Renderer_Menu::clearScene() {
-	Parent->Object_Array = std::map<std::string, Object>();
+	Parent->Object_Array.clear();
 	Parent->renderClear();
 	Parent->drawToSurface();
 }

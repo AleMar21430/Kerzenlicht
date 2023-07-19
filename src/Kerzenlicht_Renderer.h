@@ -12,6 +12,7 @@ struct Renderer_Menu;
 
 struct Kerzenlicht_Renderer : QT_Graphics_View {
 	QT_Text_Stream* Log;
+	QProgressBar* Progress;
 
 	bool Mouse_Pressed;
 	QPoint Mouse_Down_Pos;
@@ -25,12 +26,8 @@ struct Kerzenlicht_Renderer : QT_Graphics_View {
 
 	Render_Mode View_Mode;
 
+	std::vector<QThread*> Thread_Storage;
 	std::map<std::string, Object> Object_Array;
-
-	std::vector<Mesh_Face> Face_Buffer;
-	std::vector<Rgb> Vertex_Colors_Buffer;
-	std::vector<Vec3> Vertex_Positions_Buffer;
-	std::map<std::string, std::map<std::string, double>> Vertex_Weights_Buffer;
 
 	QGraphicsScene* Scene;
 	Renderer_Menu* Menu;
@@ -49,14 +46,8 @@ struct Kerzenlicht_Renderer : QT_Graphics_View {
 	void renderFrame();
 	void drawToSurface();
 
-	void createObject(std::string P_Name);
-	void loadModel(std::string P_Name);
-	void clearBuffers();
-
-	void loadObj(std::string P_File, bool P_Vert_Colors = false, bool P_Textured = false, bool P_Normals = false);
-
+	void loadObj(std::string P_File);
 	void storeBmp(std::string P_File);
-
 	void setImage(std::string P_File);
 	
 	void wheelEvent(QWheelEvent* P_Event) override;
@@ -71,14 +62,6 @@ struct Renderer_Menu : QT_Linear_Contents {
 	Kerzenlicht_Renderer* Parent;
 
 	QProgressBar* Progress;
-
-	QCheckBox* Obj_Vertex_Colors;
-	QCheckBox* Obj_Textured;
-	QCheckBox* Obj_Normals;
-
-	bool Vertex_Colors_Obj_Import;
-	bool Textured_Obj_Import;
-	bool Normals_Obj_Import;
 
 	Renderer_Menu(Kerzenlicht_Renderer* P_Parent);
 	void openObjFile();

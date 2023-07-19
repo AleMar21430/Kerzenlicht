@@ -46,6 +46,12 @@
     <Filter Include="Header Files\Workspaces\Renderer">
       <UniqueIdentifier>{2be8f611-2ece-4c43-83f8-72ab75a56887}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core\I/O">
+      <UniqueIdentifier>{e153b821-707f-4599-a125-ef3532408de2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\I/O">
+      <UniqueIdentifier>{4e63a671-e53b-4522-bcc0-70b9637a8b13}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
@@ -92,6 +98,9 @@
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h">
       <Filter>Header Files\Workspaces\Vulkan</Filter>
     </QtMoc>
+    <QtMoc Include="src\File_Readers.h">
+      <Filter>Header Files\Core\I/O</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -132,6 +141,9 @@
     </ClCompile>
     <ClCompile Include="src\Workspace_Renderer.cpp">
       <Filter>Source Files\Workspaces\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\File_Readers.cpp">
+      <Filter>Source Files\Core\I/O</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
