@@ -57,9 +57,6 @@
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
       <Filter>Header Files\Workspaces\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kerzenlicht_Renderer.h">
-      <Filter>Header Files\Workspaces\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -100,6 +97,9 @@
     </QtMoc>
     <QtMoc Include="src\File_Readers.h">
       <Filter>Header Files\Core\I/O</Filter>
+    </QtMoc>
+    <QtMoc Include="src\Kerzenlicht_Renderer.h">
+      <Filter>Header Files\Workspaces\Renderer</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -17,13 +17,8 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 
 	View_Mode = Render_Mode::WIREFRAME;
 
+	Thread_Storage = std::vector<QThread*>();
 	Object_Array = std::map<std::string, Object>();
-
-	for (int x = 0; x < ResX; x++) {
-		for (int y = 0; y < ResY; y++) {
-			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
-		}
-	}
 
 	Scene = new QGraphicsScene();
 	setScene(Scene);
@@ -35,11 +30,11 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	log << "Res Y: " << Pixmap.size() << std::endl;
 	Log->append(QString::fromStdString(log.str()));
 
-	Thread_Storage = std::vector<QThread*>();
 	///////////
 	// Scene //
 	///////////
-
+	renderClear();
+	drawToSurface();
 	loadObj("./Cube.obj");
 
 	//createObject("Paimon");
@@ -185,21 +180,21 @@ void Kerzenlicht_Renderer::loadObj(std::string P_File) {
 	Obj_File_Loader::connect(thread, &QThread::started, [objLoader, P_File]() {objLoader->loadObjFile(P_File); });
 
 	//Obj_File_Loader::connect(objLoader, &Obj_File_Loader::progressUpdated, [this](int Progress) {Menu->Progress->setValue(Progress); });
-	Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [this](Object Mesh) {
-		Object_Array["Imported_Obj"] = Mesh;
-		renderFrame();
-		}
-	);
-	Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [objLoader, thread, this]() {
+	Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [this](Object Mesh) { createObject("Imported Obj", Mesh); } );
+	/*Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [objLoader, thread, this]() {
 		objLoader->deleteLater();
 		thread->quit();
 		thread->wait();
 		thread->deleteLater();
 		Thread_Storage.erase(std::remove(Thread_Storage.begin(), Thread_Storage.end(), thread), Thread_Storage.end());
 		}
-	);
-
+	);*/ // TODO Threads can be destroyed while creatingObject after finished if file is too large
 	thread->start();
+}
+
+void Kerzenlicht_Renderer::createObject(std::string P_Name, Object P_Mesh) {
+	Object_Array["Imported_Obj"] = P_Mesh;
+	//renderFrame();  //TODO Anything related to Gui being updated by a thread will crash it. Find solution
 }
 
 void Kerzenlicht_Renderer::renderWireframe() {

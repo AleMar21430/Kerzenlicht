@@ -22,7 +22,7 @@ signals:
 	void loadingFinished();
 };
 
-struct Obj_File_Loader : public QObject {
+struct Obj_File_Loader : QObject {
 	Q_OBJECT
 public:
 	Obj_File_Loader();
