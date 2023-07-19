@@ -93,13 +93,13 @@
     <ClInclude Include="src\Kerzenlicht_Renderer.h">
       <Filter>Header Files\Workspaces\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\File_Readers.h">
+      <Filter>Header Files\Core\I/O</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h">
       <Filter>Header Files\Workspaces\Vulkan</Filter>
-    </QtMoc>
-    <QtMoc Include="src\File_Readers.h">
-      <Filter>Header Files\Core\I/O</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

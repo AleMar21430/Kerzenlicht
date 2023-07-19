@@ -87,7 +87,7 @@ void Kerzenlicht_Renderer::drawToSurface() {
 
 void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
 	for (std::pair<const std::string, Object>& Obj : Object_Array) {
-		float Delta = P_Event->angleDelta().y()*0.00005;
+		float Delta = P_Event->angleDelta().y()*0.0001;
 		Obj.second.scale(Vec3(Delta, Delta, Delta));
 		Obj.second.processTransform();
 		renderFrame();
@@ -193,20 +193,9 @@ void Kerzenlicht_Renderer::loadObj(std::string P_File) {
 	log << "Loading Obj Model, File: " << P_File << ".";
 	Log->append(QString::fromStdString(log.write()));
 
-	Obj_File_Loader* thread = new Obj_File_Loader(this, P_File);
-	//Thread_Storage.push_back(thread);
-
-	//connect(thread, &Obj_File_Loader::progressUpdated, [this](int P_Progress) { Menu->updateProgress(P_Progress); });
-	connect(thread, &Obj_File_Loader::loadingFinished, [this](Object P_Mesh) { Object_Array["Imported_Obj"] = P_Mesh; } );
-	/*Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [objLoader, thread, this]() {
-		objLoader->deleteLater();
-		thread->quit();
-		thread->wait();
-		thread->deleteLater();
-		Thread_Storage.erase(std::remove(Thread_Storage.begin(), Thread_Storage.end(), thread), Thread_Storage.end());
-		}
-	);*/ // TODO Threads can be destroyed while creatingObject after finished if file is too large
-	thread->start();
+	std::future<Object> loadedObj = loadObjThread(P_File);
+	Object_Array["Imported_Obj"] = loadedObj.get();
+	renderFrame();
 }
 
 void Kerzenlicht_Renderer::renderWireframe() {
