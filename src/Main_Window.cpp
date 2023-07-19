@@ -13,7 +13,7 @@ Main_Window::Main_Window(QT_Application* P_App) : QT_Main_Window() {
 	//addToolBar(Toolbar);
 	showMaximized();
 
-	Log->log("Kerzenlicht Version 0.1.0 Initialized Succesfully");
+	Log->append("Kerzenlicht Version 0.1.0 Initialized Succesfully");
 }
 
 void Main_Window::readStyle() {

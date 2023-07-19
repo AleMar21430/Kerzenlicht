@@ -38,7 +38,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	log << "Renderer Settings" << std::endl;
 	log << "Res X: " << Pixmap[0].size() << std::endl;
 	log << "Res Y: " << Pixmap.size() << std::endl;
-	Log->log(log.str());
+	Log->append(QString::fromStdString(log.str()));
 
 	///////////
 	// Scene //
@@ -95,7 +95,7 @@ void Kerzenlicht_Renderer::drawToSurface() {
 
 void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
 	for (std::pair<const std::string, Object>& Obj : Object_Array) {
-		float Delta = P_Event->angleDelta().y()*0.00005;
+		float Delta = P_Event->angleDelta().y()*0.0005;
 		Obj.second.scale(Vec3(Delta, Delta, Delta));
 		Obj.second.processTransform();
 		renderFrame();
@@ -177,6 +177,9 @@ void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X,
 }
 
 void Kerzenlicht_Renderer::loadObj(std::string P_File, bool P_Vert_Colors, bool P_Textured, bool P_Normals) {
+	R_String log;
+	log << "Loading Obj Model, File: " << P_File << "With Settings [ Vert Colors:" << P_Vert_Colors << ", Textured: " << P_Textured << ", Normals: " << P_Normals, " ].";
+	Log->append(QString::fromStdString(log.write()));
 	clearBuffers();
 	
 	std::ifstream file(P_File);
@@ -227,6 +230,7 @@ void Kerzenlicht_Renderer::loadObj(std::string P_File, bool P_Vert_Colors, bool 
 				}
 			}
 		}
+		Menu->Progress->setValue(Menu->Progress->value()+1);
 	}
 	file.close();
 }
@@ -502,6 +506,12 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Textured_Obj_Import = false;
 	Normals_Obj_Import = false;
 
+	Progress = new QProgressBar();
+	Progress->setValue(0);
+	Progress->setMaximum(1);
+	Progress->setTextVisible(true);
+	Progress->setVisible(true);
+
 	Obj_Vertex_Colors = new QCheckBox("Import Obj Vertex Colors");
 	connect(Obj_Vertex_Colors, &QCheckBox::stateChanged, [this](int State) {Vertex_Colors_Obj_Import = State; });
 
@@ -558,12 +568,22 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Layout->addWidget(ResX_Input);
 	Layout->addWidget(ResY_Input);
 	Layout->addWidget(Save_Button);
+	Layout->addWidget(Progress);
 }
 
 void Renderer_Menu::openObjFile() {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Object (*.obj)"));
 	if (!fileName.isEmpty()) {
 		std::string File_Path = fileName.toStdString();
+
+		std::ifstream file(File_Path);
+		std::string line;
+		int File_Length = 0;
+		while (std::getline(file, line)) {
+			File_Length++;
+		}
+		Progress->setValue(0);
+		Progress->setMaximum(File_Length);
 
 		Parent->createObject(File_Path);
 
@@ -614,9 +634,6 @@ void Renderer_Menu::changeYResolution(int value) {
 void Renderer_Menu::save() {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Create New File"), "", tr("BitMap (*.bmp)"));
 	if (!fileName.isEmpty()) {
-		std::ofstream log;
-		log.open(fileName.toStdString());
-		log.close();
 		Parent->storeBmp(fileName.toStdString());
 	}
 }

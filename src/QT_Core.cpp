@@ -299,13 +299,6 @@ QT_Text_Stream::QT_Text_Stream(std::string P_Style) {
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 }
 
-void QT_Text_Stream::log(std::string String) {
-	append(QString::fromStdString(String));
-	std::ofstream log;
-	log.open("Log.txt", std::ios::app);
-	log << String;
-}
-
 QT_ToolBar::QT_ToolBar(std::string P_Style) {
 	setObjectName(P_Style);
 	setContentsMargins(0, 0, 0, 0);

@@ -148,7 +148,6 @@ struct QT_Text_Input : QTextEdit {
 };
 struct QT_Text_Stream : QTextBrowser {
 	QT_Text_Stream(std::string P_Style = "_Default_Text_Stream");
-	void log(std::string String = "");
 };
 struct QT_ToolBar : QToolBar {
 	QT_ToolBar(std::string P_Style = "_Default_ToolBar");

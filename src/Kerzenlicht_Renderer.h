@@ -70,6 +70,8 @@ struct Kerzenlicht_Renderer : QT_Graphics_View {
 struct Renderer_Menu : QT_Linear_Contents {
 	Kerzenlicht_Renderer* Parent;
 
+	QProgressBar* Progress;
+
 	QCheckBox* Obj_Vertex_Colors;
 	QCheckBox* Obj_Textured;
 	QCheckBox* Obj_Normals;
