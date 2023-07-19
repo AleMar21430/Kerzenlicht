@@ -46,7 +46,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 
 	createObject("Paimon");
 
-	loadObj("./Paimon.obj", false, true, true);
+	loadObj("./Cube.obj", true, false, false);
 	loadModel("Paimon");
 	Object_Array["Paimon"].loadBuffers();
 	clearBuffers();
@@ -55,7 +55,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	Object_Array["Paimon"].translate(Vec3(0, -0.95, 0));
 	Object_Array["Paimon"].processTransform();
 
-	renderWireframe();
+	renderPointCloud();
 	drawToSurface();
 }
 
