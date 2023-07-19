@@ -1,17 +1,19 @@
 # Kerzenlicht
 
-C++ Object-Based  Wireframe and Point Cloud Orthogonal Rasterizer
+C++ Qt6  Object-Based  Wireframe and Point Cloud Orthogonal View Rasterizer
 # Features
-* Support for .Obj File Import
+* Support for .Obj File Import in a separate Worker QThread
 * Support For Vertex Color
 * Wireframe Rendering
 * Point Cloud Rendering
+* Edge Visualizer Rendering
 * Width and Height Resolution Change
-* Dynamic Turntable Rotation and Scale
+* Dynamic Turntable Rotation, View Panning, and Scale
 * .bmp Image Saving
 
 # GUI:
-![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/14f849be-f0e1-4909-89cd-ec181e4311f7)
+![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/c6a11ec8-4178-4530-9ede-79b2fb39ae44)
+
 
 # Renders:
 
