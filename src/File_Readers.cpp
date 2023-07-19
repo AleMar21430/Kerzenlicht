@@ -1,61 +1,13 @@
 #include "File_Readers.h"
 
-
-Kerzenlicht_File_Loader::Kerzenlicht_File_Loader() : QObject() {}
-
-void Kerzenlicht_File_Loader::loadFile(const std::string filePath)
-{
-	QFile file(QString::fromStdString(filePath));
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		emit loadingFinished();
-		return;
-	}
-
-	uint_fast64_t totalBytes = file.size();
-	uint_fast64_t bytesRead = 0;
-	int linesRead = 0;
-	const int linesPerUpdate = 128;
-
-	while (!file.atEnd()) {
-		std::string line = file.readLine().toStdString();
-		bytesRead += line.size();
-
-		// Process the line (you can implement your .obj parsing logic here)
-
-		std::vector<std::string> Tokens = Math::splitString(line);
-		if (!Tokens.empty()) {
-			if (Tokens[0] == "v") {
-
-			}
-		}
-
-		// Update progress every linesPerUpdate lines read
-		if (++linesRead == linesPerUpdate) {
-			updateProgress(bytesRead, totalBytes);
-			linesRead = 0;
-		}
-	}
-
-	// Update progress for the remaining lines
-	if (linesRead > 0) {
-		updateProgress(bytesRead, totalBytes);
-	}
-
-	file.close();
-	emit loadingFinished();
+Obj_File_Loader::Obj_File_Loader(QObject* parent, std::string P_File_Path) : QThread(parent) {
+	File_Path = P_File_Path;
 }
 
-void Kerzenlicht_File_Loader::updateProgress(uint_fast8_t bytesRead, uint_fast8_t totalBytes) {
-	uint_fast8_t progress = static_cast<uint_fast8_t>((bytesRead * 100) / totalBytes);
-	emit progressUpdated(progress);
-}
+void Obj_File_Loader::run() {
+	std::ifstream file(File_Path);
+	std::ifstream fileTemp(File_Path);
 
-Obj_File_Loader::Obj_File_Loader() : QObject() {}
-
-void Obj_File_Loader::loadObjFile(const std::string filePath) {
-	std::ifstream file(filePath);
-	std::ifstream fileTemp(filePath);
-	
 	int lineCount = 0;
 	std::string file_line;
 	while (std::getline(fileTemp, file_line)) {
@@ -99,14 +51,14 @@ void Obj_File_Loader::loadObjFile(const std::string filePath) {
 
 		// Update progress every linesPerUpdate lines read
 		if (++linesRead == linesPerUpdate) {
-			updateProgress(linesRead, lineCount);
+			emit progressUpdated(static_cast<int>((linesRead * 100) / lineCount));
 			linesRead = 0;
 		}
 	}
 
 	// Update progress for the remaining lines
 	if (linesRead > 0) {
-		updateProgress(linesRead, lineCount);
+		emit progressUpdated(static_cast<int>((linesRead * 100) / lineCount));
 	}
 
 	file.close();
@@ -114,7 +66,6 @@ void Obj_File_Loader::loadObjFile(const std::string filePath) {
 	emit loadingFinished(Imported_Mesh);
 }
 
-void Obj_File_Loader::updateProgress(int Precent, int Total) {
-	int progress = static_cast<int>((Precent * 100) / Total);
-	emit progressUpdated(progress);
+void Obj_File_Loader::loadObjFile(const std::string filePath) {
+	
 }

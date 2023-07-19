@@ -3,7 +3,8 @@
 Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_View() {
 	Log = P_Log;
 
-	Mouse_Pressed = false;
+	Left_Mouse_Pressed = false;
+	Right_Mouse_Pressed = false;
 	Mouse_Down_Pos = QPoint(0, 0);
 
 	QSettings settings("Raylight", "KerzenLicht");
@@ -86,7 +87,7 @@ void Kerzenlicht_Renderer::drawToSurface() {
 
 void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
 	for (std::pair<const std::string, Object>& Obj : Object_Array) {
-		float Delta = P_Event->angleDelta().y()*0.0005;
+		float Delta = P_Event->angleDelta().y()*0.00005;
 		Obj.second.scale(Vec3(Delta, Delta, Delta));
 		Obj.second.processTransform();
 		renderFrame();
@@ -94,12 +95,17 @@ void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
 }
 
 void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
-	Mouse_Pressed = true;
+	if (P_Event->button() == Qt::LeftButton) {
+		Left_Mouse_Pressed = true;
+	}
+	if (P_Event->button() == Qt::RightButton) {
+		Right_Mouse_Pressed = true;
+	}
 	Mouse_Down_Pos = P_Event->pos();
 }
 
 void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
-	if (Mouse_Pressed) {
+	if (Left_Mouse_Pressed) {
 		double Delta = P_Event->pos().x() - Mouse_Down_Pos.x();
 		for (std::pair<const std::string, Object>& Obj : Object_Array) {
 			Obj.second.rotate(Vec3(0,Delta*0.001,0));
@@ -107,10 +113,25 @@ void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
 			renderFrame();
 		}
 	}
+	if (Right_Mouse_Pressed) {
+		double DeltaY = P_Event->pos().y() - Mouse_Down_Pos.y();
+		double DeltaX = P_Event->pos().x() - Mouse_Down_Pos.x();
+		for (std::pair<const std::string, Object>& Obj : Object_Array) {
+			Obj.second.translate(Vec3(DeltaX * 0.00025, DeltaY * -0.00025, 0));
+			Obj.second.processTransform();
+			renderFrame();
+		}
+	}
+	
 }
 
 void Kerzenlicht_Renderer::mouseReleaseEvent(QMouseEvent* P_Event) {
-	Mouse_Pressed = false;
+	if (P_Event->button() == Qt::LeftButton) {
+		Left_Mouse_Pressed = false;
+	}
+	if (P_Event->button() == Qt::RightButton) {
+		Right_Mouse_Pressed = false;
+	}
 }
 
 void Kerzenlicht_Renderer::resizeEvent(QResizeEvent* P_Event) {
@@ -172,15 +193,11 @@ void Kerzenlicht_Renderer::loadObj(std::string P_File) {
 	log << "Loading Obj Model, File: " << P_File << ".";
 	Log->append(QString::fromStdString(log.write()));
 
-	QThread* thread = new QThread();
-	Thread_Storage.push_back(thread);
-	Obj_File_Loader* objLoader = new Obj_File_Loader();
-	objLoader->moveToThread(thread);
+	Obj_File_Loader* thread = new Obj_File_Loader(this, P_File);
+	//Thread_Storage.push_back(thread);
 
-	Obj_File_Loader::connect(thread, &QThread::started, [objLoader, P_File]() {objLoader->loadObjFile(P_File); });
-
-	//Obj_File_Loader::connect(objLoader, &Obj_File_Loader::progressUpdated, [this](int Progress) {Menu->Progress->setValue(Progress); });
-	Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [this](Object Mesh) { createObject("Imported Obj", Mesh); } );
+	//connect(thread, &Obj_File_Loader::progressUpdated, [this](int P_Progress) { Menu->updateProgress(P_Progress); });
+	connect(thread, &Obj_File_Loader::loadingFinished, [this](Object P_Mesh) { Object_Array["Imported_Obj"] = P_Mesh; } );
 	/*Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [objLoader, thread, this]() {
 		objLoader->deleteLater();
 		thread->quit();
@@ -190,11 +207,6 @@ void Kerzenlicht_Renderer::loadObj(std::string P_File) {
 		}
 	);*/ // TODO Threads can be destroyed while creatingObject after finished if file is too large
 	thread->start();
-}
-
-void Kerzenlicht_Renderer::createObject(std::string P_Name, Object P_Mesh) {
-	Object_Array["Imported_Obj"] = P_Mesh;
-	//renderFrame();  //TODO Anything related to Gui being updated by a thread will crash it. Find solution
 }
 
 void Kerzenlicht_Renderer::renderWireframe() {
@@ -444,7 +456,7 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 
 	Progress = new QProgressBar();
 	Progress->setValue(0);
-	Progress->setMaximum(1);
+	Progress->setMaximum(100);
 	Progress->setTextVisible(true);
 	Progress->setVisible(true);
 

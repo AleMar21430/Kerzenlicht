@@ -109,7 +109,7 @@
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\Workspace_Log.h" />
     <ClInclude Include="src\Workspace_Manager.h" />
-    <QtMoc Include="src\Kerzenlicht_Renderer.h" />
+    <ClInclude Include="src\Kerzenlicht_Renderer.h" />
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h" />
     <ClInclude Include="src\QT_Core.h" />
     <ClInclude Include="src\Math.h" />

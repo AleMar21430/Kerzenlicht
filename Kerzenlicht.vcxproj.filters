@@ -90,6 +90,9 @@
     <ClInclude Include="src\Workspace_Renderer.h">
       <Filter>Header Files\Workspaces\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Kerzenlicht_Renderer.h">
+      <Filter>Header Files\Workspaces\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h">
@@ -97,9 +100,6 @@
     </QtMoc>
     <QtMoc Include="src\File_Readers.h">
       <Filter>Header Files\Core\I/O</Filter>
-    </QtMoc>
-    <QtMoc Include="src\Kerzenlicht_Renderer.h">
-      <Filter>Header Files\Workspaces\Renderer</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

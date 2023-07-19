@@ -11,12 +11,10 @@ enum Render_Mode {
 struct Renderer_Menu;
 
 struct Kerzenlicht_Renderer : QT_Graphics_View {
-	Q_OBJECT;
-public:
 	QT_Text_Stream* Log;
-	QProgressBar* Progress;
 
-	bool Mouse_Pressed;
+	bool Left_Mouse_Pressed;
+	bool Right_Mouse_Pressed;
 	QPoint Mouse_Down_Pos;
 
 	uint32_t ResX;
@@ -58,12 +56,10 @@ public:
 	void mouseReleaseEvent(QMouseEvent* P_Event) override;
 	void resizeEvent(QResizeEvent* P_Event) override;
 	void closeEvent(QCloseEvent* P_Event) override;
-
-public slots:
-	void createObject(std::string P_Name, Object P_Mesh);
 };
 
 struct Renderer_Menu : QT_Linear_Contents {
+
 	Kerzenlicht_Renderer* Parent;
 
 	QProgressBar* Progress;
@@ -74,7 +70,7 @@ struct Renderer_Menu : QT_Linear_Contents {
 	void renderWireframe();
 	void renderPointCloud();
 	void renderEdgeVisualizer();
-	void changeXResolution(int value);
-	void changeYResolution(int value);
+	void changeXResolution(int P_Value);
+	void changeYResolution(int P_Value);
 	void save();
 };
