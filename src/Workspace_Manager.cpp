@@ -27,7 +27,7 @@ Workspace_Dock_Header::Workspace_Dock_Header(QT_Text_Stream* P_Log, Workspace_Ma
 	Expand_Collapse_Toggle->setIcon(QPixmap("resources/Icons/Collapse.png"));
 	Workspace_Type_Button->setIcon(QPixmap("resources/Icons/workspaces/Dock_Manager.png"));
 	More_Settings_Toggle->setIcon(QPixmap("resources/Icons/Settings.png"));
-	Add_Dock_Button->setIcon(QPixmap("resource/Iconss/Add.png"));
+	Add_Dock_Button->setIcon(QPixmap("resources/Icons/Add.png"));
 	Add_Tab_Button->setIcon(QPixmap("resources/Icons/Add_Tab.png"));
 	Floating_Toggle->setIcon(QPixmap("resources/Icons/Float_Dock.png"));
 	Collapsible_Mode_Toggle->setIcon(QPixmap("resources/Icons/Collapse.png"));

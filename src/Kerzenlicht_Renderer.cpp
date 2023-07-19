@@ -408,16 +408,16 @@ void Kerzenlicht_Renderer::renderPointCloud() {
 						}
 						else {
 							renderPixel(
-								static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
+								static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 							);
 							renderPixel(
-								static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
+								static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 							);
 							renderPixel(
-								static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
+								static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
+								static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 							);
 						}
 					}
@@ -511,7 +511,8 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Obj_Normals = new QCheckBox("Import Obj Normals");
 	connect(Obj_Normals, &QCheckBox::stateChanged, [this](int State) {Normals_Obj_Import = State; });
 
-	QT_Button* Load_File_Button = new QT_Button("Import Obj File");
+	QT_Button* Load_File_Button = new QT_Button();
+	Load_File_Button->setText("Import Obj File");
 	connect(Load_File_Button, &QT_Button::clicked, this, &Renderer_Menu::openObjFile);
 
 	QT_Button* Clear_Button = new QT_Button();

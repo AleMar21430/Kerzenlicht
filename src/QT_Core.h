@@ -75,7 +75,8 @@ struct QT_Linear_Layout : QHBoxLayout {
 struct QT_Linear_Contents : QT_Widget {
 	QT_Linear_Layout* Layout;
 
-	QT_Linear_Contents(bool P_Vertical = true);
+	QT_Linear_Contents(bool P_Vertical);
+	QT_Linear_Contents(bool P_Vertical, bool P_Expand_X, bool P_Expand_Y);
 	QT_Linear_Contents(std::string P_Style = "_Default_Linear_Contents", bool P_Vertical = true);
 };
 

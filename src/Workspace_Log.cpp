@@ -3,7 +3,7 @@
 Workspace_Log::Workspace_Log(QT_Text_Stream* P_Log) : QT_Linear_Contents("_Container", true) {
 	Log = P_Log;
 
-	QT_Linear_Contents* Options = new QT_Linear_Contents(false);
+	QT_Linear_Contents* Options = new QT_Linear_Contents(false, true, false);
 	QT_Button* Clear_Button = new QT_Button();
 	Clear_Button->setText("Clear");
 	connect(Clear_Button, &QT_Button::clicked, [this]() {Log->clear(); });

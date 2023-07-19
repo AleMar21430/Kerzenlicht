@@ -81,6 +81,26 @@ QT_Linear_Contents::QT_Linear_Contents(bool P_Vertical) {
 	setLayout(Layout);
 }
 
+QT_Linear_Contents::QT_Linear_Contents(bool P_Vertical, bool P_Expand_X, bool P_Expand_Y) {
+	setObjectName("_Default_Linear_Contents");
+	setContentsMargins(0, 0, 0, 0);
+	if (P_Expand_X && P_Expand_Y) {
+		setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	}
+	else if (!P_Expand_X && P_Expand_Y) {
+		setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	}
+	else if (P_Expand_X && !P_Expand_Y) {
+		setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	}
+	else {
+		setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	}
+
+	Layout = new QT_Linear_Layout(P_Vertical);
+	setLayout(Layout);
+}
+
 QT_Linear_Contents::QT_Linear_Contents(std::string P_Style, bool P_Vertical) {
 	setObjectName(P_Style);
 	setContentsMargins(0, 0, 0, 0);
@@ -204,13 +224,15 @@ QT_Splitter::QT_Splitter(std::string P_Style, bool P_Vertical) {
 	setObjectName(P_Style);
 	setContentsMargins(0, 0, 0, 0);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	setHandleWidth(2);
 	if (P_Vertical) { setOrientation(Qt::Vertical); }
 	else { setOrientation(Qt::Horizontal); }
 }
 QT_Splitter::QT_Splitter(bool P_Vertical) {
 	setObjectName("_Default_Splitter");
 	setContentsMargins(0, 0, 0, 0);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	setHandleWidth(2);
 	if (P_Vertical) { setOrientation(Qt::Vertical); }
 	else { setOrientation(Qt::Horizontal); }
 }
