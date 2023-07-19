@@ -9,14 +9,14 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 
 	QSettings settings("Raylight", "KerzenLicht");
 
-	ResX = settings.value("ResX", 1600).toInt();
-	ResY = settings.value("ResY", 1220).toInt();
+	ResX = settings.value("ResX", 1800).toInt();
+	ResY = settings.value("ResY", 1120).toInt();
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
 	Pixmap = std::vector(ResX, std::vector<Rgba>(ResY));
 
-	View_Mode = Render_Mode::POINTCLOUD;
+	View_Mode = static_cast<Render_Mode>(settings.value("Render_Mode", Render_Mode::POINTCLOUD).toInt());
 
 	Thread_Storage = std::vector<QThread*>();
 	Object_Array = std::map<std::string, Object>();
@@ -509,18 +509,21 @@ void Renderer_Menu::renderWireframe() {
 	Parent->renderClear();
 	Parent->renderWireframe();
 	Parent->drawToSurface();
+	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", Render_Mode::WIREFRAME);
 }
 void Renderer_Menu::renderPointCloud() {
 	Parent->View_Mode = Render_Mode::POINTCLOUD;
 	Parent->renderClear();
 	Parent->renderPointCloud();
 	Parent->drawToSurface();
+	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", Render_Mode::POINTCLOUD);
 }
 void Renderer_Menu::renderEdgeVisualizer() {
 	Parent->View_Mode = Render_Mode::VISUALIZER;
 	Parent->renderClear();
 	Parent->renderEdgeVisualizer();
 	Parent->drawToSurface();
+	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", Render_Mode::VISUALIZER);
 }
 
 void Renderer_Menu::changeXResolution(int value) {
