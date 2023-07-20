@@ -94,9 +94,8 @@ void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
 
 void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
 	if (Left_Mouse_Pressed) {
-		double Delta = P_Event->pos().x() - Mouse_Down_Pos.x();
 		for (std::pair<const std::string, Object>& Obj : Object_Array) {
-			Obj.second.rotate(Vec3(0,Delta*0.001,0));
+			Obj.second.rotate(Vec3((P_Event->pos().y() - Mouse_Down_Pos.y()) * 0.001, (P_Event->pos().x() - Mouse_Down_Pos.x()) * 0.001, 0));
 			Obj.second.processTransform();
 			renderFrame();
 		}

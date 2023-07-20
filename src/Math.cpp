@@ -1,6 +1,5 @@
 #include "Math.h"
 
-
 Vec2::Vec2() {
 	X = 0;
 	Y = 0;

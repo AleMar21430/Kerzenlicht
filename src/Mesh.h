@@ -18,6 +18,7 @@ struct Mesh_Face {
 };
 
 struct Mesh {
+	std::string Name;
 	std::vector<Mesh_Face> Faces;
 	std::vector<Vec3> Vertex_Positions;
 	std::map<std::string, std::vector<Rgb>> Vertex_Colors;

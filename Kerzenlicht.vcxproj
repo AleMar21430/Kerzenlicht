@@ -105,6 +105,11 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Object.h" />
+    <ClInclude Include="src\Atmosphere.h" />
+    <ClInclude Include="src\Bone.h" />
+    <ClInclude Include="src\Force.h" />
+    <ClInclude Include="src\Light.h" />
+    <ClInclude Include="src\Pivot.h" />
     <ClInclude Include="src\R_String.h" />
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\Workspace_Log.h" />
@@ -123,6 +128,11 @@
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Math.cpp" />
+    <ClCompile Include="src\Atmosphere.cpp" />
+    <ClCompile Include="src\Bone.cpp" />
+    <ClCompile Include="src\Force.cpp" />
+    <ClCompile Include="src\Light.cpp" />
+    <ClCompile Include="src\Pivot.cpp" />
     <ClCompile Include="src\Workspace_Log.cpp" />
     <ClCompile Include="src\Workspace_Manager.cpp" />
     <ClCompile Include="src\Kerzenlicht_Renderer.cpp" />

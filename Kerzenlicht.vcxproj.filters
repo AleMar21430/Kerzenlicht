@@ -52,6 +52,12 @@
     <Filter Include="Source Files\Core\I/O">
       <UniqueIdentifier>{4e63a671-e53b-4522-bcc0-70b9637a8b13}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core\Objects">
+      <UniqueIdentifier>{9a2a4dfe-053d-477b-bbe5-9ab829b30381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Objects">
+      <UniqueIdentifier>{0171936f-75e4-449e-bf71-5f3524140269}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\R_Workspace_OpenGL_Viewport.h">
@@ -64,15 +70,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Math.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Camera.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Object.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Main_Window.h">
@@ -89,6 +86,30 @@
     </ClInclude>
     <ClInclude Include="src\Workspace_Renderer.h">
       <Filter>Header Files\Workspaces\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>Header Files\Core\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Header Files\Core\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Object.h">
+      <Filter>Header Files\Core\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Pivot.h">
+      <Filter>Header Files\Core\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Light.h">
+      <Filter>Header Files\Core\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Force.h">
+      <Filter>Header Files\Core\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bone.h">
+      <Filter>Header Files\Core\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Atmosphere.h">
+      <Filter>Header Files\Core\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -121,15 +142,6 @@
     <ClCompile Include="src\Math.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Object.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Mesh.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Workspace_Manager.cpp">
       <Filter>Source Files\Workspaces</Filter>
     </ClCompile>
@@ -144,6 +156,30 @@
     </ClCompile>
     <ClCompile Include="src\File_Readers.cpp">
       <Filter>Source Files\Core\I/O</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pivot.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Atmosphere.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bone.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Force.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Light.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
