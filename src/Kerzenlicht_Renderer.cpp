@@ -198,16 +198,48 @@ void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X,
 }
 
 void Kerzenlicht_Renderer::render2DPoly(std::vector<std::pair<int,int>> P_Poly) {
-	for (size_t i = 0; i < P_Poly.size(); i++) {
-		int X1 = P_Poly[i].first-150;
-		int Y1 = P_Poly[i].second-300;
+	std::vector<std::pair<int, int>> points = P_Poly;
+	for (std::pair<int, int> &Point : points) {
+		Point.first -= 150;
+		Point.second -= 300;
+		Point.first *= 3;
+		Point.second *= 3;
+	}
 
-		size_t nextIndex = (i + 1) % P_Poly.size();
+	int minY = points[0].second;
+	int maxY = points[0].second;
 
-		int X2 = P_Poly[nextIndex].first-150;
-		int Y2 = P_Poly[nextIndex].second-300;
+	for (const auto& point : points) {
+		minY = std::min(minY, point.second);
+		maxY = std::max(maxY, point.second);
+	}
 
-		renderLine(X1*3, Y1*3, X2*3, Y2*3);
+	// Scanline filling
+	for (int y = minY; y <= maxY; y++) {
+		std::vector<int> intersectX;
+
+		for (size_t i = 0; i < points.size(); i++) {
+			size_t nextIndex = (i + 1) % points.size();
+			int P_Start_Y = points[i].second;
+			int P_End_Y = points[nextIndex].second;
+
+			if ((P_Start_Y <= y && P_End_Y > y) || (P_End_Y <= y && P_Start_Y > y)) {
+				int P_Start_X = points[i].first;
+				int P_End_X = points[nextIndex].first;
+
+				int intersectXVal = P_Start_X + (y - P_Start_Y) * (P_End_X - P_Start_X) / (P_End_Y - P_Start_Y);
+				intersectX.push_back(intersectXVal);
+			}
+		}
+
+		std::sort(intersectX.begin(), intersectX.end());
+
+		// Draw the scanline
+		for (size_t i = 0; i < intersectX.size(); i += 2) {
+			int P_Start_X = intersectX[i];
+			int P_End_X = intersectX[i + 1];
+			renderLine(P_Start_X, y, P_End_X, y);
+		}
 	}
 }
 
