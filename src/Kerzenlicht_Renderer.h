@@ -42,6 +42,7 @@ public:
 	void renderClear();
 	void renderPixel(uint32_t P_X, uint32_t P_Y);
 	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
+	void render2DPoly(std::vector<std::pair<int, int>> P_Poly);
 	void renderWireframe();
 	void renderPointCloud();
 	void renderEdgeVisualizer();

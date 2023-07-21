@@ -34,9 +34,23 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	// Scene //
 	///////////
+	//renderClear();
+	//drawToSurface();
+	//loadObj("./Monke.obj");
 	renderClear();
+	render2DPoly({
+		std::pair<int,int>(165, 380),
+		std::pair<int,int>(185, 360),
+		std::pair<int,int>(180, 330),
+		std::pair<int,int>(207, 345),
+		std::pair<int,int>(233, 330),
+		std::pair<int,int>(230, 360),
+		std::pair<int,int>(250, 380),
+		std::pair<int,int>(220, 385),
+		std::pair<int,int>(205, 410),
+		std::pair<int,int>(193, 383) 
+	});
 	drawToSurface();
-	loadObj("./Monke.obj");
 }
 
 void Kerzenlicht_Renderer::setImage(std::string P_File) {
@@ -109,7 +123,6 @@ void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
 			renderFrame();
 		}
 	}
-	
 }
 
 void Kerzenlicht_Renderer::mouseReleaseEvent(QMouseEvent* P_Event) {
@@ -182,6 +195,20 @@ void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X,
 		}
 	}
 	renderPixel(P_End_X, P_End_Y);
+}
+
+void Kerzenlicht_Renderer::render2DPoly(std::vector<std::pair<int,int>> P_Poly) {
+	for (size_t i = 0; i < P_Poly.size(); i++) {
+		int X1 = P_Poly[i].first-150;
+		int Y1 = P_Poly[i].second-300;
+
+		size_t nextIndex = (i + 1) % P_Poly.size();
+
+		int X2 = P_Poly[nextIndex].first-150;
+		int Y2 = P_Poly[nextIndex].second-300;
+
+		renderLine(X1*3, Y1*3, X2*3, Y2*3);
+	}
 }
 
 void Kerzenlicht_Renderer::loadObj(std::string P_File) {

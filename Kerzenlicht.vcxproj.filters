@@ -87,28 +87,10 @@
     <ClInclude Include="src\Workspace_Renderer.h">
       <Filter>Header Files\Workspaces\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Camera.h">
-      <Filter>Header Files\Core\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Header Files\Core\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="src\Object.h">
       <Filter>Header Files\Core\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\Pivot.h">
-      <Filter>Header Files\Core\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Light.h">
-      <Filter>Header Files\Core\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Force.h">
-      <Filter>Header Files\Core\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Bone.h">
-      <Filter>Header Files\Core\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Atmosphere.h">
+    <ClInclude Include="src\Mesh.h">
       <Filter>Header Files\Core\Objects</Filter>
     </ClInclude>
   </ItemGroup>
@@ -157,28 +139,10 @@
     <ClCompile Include="src\File_Readers.cpp">
       <Filter>Source Files\Core\I/O</Filter>
     </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Source Files\Core\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="src\Mesh.cpp">
       <Filter>Source Files\Core\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Object.cpp">
-      <Filter>Source Files\Core\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Pivot.cpp">
-      <Filter>Source Files\Core\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Atmosphere.cpp">
-      <Filter>Source Files\Core\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Bone.cpp">
-      <Filter>Source Files\Core\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Force.cpp">
-      <Filter>Source Files\Core\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Light.cpp">
       <Filter>Source Files\Core\Objects</Filter>
     </ClCompile>
   </ItemGroup>

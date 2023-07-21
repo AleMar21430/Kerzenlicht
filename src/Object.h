@@ -1,15 +1,12 @@
 #pragma once
 
 #include "Math.h"
+
 #include "Mesh.h"
-#include"Camera.h"
 
 enum Object_Type {
-	CAMERA,
-	CURVE,
 	EMPTY,
 	MESH,
-	PIVOT
 };
 
 struct Object {
