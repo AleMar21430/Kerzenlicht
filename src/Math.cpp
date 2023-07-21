@@ -314,3 +314,28 @@ std::vector<std::string> Math::splitString(std::string& input) {
 
 	return result;
 }
+
+void Math::centerPointsToOrigin(std::vector<std::pair<int, int>>& points) {
+	// Find the minimum and maximum x and y coordinates
+	int minX = points[0].first;
+	int maxX = points[0].first;
+	int minY = points[0].second;
+	int maxY = points[0].second;
+
+	for (const auto& point : points) {
+		minX = std::min(minX, point.first);
+		maxX = std::max(maxX, point.first);
+		minY = std::min(minY, point.second);
+		maxY = std::max(maxY, point.second);
+	}
+
+	// Calculate the center of the bounding box
+	int centerX = (minX + maxX) / 2;
+	int centerY = (minY + maxY) / 2;
+
+	// Shift all points to center them around the origin
+	for (auto& point : points) {
+		point.first -= centerX;
+		point.second -= centerY;
+	}
+}

@@ -38,7 +38,8 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	//drawToSurface();
 	//loadObj("./Monke.obj");
 	renderClear();
-	render2DPoly({
+	setPenColor(Rgba::random());
+	std::vector<std::pair<int, int>> Poly1 = {
 		std::pair<int,int>(165, 380),
 		std::pair<int,int>(185, 360),
 		std::pair<int,int>(180, 330),
@@ -48,8 +49,97 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 		std::pair<int,int>(250, 380),
 		std::pair<int,int>(220, 385),
 		std::pair<int,int>(205, 410),
-		std::pair<int,int>(193, 383) 
-	});
+		std::pair<int,int>(193, 383)
+	};
+	Math::centerPointsToOrigin(Poly1);
+	for (std::pair<int, int>& Point : Poly1) {
+		Point.first *= 3;
+		Point.second *= 3;
+		Point.first += 200;
+		Point.second += 150;
+	}
+	render2DPoly(Poly1);
+
+	setPenColor(Rgba::random());
+	std::vector<std::pair<int, int>> Poly2 = {
+		std::pair<int,int>(321, 335),
+		std::pair<int,int>(288, 286),
+		std::pair<int,int>(339, 251),
+		std::pair<int,int>(374, 302)
+	};
+	Math::centerPointsToOrigin(Poly2);
+	for (std::pair<int, int>& Point : Poly2) {
+		Point.first *= 2;
+		Point.second *= 2;
+		Point.first += 400;
+		Point.second += 150;
+	}
+	render2DPoly(Poly2);
+
+	setPenColor(Rgba::random());
+	std::vector<std::pair<int, int>> Poly3 = {
+		std::pair<int,int>(377, 249),
+		std::pair<int,int>(411, 197),
+		std::pair<int,int>(436, 249)
+	};
+	Math::centerPointsToOrigin(Poly3);
+	for (std::pair<int, int>& Point : Poly3) {
+		Point.first *= 3;
+		Point.second *= 3;
+		Point.first += 600;
+		Point.second += 150;
+	}
+	render2DPoly(Poly3);
+
+	setPenColor(Rgba::random());
+	std::vector<std::pair<int, int>> Poly4 = {
+		std::pair<int, int>(413, 177),
+		std::pair<int, int>(448, 159),
+		std::pair<int, int>(502, 88),
+		std::pair<int, int>(553, 53),
+		std::pair<int, int>(535, 36),
+		std::pair<int, int>(676, 37),
+		std::pair<int, int>(660, 52),
+		std::pair<int, int>(750, 145),
+		std::pair<int, int>(761, 179),
+		std::pair<int, int>(672, 192),
+		std::pair<int, int>(659, 214),
+		std::pair<int, int>(615, 214),
+		std::pair<int, int>(632, 230),
+		std::pair<int, int>(580, 230),
+		std::pair<int, int>(597, 215),
+		std::pair<int, int>(552, 214),
+		std::pair<int, int>(517, 144),
+		std::pair<int, int>(466, 180)
+	};
+	Math::centerPointsToOrigin(Poly4);
+	for (std::pair<int, int>& Point : Poly4) {
+		Point.first *= 1;
+		Point.second *= 1;
+		Point.first += 1000;
+		Point.second += 150;
+	}
+	render2DPoly(Poly4);
+	for (std::pair<int, int>& Point : Poly4) {
+		Point.first += 400;
+	}
+	setPenColor(Rgba::random());
+	render2DPoly(Poly4);
+
+	setPenColor(Rgba(0.1,0.1,0.1,1));
+	std::vector<std::pair<int, int>> Poly5 = {
+		std::pair<int, int>(682, 175),
+		std::pair<int, int>(708, 120),
+		std::pair<int, int>(735, 148),
+		std::pair<int, int>(739, 170)
+	};
+	Math::centerPointsToOrigin(Poly5);
+	for (std::pair<int, int>& Point : Poly5) {
+		Point.first += 1400;
+		Point.second += 150;
+	}
+	render2DPoly(Poly5);
+
 	drawToSurface();
 }
 
@@ -198,34 +288,27 @@ void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X,
 }
 
 void Kerzenlicht_Renderer::render2DPoly(std::vector<std::pair<int,int>> P_Poly) {
-	std::vector<std::pair<int, int>> points = P_Poly;
-	for (std::pair<int, int> &Point : points) {
-		Point.first -= 150;
-		Point.second -= 300;
-		Point.first *= 3;
-		Point.second *= 3;
-	}
 
-	int minY = points[0].second;
-	int maxY = points[0].second;
+	int minY = P_Poly[0].second;
+	int maxY = P_Poly[0].second;
 
-	for (const auto& point : points) {
+	for (const auto& point : P_Poly) {
 		minY = std::min(minY, point.second);
 		maxY = std::max(maxY, point.second);
 	}
 
-	// Scanline filling
+	// Scanline fill
 	for (int y = minY; y <= maxY; y++) {
 		std::vector<int> intersectX;
 
-		for (size_t i = 0; i < points.size(); i++) {
-			size_t nextIndex = (i + 1) % points.size();
-			int P_Start_Y = points[i].second;
-			int P_End_Y = points[nextIndex].second;
+		for (size_t i = 0; i < P_Poly.size(); i++) {
+			size_t nextIndex = (i + 1) % P_Poly.size();
+			int P_Start_Y = P_Poly[i].second;
+			int P_End_Y = P_Poly[nextIndex].second;
 
 			if ((P_Start_Y <= y && P_End_Y > y) || (P_End_Y <= y && P_Start_Y > y)) {
-				int P_Start_X = points[i].first;
-				int P_End_X = points[nextIndex].first;
+				int P_Start_X = P_Poly[i].first;
+				int P_End_X = P_Poly[nextIndex].first;
 
 				int intersectXVal = P_Start_X + (y - P_Start_Y) * (P_End_X - P_Start_X) / (P_End_Y - P_Start_Y);
 				intersectX.push_back(intersectXVal);
@@ -234,7 +317,6 @@ void Kerzenlicht_Renderer::render2DPoly(std::vector<std::pair<int,int>> P_Poly) 
 
 		std::sort(intersectX.begin(), intersectX.end());
 
-		// Draw the scanline
 		for (size_t i = 0; i < intersectX.size(); i += 2) {
 			int P_Start_X = intersectX[i];
 			int P_End_X = intersectX[i + 1];
