@@ -12,6 +12,8 @@ C++ Qt6  Object-Based  Wireframe and Point Cloud Orthogonal View Rasterizer
 * .bmp Image Saving
 
 # GUI:
+![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/2d342015-c80b-4828-84c1-e7d570d8dabb)
+
 ![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/c6a11ec8-4178-4530-9ede-79b2fb39ae44)
 
 
