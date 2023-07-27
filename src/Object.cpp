@@ -67,6 +67,7 @@ void Object::translate(Vec3 P_Pos) {
 
 void Object::processTransform() {
 	if (Type == MESH) {
+		#pragma omp parallel for
 		for (int i = 0; i < MeshData.Vertex_Positions.size(); i++) {
 			Vertex& vert = MeshData.Vertex_Output[i];
 			vert.Pos = MeshData.Vertex_Positions[i] * Scale;
