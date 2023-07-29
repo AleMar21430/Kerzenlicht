@@ -162,6 +162,8 @@ void Kerzenlicht_Renderer::updateProgress(int P_Progress) {
 
 void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Render_Object = P_Object;
+	Render_Object.rotate(Vec3(0, 0, 180));
+	Render_Object.processTransform();
 	renderFrame();
 }
 
@@ -175,6 +177,8 @@ void Kerzenlicht_Renderer::setPenOpacity(float P_Opacity) {
 
 void Kerzenlicht_Renderer::renderClear() {
 	double inf = numeric_limits<double>::infinity();
+	Pixmap = vector(ResX, vector<Rgba>(ResY));
+	ZBuffer = vector(ResX, vector<double>(ResY));
 	for (int x = 0; x < ResX; x++) {
 		for (int y = 0; y < ResY; y++) {
 			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
@@ -252,12 +256,12 @@ void Kerzenlicht_Renderer::render2DPoly(vector<pair<int,int>> P_Poly) {
 
 void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex P_Vert3) {
 
-	int x1 = static_cast<int>((P_Vert1.Pos.X + 1.0f) * 0.5f * ResX);
-	int y1 = static_cast<int>((P_Vert1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-	int x2 = static_cast<int>((P_Vert2.Pos.X + 1.0f) * 0.5f * ResX);
-	int y2 = static_cast<int>((P_Vert2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-	int x3 = static_cast<int>((P_Vert3.Pos.X + 1.0f) * 0.5f * ResX);
-	int y3 = static_cast<int>((P_Vert3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+	int x1 = static_cast<int>((P_Vert1.Pos.X + 1.0) * 0.5 * ResX);
+	int y1 = static_cast<int>((P_Vert1.Pos.Y * Aspect_Ratio + 1.0) * 0.5 * ResY);
+	int x2 = static_cast<int>((P_Vert2.Pos.X + 1.0) * 0.5 * ResX);
+	int y2 = static_cast<int>((P_Vert2.Pos.Y * Aspect_Ratio + 1.0) * 0.5 * ResY);
+	int x3 = static_cast<int>((P_Vert3.Pos.X + 1.0) * 0.5 * ResX);
+	int y3 = static_cast<int>((P_Vert3.Pos.Y * Aspect_Ratio + 1.0) * 0.5 * ResY);
 
 	int minX = min({ x1, x2, x3 });
 	int minY = min({ y1, y2, y3 });
@@ -275,7 +279,7 @@ void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex
 					if (u > 0 && u <= 1 && v > 0 && v <= 1 && w > 0 && w <= 1) {
 						setPenColor(Rgba(
 							P_Vert1.Color * u + P_Vert2.Color * v + P_Vert3.Color * w,
-							1
+							1.0
 						));
 						renderPixel(x, y);
 					}
@@ -292,7 +296,7 @@ tuple<double, double, double> Kerzenlicht_Renderer::barycentricCoords(const Vec2
 	
 	double u = AreaPBC / AreaABC;
 	double v = AreaACP / AreaABC;
-	double w = 1 - u - v;
+	double w = 1.0 - u - v;
 
 	return make_tuple(u,v,w);
 }
@@ -568,13 +572,13 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	QIntValidator* ValidatorX = new QIntValidator();
 	ResX_Input->setValidator(ValidatorX);
 	ResX_Input->setText(QString::fromStdString(to_string(Parent->ResX)));
-	connect(ResX_Input, &QT_Value_Input::textChanged, [this](QString text) {changeXResolution(text.toInt()); });
+	connect(ResX_Input, &QT_Value_Input::returnPressed, [this, ResX_Input]() {changeXResolution(ResX_Input->text().toInt()); });
 
 	QT_Value_Input* ResY_Input = new QT_Value_Input();
 	QIntValidator* ValidatorY = new QIntValidator();
 	ResY_Input->setValidator(ValidatorY);
 	ResY_Input->setText(QString::fromStdString(to_string(Parent->ResY)));
-	connect(ResY_Input, &QT_Value_Input::textChanged, [this](QString text) {changeYResolution(text.toInt()); });
+	connect(ResY_Input, &QT_Value_Input::returnPressed, [this, ResY_Input]() {changeYResolution(ResY_Input->text().toInt()); });
 
 	QT_Button* Save_Button = new QT_Button;
 	Save_Button->setText("Save to .Bmp");
@@ -619,19 +623,17 @@ void Renderer_Menu::renderEdgeVisualizer() {
 
 void Renderer_Menu::changeXResolution(int value) {
 	Parent->ResX = value;
-	QSettings("Raylight", "KerzenLicht").setValue("ResX", value);
 	Parent->Aspect_Ratio = static_cast<double>(Parent->ResX) / static_cast<double>(Parent->ResY);
-	Parent->Pixmap = vector(Parent->ResX, vector<Rgba>(Parent->ResY));
 	Parent->renderClear();
+	QSettings("Raylight", "KerzenLicht").setValue("ResX", value);
 	Parent->renderFrame();
 }
 
 void Renderer_Menu::changeYResolution(int value) {
 	Parent->ResY = value;
 	Parent->Aspect_Ratio = static_cast<double>(Parent->ResX) / static_cast<double>(Parent->ResY);
-	QSettings("Raylight", "KerzenLicht").setValue("ResY", value);
-	Parent->Pixmap = vector(Parent->ResX, vector<Rgba>(Parent->ResY));
 	Parent->renderClear();
+	QSettings("Raylight", "KerzenLicht").setValue("ResY", value);
 	Parent->renderFrame();
 }
 
