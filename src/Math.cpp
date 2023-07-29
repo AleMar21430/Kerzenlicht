@@ -165,14 +165,6 @@ Vec3& Vec3::operator*(const double& other) {
 	return Result;
 }
 
-Vec3& Vec3::operator*(const Matrix_4x4& other) {
-	Vec3 Result;
-	Result.X = X * other.m[0][0] + Y * other.m[1][0] + Z * other.m[2][0] + other.m[3][0];
-	Result.Y = X * other.m[0][1] + Y * other.m[1][1] + Z * other.m[2][1] + other.m[3][1];
-	Result.Z = X * other.m[0][2] + Y * other.m[1][2] + Z * other.m[2][2] + other.m[3][2];
-	return Result;
-}
-
 double Vec3::dot(const Vec3& other) {
 	return X * other.X + Y * other.Y + Z * other.Z;
 }
@@ -397,7 +389,7 @@ void Math::centerPointsToOrigin(std::vector<std::pair<int, int>>& points) {
 }
 
 Matrix_3x3 Matrix_3x3::operator*(Matrix_3x3 other) {
-	Matrix_3x3 Result;
+	Matrix_3x3 Result = Matrix_3x3();
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
 			Result.matrix[i][j] =
@@ -418,7 +410,7 @@ Matrix_4x4::Matrix_4x4(vector<vector<double>> P_Input) {
 }
 
 Matrix_4x4 Matrix_4x4::operator*(Matrix_4x4 other) {
-	Matrix_4x4 Result;
+	Matrix_4x4 Result = Matrix_4x4();
 	for (int i = 0; i < 4; ++i) {
 		for (int j = 0; j < 4; ++j) {
 			Result.m[i][j] =
@@ -429,4 +421,34 @@ Matrix_4x4 Matrix_4x4::operator*(Matrix_4x4 other) {
 		}
 	}
 	return Result;
+}
+
+Vec4& Vec4::operator*(const Matrix_4x4& other) {
+	Vec4 Result = Vec4();
+	Result.X = other.m[0][0] * X + other.m[0][1] * Y + other.m[0][2] * Z + other.m[0][3] * W;
+	Result.Y = other.m[1][0] * X + other.m[1][1] * Y + other.m[1][2] * Z + other.m[1][3] * W;
+	Result.Z = other.m[2][0] * X + other.m[2][1] * Y + other.m[2][2] * Z + other.m[2][3] * W;
+	Result.W = other.m[3][0] * X + other.m[3][1] * Y + other.m[3][2] * Z + other.m[3][3] * W;
+	return Result;
+}
+
+Vec4::Vec4() {
+	X = 0;
+	Y = 0;
+	Z = 0;
+	W = 0;
+}
+
+Vec4::Vec4(const Vec3& P_XYZ, double P_W) {
+	X = P_XYZ.X;
+	Y = P_XYZ.Y;
+	Z = P_XYZ.Z;
+	W = P_W;
+}
+
+Vec4::Vec4(double P_X, double P_Y, double P_Z, double P_W) {
+	X = P_X;
+	Y = P_Y;
+	Z = P_Z;
+	W = P_W;
 }

@@ -21,13 +21,13 @@ Object::Object(std::string P_Name) {
 }
 
 void Object::scale(Vec3 P_Scale) {
-	Scale = Scale + P_Scale;
+	Scale += P_Scale;
 }
 
 void Object::rotate(Vec3 P_Rot) {
-	Rot_Euler = Rot_Euler + P_Rot;
+	Rot_Euler += P_Rot;
 }
 
 void Object::translate(Vec3 P_Pos) {
-	Pos = Pos + P_Pos;
+	Pos += P_Pos;
 }

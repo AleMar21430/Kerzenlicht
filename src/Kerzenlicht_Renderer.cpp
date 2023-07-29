@@ -85,13 +85,17 @@ void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
 
 void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
 	if (Left_Mouse_Pressed) {
-		Render_Object.rotate(Vec3((P_Event->pos().y() - Mouse_Down_Pos.y()) * 0.001, (P_Event->pos().x() - Mouse_Down_Pos.x()) * 0.001, 0));
+		Render_Object.rotate(Vec3(
+			(P_Event->pos().x() - Mouse_Down_Pos.x()) * -0.001,
+			(P_Event->pos().y() - Mouse_Down_Pos.y()) * -0.001,
+			0)
+		);
 		renderFrame();
 	}
 	if (Right_Mouse_Pressed) {
-		double DeltaY = P_Event->pos().y() - Mouse_Down_Pos.y();
 		double DeltaX = P_Event->pos().x() - Mouse_Down_Pos.x();
-		Render_Object.translate(Vec3(DeltaX * 5, DeltaY * -5, 0));
+		double DeltaY = P_Event->pos().y() - Mouse_Down_Pos.y();
+		Render_Object.translate(Vec3(DeltaX * 0.05, DeltaY * -0.05, 0));
 		renderFrame();
 	}
 }
@@ -159,8 +163,10 @@ void Kerzenlicht_Renderer::updateProgress(int P_Progress) {
 
 void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Render_Object = P_Object;
+	Render_Object.Pos = Vec3(0, 0, 0);
+	Render_Object.Rot_Euler = Vec3(0, 0, 0);
+	Render_Object.Scale = Vec3(300, 300, 300);
 	Render_Object.translate(Vec3(ResX / 2.0, ResY / 2.0, 0));
-	Render_Object.scale(Vec3(100, 100, 100));
 	renderFrame();
 }
 
@@ -308,26 +314,15 @@ void Kerzenlicht_Renderer::loadObj(string P_File) {
 
 void Kerzenlicht_Renderer::renderWireframe() {
 	setPenColor(Rgba(1, 1, 1, 1));
+	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
 	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
-		if (tri.I1 > 0 && tri.I1 < Render_Object.MeshData.Vertex_Output.size() &&
-			tri.I2 > 0 && tri.I2 < Render_Object.MeshData.Vertex_Output.size() &&
-			tri.I3 > 0 && tri.I3 < Render_Object.MeshData.Vertex_Output.size()) {
+		Vec3 v1 = Render_Object.MeshData.Vertex_Output[tri.I1].Pos;
+		Vec3 v2 = Render_Object.MeshData.Vertex_Output[tri.I2].Pos;
+		Vec3 v3 = Render_Object.MeshData.Vertex_Output[tri.I3].Pos;
 
-			Vec3 v1 = Render_Object.MeshData.Vertex_Output[tri.I1].Pos;
-			Vec3 v2 = Render_Object.MeshData.Vertex_Output[tri.I2].Pos;
-			Vec3 v3 = Render_Object.MeshData.Vertex_Output[tri.I3].Pos;
-
-			int x1 = static_cast<int>((v1.X + 1.0f) * 0.5f * ResX);
-			int y1 = static_cast<int>((v1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-			int x2 = static_cast<int>((v2.X + 1.0f) * 0.5f * ResX);
-			int y2 = static_cast<int>((v2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-			int x3 = static_cast<int>((v3.X + 1.0f) * 0.5f * ResX);
-			int y3 = static_cast<int>((v3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-
-			renderLine(x1, y1, x2, y2);
-			renderLine(x2, y2, x3, y3);
-			renderLine(x3, y3, x1, y1);
-		}
+		renderLine(v1.X, v1.Y, v2.X, v2.Y);
+		renderLine(v2.X, v2.Y, v3.X, v3.Y);
+		renderLine(v1.X, v1.Y, v3.X, v3.Y);
 	}
 }
 

@@ -63,8 +63,6 @@ struct Vec3 {
 
 	Vec3& operator*(const double& other);
 
-	Vec3& operator*(const Matrix_4x4& other);
-
 	double dot(const Vec3& other);
 	Vec3 cross(const Vec3& other);
 	double len();
@@ -77,6 +75,16 @@ struct Matrix_3x3 {
 	double matrix[3][3];
 
 	Matrix_3x3 operator*(Matrix_3x3 other);
+};
+
+struct Vec4 {
+	double X, Y, Z, W;
+
+	Vec4();
+	Vec4(const Vec3& P_XYZ, double P_W);
+	Vec4(double P_X, double P_Y, double P_Z, double P_W);
+
+	Vec4& operator*(const Matrix_4x4& other);
 };
 
 struct Matrix_4x4 {

@@ -26,7 +26,6 @@ struct Vertex {
 	Vertex(Vec3 P_Pos, Rgb P_Color);
 
 	Vec2 project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV);
-	Vertex vertShader(const Matrix_4x4& P_Model_Matrix);
 };
 
 struct Mesh_Face {

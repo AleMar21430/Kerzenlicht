@@ -32,11 +32,6 @@ Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) {
 	return Vec2(f * x, f * z);
 }
 
-Vertex Vertex::vertShader(const Matrix_4x4& P_Model_Matrix) {
-	Pos = Pos * P_Model_Matrix;
-	return *this;
-}
-
 Mesh_Face::Mesh_Face(uint32_t P_I1, uint32_t P_I2, uint32_t P_I3) {
 	I1 = P_I1;
 	I2 = P_I2;
@@ -101,14 +96,24 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 	if (Vertex_Colors["Col"].size() == Vertex_Positions.size()) {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
 			Vertex Vert = Vertex(Vertex_Positions[i], Vertex_Colors["Col"][i]);
-			Vert.Pos = Vert.Pos * Model_Matrix;
+			Vec4 vertShader = Vec4(Vert.Pos, 1) * Model_Matrix;
+			Vert.Pos = Vec3(
+				vertShader.X / vertShader.W,
+				vertShader.Y / vertShader.W,
+				vertShader.Z / vertShader.W
+			);
 			Vertex_Output.push_back(Vert);
 		}
 	}
 	else {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
 			Vertex Vert = Vertex(Vertex_Positions[i], Rgb(0,0,0));
-			Vert.Pos = Vert.Pos * Model_Matrix;
+			Vec4 vertShader = Vec4(Vert.Pos, 1) * Model_Matrix;
+			Vert.Pos = Vec3(
+				vertShader.X / vertShader.W,
+				vertShader.Y / vertShader.W,
+				vertShader.Z / vertShader.W
+			);
 			Vertex_Output.push_back(Vert);
 		}
 	}
