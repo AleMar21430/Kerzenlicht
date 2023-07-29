@@ -6,7 +6,6 @@ struct Vertex;
 struct Mesh_Face;
 
 struct Mesh {
-	std::string Name;
 	std::vector<Mesh_Face> Faces;
 	std::vector<Vec3> Vertex_Positions;
 	std::map<std::string, std::vector<Rgb>> Vertex_Colors;
@@ -15,6 +14,7 @@ struct Mesh {
 	std::vector<Vertex> Vertex_Output;
 
 	Mesh();
+	void applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, const Vec3& P_Scale);
 };
 
 struct Vertex {
@@ -26,6 +26,7 @@ struct Vertex {
 	Vertex(Vec3 P_Pos, Rgb P_Color);
 
 	Vec2 project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV);
+	Vertex vertShader(const Matrix_4x4& P_Model_Matrix);
 };
 
 struct Mesh_Face {

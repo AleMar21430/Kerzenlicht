@@ -17,10 +17,7 @@ struct Object {
 	Object();
 	Object(std::string P_Name);
 
-	void loadBuffers();
 	void scale(Vec3 P_Scale);
-	void setScale(Vec3 P_Scale);
 	void rotate(Vec3 P_Rot);
 	void translate(Vec3 P_Pos = Vec3());
-	void processTransform();
 };

@@ -17,8 +17,8 @@ void Obj_File_Loader::run() {
 
 	int linesRead = 0;
 	int Temp = 0;
-	if (static_cast<int>(lineCount / 1000) > 2) {
-		Temp = static_cast<int>(lineCount / 1000);
+	if (static_cast<int>(lineCount / 512) > 2) {
+		Temp = static_cast<int>(lineCount / 512);
 	}
 	else {
 		Temp = 2;
@@ -67,6 +67,5 @@ void Obj_File_Loader::run() {
 	emit updateProgress_Signal(100);
 
 	file.close();
-	Imported_Mesh.loadBuffers();
 	emit loadingFinished_Signal(Imported_Mesh);
 }

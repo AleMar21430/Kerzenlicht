@@ -14,11 +14,16 @@
 #include <map>
 #include <omp.h>
 
-#define PI          3.1415926535897932384626433832795
-#define TWO_PI      6.2831853071795864769252867665590
-#define INVERTED_PI 0.3183098861837906715377675267450
+#define PI          3.141592653589793
+#define TWO_PI      6.283185307179586
+#define INVERTED_PI 0.318309886183791
 
 using namespace std;
+
+struct Vec2;
+struct Vec3;
+struct Matrix_3x3;
+struct Matrix_4x4;
 
 struct Vec2 {
 	double X, Y;
@@ -58,12 +63,29 @@ struct Vec3 {
 
 	Vec3& operator*(const double& other);
 
+	Vec3& operator*(const Matrix_4x4& other);
+
 	double dot(const Vec3& other);
 	Vec3 cross(const Vec3& other);
 	double len();
 	Vec3 normalize();
 	Vec3 rotate(Vec3 P_Pos, const Vec3 P_Anchor, const Vec3 P_Rotation);
 	void rotate(const Vec3 P_Anchor, const Vec3 P_Rotation);
+};
+
+struct Matrix_3x3 {
+	double matrix[3][3];
+
+	Matrix_3x3 operator*(Matrix_3x3 other);
+};
+
+struct Matrix_4x4 {
+	vector<vector<double>> m;
+
+	Matrix_4x4();
+	Matrix_4x4(vector<vector<double>> P_Input);
+
+	Matrix_4x4 operator*(Matrix_4x4 other);
 };
 
 struct Rgb {
