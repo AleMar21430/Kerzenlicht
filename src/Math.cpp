@@ -254,6 +254,22 @@ Rgb::Rgb(float P_R, float P_G, float P_B) {
 	B = P_B;
 }
 
+Rgb& Rgb::operator+(const Rgb& other) {
+	Rgb Result = Rgb();
+	Result.R = R + other.R;
+	Result.G = G + other.G;
+	Result.B = B + other.B;
+	return Result;
+}
+
+Rgb& Rgb::operator*(const double& other) {
+	Rgb Result = Rgb();
+	Result.R = R * other;
+	Result.G = G * other;
+	Result.B = B * other;
+	return Result;
+}
+
 Rgb Rgb::random() {
 	return Rgb(rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX));
 }
@@ -263,6 +279,13 @@ Rgba::Rgba() {
 	G = 1;
 	B = 1;
 	A = 1;
+}
+
+Rgba::Rgba(Rgb P_Color, float P_Alpha) {
+	R = P_Color.R;
+	G = P_Color.G;
+	B = P_Color.B;
+	A = P_Alpha;
 }
 
 Rgba::Rgba(float P_R, float P_G, float P_B, float P_A) {

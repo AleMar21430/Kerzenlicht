@@ -26,11 +26,12 @@ public:
 	double Aspect_Ratio;
 	Rgba Pen_Color;
 	float Pen_Opacity;
-	std::vector<std::vector<Rgba>> Pixmap;
+	vector<vector<Rgba>> Pixmap;
+	vector<vector<double>> ZBuffer;
 
 	Render_Mode View_Mode;
 
-	std::vector<QThread*> Thread_Storage;
+	vector<QThread*> Thread_Storage;
 	Object Render_Object;
 	Camera Render_Camera;
 
@@ -45,16 +46,20 @@ public:
 	void renderClear();
 	void renderPixel(uint32_t P_X, uint32_t P_Y);
 	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
-	void render2DPoly(std::vector<std::pair<int, int>> P_Poly);
+	void render2DPoly(vector<pair<int, int>> P_Poly);
+	
+	void renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex P_Vert3);
+	tuple<double, double, double> barycentricCoords(const Vec2& P_Pos1, const Vec2& P_Pos2, const Vec2& P_Pos3, double P_X, double P_Y);
+
 	void renderWireframe();
 	void renderPointCloud();
-	void renderEdgeVisualizer();
+	void renderVisualizer();
 	void renderPathTracer();
 	void renderFrame();
 	void drawToSurface();
 
-	void loadObj(std::string P_File);
-	void storeBmp(std::string P_File);
+	void loadObj(string P_File);
+	void storeBmp(string P_File);
 	
 	void wheelEvent(QWheelEvent* P_Event) override;
 	void mousePressEvent(QMouseEvent* P_Event) override;

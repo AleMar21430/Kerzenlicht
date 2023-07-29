@@ -18,6 +18,8 @@
 #define TWO_PI      6.2831853071795864769252867665590
 #define INVERTED_PI 0.3183098861837906715377675267450
 
+using namespace std;
+
 struct Vec2 {
 	double X, Y;
 
@@ -70,6 +72,10 @@ struct Rgb {
 	Rgb();
 	Rgb(float P_R, float P_G, float P_B);
 
+	Rgb& operator+(const Rgb& other);
+
+	Rgb& operator*(const double& other);
+
 	static Rgb random();
 };
 
@@ -77,6 +83,7 @@ struct Rgba {
 	float R, G, B, A;
 
 	Rgba();
+	Rgba(Rgb P_Color, float P_Alpha);
 	Rgba(float P_R, float P_G, float P_B, float P_A);
 
 	Rgba& operator*(const double& other);

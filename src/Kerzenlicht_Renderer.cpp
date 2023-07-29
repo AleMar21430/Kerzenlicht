@@ -14,11 +14,12 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
-	Pixmap = std::vector(ResX, std::vector<Rgba>(ResY));
+	Pixmap = vector(ResX, vector<Rgba>(ResY));
+	ZBuffer = vector(ResX, vector<double>(ResY));
 
 	View_Mode = static_cast<Render_Mode>(settings.value("Render_Mode", Render_Mode::POINTCLOUD).toInt());
 
-	Thread_Storage = std::vector<QThread*>(); // for loading
+	Thread_Storage = vector<QThread*>(); // for loading
 
 	Render_Object = Object();
 	Render_Camera = Camera();
@@ -27,10 +28,10 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	setScene(Scene);
 	Menu = new Renderer_Menu(this);
 
-	std::stringstream log;
-	log << "Renderer Settings" << std::endl;
-	log << "Res X: " << Pixmap[0].size() << std::endl;
-	log << "Res Y: " << Pixmap.size() << std::endl;
+	stringstream log;
+	log << "Renderer Settings" << endl;
+	log << "Res X: " << Pixmap[0].size() << endl;
+	log << "Res Y: " << Pixmap.size() << endl;
 	Log->append(QString::fromStdString(log.str()));
 
 	///////////
@@ -173,9 +174,11 @@ void Kerzenlicht_Renderer::setPenOpacity(float P_Opacity) {
 }
 
 void Kerzenlicht_Renderer::renderClear() {
+	double inf = numeric_limits<double>::infinity();
 	for (int x = 0; x < ResX; x++) {
 		for (int y = 0; y < ResY; y++) {
 			Pixmap[x][y] = Rgba(0.1, 0.1, 0.1, 1);
+			ZBuffer[x][y] = inf;
 		}
 	}
 }
@@ -187,8 +190,8 @@ void Kerzenlicht_Renderer::renderPixel(uint32_t P_X, uint32_t P_Y) {
 }
 
 void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y) {
-	int dx = std::abs(P_End_X - P_Start_X);
-	int dy = std::abs(P_End_Y - P_Start_Y);
+	int dx = abs(P_End_X - P_Start_X);
+	int dy = abs(P_End_Y - P_Start_Y);
 	int err = dx - dy;
 	int x = P_Start_X;
 	int y = P_Start_Y;
@@ -209,19 +212,19 @@ void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X,
 	renderPixel(P_End_X, P_End_Y);
 }
 
-void Kerzenlicht_Renderer::render2DPoly(std::vector<std::pair<int,int>> P_Poly) {
+void Kerzenlicht_Renderer::render2DPoly(vector<pair<int,int>> P_Poly) {
 
 	int minY = P_Poly[0].second;
 	int maxY = P_Poly[0].second;
 
 	for (const auto& point : P_Poly) {
-		minY = std::min(minY, point.second);
-		maxY = std::max(maxY, point.second);
+		minY = min(minY, point.second);
+		maxY = max(maxY, point.second);
 	}
 
 	// Scanline fill
 	for (int y = minY; y <= maxY; y++) {
-		std::vector<int> intersectX;
+		vector<int> intersectX;
 
 		for (size_t i = 0; i < P_Poly.size(); i++) {
 			size_t nextIndex = (i + 1) % P_Poly.size();
@@ -237,7 +240,7 @@ void Kerzenlicht_Renderer::render2DPoly(std::vector<std::pair<int,int>> P_Poly) 
 			}
 		}
 
-		std::sort(intersectX.begin(), intersectX.end());
+		sort(intersectX.begin(), intersectX.end());
 
 		for (size_t i = 0; i < intersectX.size(); i += 2) {
 			int P_Start_X = intersectX[i];
@@ -247,7 +250,46 @@ void Kerzenlicht_Renderer::render2DPoly(std::vector<std::pair<int,int>> P_Poly) 
 	}
 }
 
-void Kerzenlicht_Renderer::loadObj(std::string P_File) {
+void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex P_Vert3) {
+
+	int x1 = static_cast<int>((P_Vert1.Pos.X + 1.0f) * 0.5f * ResX);
+	int y1 = static_cast<int>((P_Vert1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+	int x2 = static_cast<int>((P_Vert2.Pos.X + 1.0f) * 0.5f * ResX);
+	int y2 = static_cast<int>((P_Vert2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+	int x3 = static_cast<int>((P_Vert3.Pos.X + 1.0f) * 0.5f * ResX);
+	int y3 = static_cast<int>((P_Vert3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+
+	int minX = min({ x1, x2, x3 });
+	int minY = min({ y1, y2, y3 });
+	int maxX = max({ x1, x2, x3 }) + 1;
+	int maxY = max({ y1, y2, y3 }) + 1;
+
+	for (int x = minX; x < maxX; x++) {
+		for (int y = minY; y < maxY; y++) {
+			double u, v, w;
+			tie(u,v,w) = barycentricCoords(Vec2(x1, y1), Vec2(x2, y2), Vec2(x3, y3), x, y);
+			if (u > 0 && u <= 1 && v > 0 && v <= 1 && w > 0 && w <= 1) {
+				Rgb Color = Rgb((P_Vert1.Color * u) + (P_Vert2.Color * v) + (P_Vert3.Color * w));
+				setPenColor(Rgba(u,v,w,1));
+				renderPixel(x,y);
+			}
+		}
+	}
+}
+
+tuple<double, double, double> Kerzenlicht_Renderer::barycentricCoords(const Vec2& P_A, const Vec2& P_B, const Vec2& P_C, double P_X, double P_Y) {
+	double AreaPBC = (P_B.Y - P_C.Y) * (P_X   - P_C.X) + (P_C.X - P_B.X) * (P_Y   - P_C.Y);
+	double AreaACP = (P_C.Y - P_A.Y) * (P_X   - P_C.X) + (P_A.X - P_C.X) * (P_Y   - P_C.Y);
+	double AreaABC = (P_B.Y - P_C.Y) * (P_A.X - P_C.X) + (P_C.X - P_B.X) * (P_A.Y - P_C.Y);
+	
+	double u = AreaPBC / AreaABC;
+	double v = AreaACP / AreaABC;
+	double w = 1 - u - v;
+
+	return make_tuple(u,v,w);
+}
+
+void Kerzenlicht_Renderer::loadObj(string P_File) {
 	R_String log;
 	log << "Loading Obj Model, File: " << P_File << ".";
 	Log->append(QString::fromStdString(log.write()));
@@ -262,7 +304,7 @@ void Kerzenlicht_Renderer::loadObj(std::string P_File) {
 		thread->quit();
 		thread->wait();
 		thread->deleteLater();
-		Thread_Storage.erase(std::remove(Thread_Storage.begin(), Thread_Storage.end(), thread), Thread_Storage.end());
+		Thread_Storage.erase(remove(Thread_Storage.begin(), Thread_Storage.end(), thread), Thread_Storage.end());
 		}
 	);*/ // TODO Threads can be destroyed while creatingObject after finished if file is too large
 	thread->start();
@@ -293,27 +335,24 @@ void Kerzenlicht_Renderer::renderWireframe() {
 	}
 }
 
-void Kerzenlicht_Renderer::renderEdgeVisualizer() {
+void Kerzenlicht_Renderer::renderVisualizer() {
 	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
 		if (tri.I1 > 0 && tri.I1 < Render_Object.MeshData.Vertex_Output.size() &&
 			tri.I2 > 0 && tri.I2 < Render_Object.MeshData.Vertex_Output.size() &&
 			tri.I3 > 0 && tri.I3 < Render_Object.MeshData.Vertex_Output.size()) {
 
-			Vec3 v1 = Render_Object.MeshData.Vertex_Output[tri.I1].Pos;
-			Vec3 v2 = Render_Object.MeshData.Vertex_Output[tri.I2].Pos;
-			Vec3 v3 = Render_Object.MeshData.Vertex_Output[tri.I3].Pos;
+			Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
+			Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
+			Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
 
-			int x1 = static_cast<int>((v1.X + 1.0f) * 0.5f * ResX);
-			int y1 = static_cast<int>((v1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-			int x2 = static_cast<int>((v2.X + 1.0f) * 0.5f * ResX);
-			int y2 = static_cast<int>((v2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-			int x3 = static_cast<int>((v3.X + 1.0f) * 0.5f * ResX);
-			int y3 = static_cast<int>((v3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+			//int x1 = static_cast<int>((v1.X + 1.0f) * 0.5f * ResX);
+			//int y1 = static_cast<int>((v1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+			//int x2 = static_cast<int>((v2.X + 1.0f) * 0.5f * ResX);
+			//int y2 = static_cast<int>((v2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+			//int x3 = static_cast<int>((v3.X + 1.0f) * 0.5f * ResX);
+			//int y3 = static_cast<int>((v3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
 
-			setPenColor(Rgba::random());
-			renderLine(x1, y1, x2, y2);
-			renderLine(x2, y2, x3, y3);
-			renderLine(x3, y3, x1, y1);
+			renderTriangle(v1, v2, v3);
 		}
 	}
 }
@@ -433,13 +472,13 @@ void Kerzenlicht_Renderer::renderFrame() {
 		renderPointCloud();
 	}
 	else if (View_Mode == Render_Mode::VISUALIZER) {
-		renderEdgeVisualizer();
+		renderVisualizer();
 	}
 	drawToSurface();
 }
 
-void Kerzenlicht_Renderer::storeBmp(std::string P_File) {
-	std::ofstream file(P_File, std::ios::binary);
+void Kerzenlicht_Renderer::storeBmp(string P_File) {
+	ofstream file(P_File, ios::binary);
 	if (!file.is_open()) {
 		return;
 	}
@@ -520,13 +559,13 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	QT_Value_Input* ResX_Input = new QT_Value_Input();
 	QIntValidator* ValidatorX = new QIntValidator();
 	ResX_Input->setValidator(ValidatorX);
-	ResX_Input->setText(QString::fromStdString(std::to_string(Parent->ResX)));
+	ResX_Input->setText(QString::fromStdString(to_string(Parent->ResX)));
 	connect(ResX_Input, &QT_Value_Input::textChanged, [this](QString text) {changeXResolution(text.toInt()); });
 
 	QT_Value_Input* ResY_Input = new QT_Value_Input();
 	QIntValidator* ValidatorY = new QIntValidator();
 	ResY_Input->setValidator(ValidatorY);
-	ResY_Input->setText(QString::fromStdString(std::to_string(Parent->ResY)));
+	ResY_Input->setText(QString::fromStdString(to_string(Parent->ResY)));
 	connect(ResY_Input, &QT_Value_Input::textChanged, [this](QString text) {changeYResolution(text.toInt()); });
 
 	QT_Button* Save_Button = new QT_Button;
@@ -565,7 +604,7 @@ void Renderer_Menu::renderPointCloud() {
 void Renderer_Menu::renderEdgeVisualizer() {
 	Parent->View_Mode = Render_Mode::VISUALIZER;
 	Parent->renderClear();
-	Parent->renderEdgeVisualizer();
+	Parent->renderVisualizer();
 	Parent->drawToSurface();
 	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", Render_Mode::VISUALIZER);
 }
@@ -574,7 +613,7 @@ void Renderer_Menu::changeXResolution(int value) {
 	Parent->ResX = value;
 	QSettings("Raylight", "KerzenLicht").setValue("ResX", value);
 	Parent->Aspect_Ratio = static_cast<double>(Parent->ResX) / static_cast<double>(Parent->ResY);
-	Parent->Pixmap = std::vector(Parent->ResX, std::vector<Rgba>(Parent->ResY));
+	Parent->Pixmap = vector(Parent->ResX, vector<Rgba>(Parent->ResY));
 	Parent->renderClear();
 	Parent->renderFrame();
 }
@@ -583,7 +622,7 @@ void Renderer_Menu::changeYResolution(int value) {
 	Parent->ResY = value;
 	Parent->Aspect_Ratio = static_cast<double>(Parent->ResX) / static_cast<double>(Parent->ResY);
 	QSettings("Raylight", "KerzenLicht").setValue("ResY", value);
-	Parent->Pixmap = std::vector(Parent->ResX, std::vector<Rgba>(Parent->ResY));
+	Parent->Pixmap = vector(Parent->ResX, vector<Rgba>(Parent->ResY));
 	Parent->renderClear();
 	Parent->renderFrame();
 }
