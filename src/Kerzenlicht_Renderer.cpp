@@ -261,17 +261,25 @@ void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex
 
 	int minX = min({ x1, x2, x3 });
 	int minY = min({ y1, y2, y3 });
-	int maxX = max({ x1, x2, x3 }) + 1;
-	int maxY = max({ y1, y2, y3 }) + 1;
+	int maxX = max({ x1, x2, x3 })+1;
+	int maxY = max({ y1, y2, y3 })+1;
 
 	for (int x = minX; x < maxX; x++) {
 		for (int y = minY; y < maxY; y++) {
-			double u, v, w;
-			tie(u,v,w) = barycentricCoords(Vec2(x1, y1), Vec2(x2, y2), Vec2(x3, y3), x, y);
-			if (u > 0 && u <= 1 && v > 0 && v <= 1 && w > 0 && w <= 1) {
-				Rgb Color = Rgb((P_Vert1.Color * u) + (P_Vert2.Color * v) + (P_Vert3.Color * w));
-				setPenColor(Rgba(u,v,w,1));
-				renderPixel(x,y);
+			if (x > 0 && x < ResX && y > 0 && y < ResY) {
+				double u, v, w;
+				tie(u, v, w) = barycentricCoords(Vec2(x1, y1), Vec2(x2, y2), Vec2(x3, y3), x, y);
+				double Depth = u * P_Vert1.Pos.Z + v * P_Vert2.Pos.Z + w * P_Vert3.Pos.Z;
+				if (Depth < ZBuffer[x][y]) {
+					ZBuffer[x][y] = Depth;
+					if (u > 0 && u <= 1 && v > 0 && v <= 1 && w > 0 && w <= 1) {
+						setPenColor(Rgba(
+							P_Vert1.Color * u + P_Vert2.Color * v + P_Vert3.Color * w,
+							1
+						));
+						renderPixel(x, y);
+					}
+				}
 			}
 		}
 	}

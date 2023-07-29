@@ -254,7 +254,7 @@ Rgb::Rgb(float P_R, float P_G, float P_B) {
 	B = P_B;
 }
 
-Rgb& Rgb::operator+(const Rgb& other) {
+Rgb Rgb::operator+(Rgb other) {
 	Rgb Result = Rgb();
 	Result.R = R + other.R;
 	Result.G = G + other.G;
@@ -262,7 +262,7 @@ Rgb& Rgb::operator+(const Rgb& other) {
 	return Result;
 }
 
-Rgb& Rgb::operator*(const double& other) {
+Rgb Rgb::operator*(float other) {
 	Rgb Result = Rgb();
 	Result.R = R * other;
 	Result.G = G * other;
@@ -295,7 +295,7 @@ Rgba::Rgba(float P_R, float P_G, float P_B, float P_A) {
 	A = P_A;
 }
 
-Rgba& Rgba::operator*(const double& other) {
+Rgba& Rgba::operator*(const float& other) {
 	Rgba Result = Rgba();
 	Result.R = R * other;
 	Result.G = G * other;

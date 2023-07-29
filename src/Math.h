@@ -72,9 +72,9 @@ struct Rgb {
 	Rgb();
 	Rgb(float P_R, float P_G, float P_B);
 
-	Rgb& operator+(const Rgb& other);
+	Rgb operator+(Rgb other);
 
-	Rgb& operator*(const double& other);
+	Rgb operator*(float other);
 
 	static Rgb random();
 };
@@ -86,7 +86,7 @@ struct Rgba {
 	Rgba(Rgb P_Color, float P_Alpha);
 	Rgba(float P_R, float P_G, float P_B, float P_A);
 
-	Rgba& operator*(const double& other);
+	Rgba& operator*(const float& other);
 
 	Rgba clamp();
 
