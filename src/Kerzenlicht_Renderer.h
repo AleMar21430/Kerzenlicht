@@ -3,12 +3,14 @@
 #include "QT_Core.h"
 
 enum Render_Mode {
-	WIREFRAME,
+	PATHTRACING,
 	POINTCLOUD,
-	VISUALIZER
+	VISUALIZER,
+	WIREFRAME
 };
 
 struct Renderer_Menu;
+struct Ray;
 
 struct Kerzenlicht_Renderer : QT_Graphics_View {
 	Q_OBJECT
@@ -47,6 +49,7 @@ public:
 	void renderWireframe();
 	void renderPointCloud();
 	void renderEdgeVisualizer();
+	void renderPathTracer();
 	void renderFrame();
 	void drawToSurface();
 
@@ -60,6 +63,9 @@ public:
 	void keyPressEvent(QKeyEvent* P_Event) override;
 	void resizeEvent(QResizeEvent* P_Event) override;
 	void closeEvent(QCloseEvent* P_Event) override;
+
+	// Pathtracing
+	Rgba calculatePixelColor(const Ray& ray) const;
 
 public slots:
 	void loadObject(Object P_Object);
@@ -80,4 +86,12 @@ struct Renderer_Menu : QT_Linear_Contents {
 	void changeXResolution(int P_Value);
 	void changeYResolution(int P_Value);
 	void save();
+};
+
+struct Ray {
+	Vec3 org, dir;
+
+	/* Origin and direction */
+	Ray(const Vec3 org, const Vec3& dir) : org(org), dir(dir) {}
+	Ray() : org(Vec3(0, 0, 0)), dir(Vec3(0, 0, 0)) {}
 };

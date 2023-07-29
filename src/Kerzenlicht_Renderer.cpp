@@ -74,6 +74,9 @@ void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
 }
 
 void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
+	if (P_Event->button() == Qt::LeftButton) {
+		Left_Mouse_Pressed = true;
+	}
 	if (P_Event->button() == Qt::RightButton) {
 		Right_Mouse_Pressed = true;
 	}
@@ -81,15 +84,25 @@ void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
 }
 
 void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
+	if (Left_Mouse_Pressed) {
+		Render_Object.rotate(Vec3((P_Event->pos().y() - Mouse_Down_Pos.y()) * 0.001, (P_Event->pos().x() - Mouse_Down_Pos.x()) * 0.001, 0));
+		Render_Object.processTransform();
+		renderFrame();
+	}
 	if (Right_Mouse_Pressed) {
-		//Render_Camera.f_rotateX(P_Event->pos().x() - Mouse_Down_Pos.x() * 0.00001);
-		//Render_Camera.f_rotateY(P_Event->pos().y() - Mouse_Down_Pos.y() * 0.00001);
+		double DeltaY = P_Event->pos().y() - Mouse_Down_Pos.y();
+		double DeltaX = P_Event->pos().x() - Mouse_Down_Pos.x();
+		Render_Object.translate(Vec3(DeltaX * 0.00025, DeltaY * -0.00025, 0));
+		Render_Object.processTransform();
 		renderFrame();
 	}
 }
 
 void Kerzenlicht_Renderer::mouseReleaseEvent(QMouseEvent* P_Event) {
 	if (P_Event->button() == Qt::LeftButton) {
+		Left_Mouse_Pressed = false;
+	}
+	if (P_Event->button() == Qt::RightButton) {
 		Right_Mouse_Pressed = false;
 	}
 }
@@ -135,6 +148,11 @@ void Kerzenlicht_Renderer::resizeEvent(QResizeEvent* P_Event) {
 
 void Kerzenlicht_Renderer::closeEvent(QCloseEvent* P_Event) {
 	P_Event->accept();
+}
+
+Rgba Kerzenlicht_Renderer::calculatePixelColor(const Ray& ray) const {
+	//vector<LightPath> all_light_paths = TraceLightRays(8); // Light Bounces
+	return Rgba();//radiance(ray, all_light_paths);
 }
 
 void Kerzenlicht_Renderer::updateProgress(int P_Progress) {
@@ -300,6 +318,64 @@ void Kerzenlicht_Renderer::renderEdgeVisualizer() {
 	}
 }
 
+void Kerzenlicht_Renderer::renderPathTracer() {
+	Rgba accumulated_radiance = Rgba();
+	Vec3 cx_ = Vec3(ResX * 0.5135 / ResY, 0, 0);
+	Vec3 cy_ = (cx_.cross(Render_Camera.forward_vec)).normalize() * 0.5135;
+
+	for (int x = 0; x < ResX; x++) {
+		for (int y = 0; y < ResY; y++) {
+			/* Compute radiance at subpixel using 8 samples */
+			for (int s = 0; s < 8; s++) {
+				const double r1 = 2.0 * (rand() / static_cast<double>(RAND_MAX) * 0.1);
+				const double r2 = 2.0 * (rand() / static_cast<double>(RAND_MAX) * 0.1);
+				/* Transform uniform into non-uniform filter samples */
+				double dx;
+				if (r1 < 1.0)
+					dx = sqrt(r1) - 1.0;
+				else
+					dx = 1.0 - sqrt(2.0 - r1);
+				double dy;
+				if (r2 < 1.0)
+					dy = sqrt(r2) - 1.0;
+				else
+					dy = 1.0 - sqrt(2.0 - r2);
+
+				Vec3 dir = cx_ * ((x + (0.5 + dx) / 2.0) / ResX - 0.5) +
+					cy_ * ((y + (0.5 + dy) / 2.0) / ResY - 0.5) +
+					Render_Camera.forward_vec;
+
+				/* Extend camera_ ray to start inside box */
+
+				dir = dir.normalize();
+
+				Ray ray = Ray(Render_Camera.position, dir);
+
+				if (Render_Camera.depth_of_field) {
+					//DoF
+					double u1 = ((rand() / static_cast<double>(RAND_MAX) * 0.1) * 2.0) - 1.0;
+					double u2 = ((rand() / static_cast<double>(RAND_MAX) * 0.1) * 2.0) - 1.0;
+
+					double fac = (double)(2 * M_PI * u2);
+
+					Vec3 offset = Vec3(u1 * cos(fac), u1 * sin(fac), 0.0) * Render_Camera.depth_of_field_f_stops;
+					Vec3 focalPlaneIntersection = ray.org + ray.dir * (Render_Camera.Fov / Render_Camera.forward_vec.dot(ray.dir));
+					ray.org = ray.org + offset;
+					ray.dir = (focalPlaneIntersection - ray.org).normalize();
+
+				}
+				/* Accumulate radiance */
+				//accumulated_radiance = accumulated_radiance + calculatePixelColor(ray) / 8;// / dof_samples;
+			}
+
+			accumulated_radiance = accumulated_radiance.clamp() * 0.25;
+
+
+			Pixmap[x][y] = accumulated_radiance;
+		}
+	}
+}
+
 void Kerzenlicht_Renderer::renderPointCloud() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
@@ -310,41 +386,38 @@ void Kerzenlicht_Renderer::renderPointCloud() {
 			Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
 			Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
 			Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
-			Vec2 p1 = v1.project(Render_Camera.position, Render_Camera.forward_vec, 5);
-			Vec2 p2 = v2.project(Render_Camera.position, Render_Camera.forward_vec, 5);
-			Vec2 p3 = v3.project(Render_Camera.position, Render_Camera.forward_vec, 5);
 
 			if (Render_Object.MeshData.Vertex_Colors.size() > 0) {
 				setPenColor(Rgba::fromRgb(v1.Color));
 				renderPixel(
-					static_cast<int>((p1.X + 1.0f) * 0.5f * ResX),
-					static_cast<int>((p1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+					static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 				);
 
 				setPenColor(Rgba::fromRgb(v2.Color));
 				renderPixel(
-					static_cast<int>((p2.X + 1.0f) * 0.5f * ResX),
-					static_cast<int>((p2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+					static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 				);
 
 				setPenColor(Rgba::fromRgb(v3.Color));
 				renderPixel(
-					static_cast<int>((p3.X + 1.0f) * 0.5f * ResX),
-					static_cast<int>((p3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+					static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 				);
 			}
 			else {
 				renderPixel(
-					static_cast<int>((p1.X + 1.0f) * 0.5f * ResX),
-					static_cast<int>((p1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+					static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 				);
 				renderPixel(
-					static_cast<int>((p2.X + 1.0f) * 0.5f * ResX),
-					static_cast<int>((p2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+					static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 				);
 				renderPixel(
-					static_cast<int>((p3.X + 1.0f) * 0.5f * ResX),
-					static_cast<int>((p3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+					static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
 				);
 			}
 		}

@@ -272,6 +272,23 @@ Rgba::Rgba(float P_R, float P_G, float P_B, float P_A) {
 	A = P_A;
 }
 
+Rgba& Rgba::operator*(const double& other) {
+	Rgba Result = Rgba();
+	Result.R = R * other;
+	Result.G = G * other;
+	Result.B = B * other;
+	Result.A = A * other;
+	return Result;
+}
+
+Rgba Rgba::clamp() {
+	R = R < 0 ? 0.0 : R > 1.0 ? 1.0 : R;
+	G = G < 0 ? 0.0 : G > 1.0 ? 1.0 : G;
+	B = B < 0 ? 0.0 : B > 1.0 ? 1.0 : B;
+	A = A < 0 ? 0.0 : A > 1.0 ? 1.0 : A;
+	return *this;
+}
+
 Rgba Rgba::random() {
 	return Rgba(rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), 1);
 }

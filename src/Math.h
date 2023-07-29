@@ -79,6 +79,10 @@ struct Rgba {
 	Rgba();
 	Rgba(float P_R, float P_G, float P_B, float P_A);
 
+	Rgba& operator*(const double& other);
+
+	Rgba clamp();
+
 	static Rgba random();
 	static Rgba fromRgb(Rgb P_Rgb);
 };
