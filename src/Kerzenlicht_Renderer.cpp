@@ -18,8 +18,10 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 
 	View_Mode = static_cast<Render_Mode>(settings.value("Render_Mode", Render_Mode::POINTCLOUD).toInt());
 
-	Thread_Storage = std::vector<QThread*>();
-	Object_Array = std::map<std::string, Object>();
+	Thread_Storage = std::vector<QThread*>(); // for loading
+
+	Render_Object = Object();
+	Render_Camera = Camera();
 
 	Scene = new QGraphicsScene();
 	setScene(Scene);
@@ -34,84 +36,9 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	// Scene //
 	///////////
-	//renderClear();
-	//drawToSurface();
-	//loadObj("./Monke.obj");
 	renderClear();
-	setPenColor(Rgba::random());
-	std::vector<std::pair<int, int>> Poly1 = {
-		std::pair<int,int>(165, 380),
-		std::pair<int,int>(185, 360),
-		std::pair<int,int>(180, 330),
-		std::pair<int,int>(207, 345),
-		std::pair<int,int>(233, 330),
-		std::pair<int,int>(230, 360),
-		std::pair<int,int>(250, 380),
-		std::pair<int,int>(220, 385),
-		std::pair<int,int>(205, 410),
-		std::pair<int,int>(193, 383)
-	};
-	render2DPoly(Poly1);
-
-	setPenColor(Rgba::random());
-	std::vector<std::pair<int, int>> Poly2 = {
-		std::pair<int,int>(321, 335),
-		std::pair<int,int>(288, 286),
-		std::pair<int,int>(339, 251),
-		std::pair<int,int>(374, 302)
-	};
-	render2DPoly(Poly2);
-
-	setPenColor(Rgba::random());
-	std::vector<std::pair<int, int>> Poly3 = {
-		std::pair<int,int>(377, 249),
-		std::pair<int,int>(411, 197),
-		std::pair<int,int>(436, 249)
-	};
-	render2DPoly(Poly3);
-
-	setPenColor(Rgba::random());
-	std::vector<std::pair<int, int>> Poly4 = {
-		std::pair<int, int>(413, 177),
-		std::pair<int, int>(448, 159),
-		std::pair<int, int>(502, 88),
-		std::pair<int, int>(553, 53),
-		std::pair<int, int>(535, 36),
-		std::pair<int, int>(676, 37),
-		std::pair<int, int>(660, 52),
-		std::pair<int, int>(750, 145),
-		std::pair<int, int>(761, 179),
-		std::pair<int, int>(672, 192),
-		std::pair<int, int>(659, 214),
-		std::pair<int, int>(615, 214),
-		std::pair<int, int>(632, 230),
-		std::pair<int, int>(580, 230),
-		std::pair<int, int>(597, 215),
-		std::pair<int, int>(552, 214),
-		std::pair<int, int>(517, 144),
-		std::pair<int, int>(466, 180)
-	};
-	render2DPoly(Poly4);
-
-	setPenColor(Rgba(0.1,0.1,0.1,1));
-	std::vector<std::pair<int, int>> Poly5 = {
-		std::pair<int, int>(682, 175),
-		std::pair<int, int>(708, 120),
-		std::pair<int, int>(735, 148),
-		std::pair<int, int>(739, 170)
-	};
-	render2DPoly(Poly5);
-
 	drawToSurface();
-}
-
-void Kerzenlicht_Renderer::setImage(std::string P_File) {
-	Scene->clear();
-	QPixmap Image(QString::fromStdString(P_File));
-	QGraphicsPixmapItem* Item = new QGraphicsPixmapItem(Image);
-	Scene->addItem(Item);
-	centerOn(Item->boundingRect().center());
-	fitInView(Item->boundingRect(), Qt::KeepAspectRatio);
+	loadObj("./Monke.obj");
 }
 
 void Kerzenlicht_Renderer::drawToSurface() {
@@ -140,18 +67,13 @@ void Kerzenlicht_Renderer::drawToSurface() {
 }
 
 void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
-	for (std::pair<const std::string, Object>& Obj : Object_Array) {
-		float Delta = P_Event->angleDelta().y()*0.00005;
-		Obj.second.scale(Vec3(Delta, Delta, Delta));
-		Obj.second.processTransform();
-		renderFrame();
-	}
+	float Delta = P_Event->angleDelta().y()*0.00005;
+	Render_Object.scale(Vec3(Delta, Delta, Delta));
+	Render_Object.processTransform();
+	renderFrame();
 }
 
 void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
-	if (P_Event->button() == Qt::LeftButton) {
-		Left_Mouse_Pressed = true;
-	}
 	if (P_Event->button() == Qt::RightButton) {
 		Right_Mouse_Pressed = true;
 	}
@@ -159,31 +81,51 @@ void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
 }
 
 void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
-	if (Left_Mouse_Pressed) {
-		for (std::pair<const std::string, Object>& Obj : Object_Array) {
-			Obj.second.rotate(Vec3((P_Event->pos().y() - Mouse_Down_Pos.y()) * 0.001, (P_Event->pos().x() - Mouse_Down_Pos.x()) * 0.001, 0));
-			Obj.second.processTransform();
-			renderFrame();
-		}
-	}
 	if (Right_Mouse_Pressed) {
-		double DeltaY = P_Event->pos().y() - Mouse_Down_Pos.y();
-		double DeltaX = P_Event->pos().x() - Mouse_Down_Pos.x();
-		for (std::pair<const std::string, Object>& Obj : Object_Array) {
-			Obj.second.translate(Vec3(DeltaX * 0.00025, DeltaY * -0.00025, 0));
-			Obj.second.processTransform();
-			renderFrame();
-		}
+		//Render_Camera.f_rotateX(P_Event->pos().x() - Mouse_Down_Pos.x() * 0.00001);
+		//Render_Camera.f_rotateY(P_Event->pos().y() - Mouse_Down_Pos.y() * 0.00001);
+		renderFrame();
 	}
 }
 
 void Kerzenlicht_Renderer::mouseReleaseEvent(QMouseEvent* P_Event) {
 	if (P_Event->button() == Qt::LeftButton) {
-		Left_Mouse_Pressed = false;
-	}
-	if (P_Event->button() == Qt::RightButton) {
 		Right_Mouse_Pressed = false;
 	}
+}
+
+void Kerzenlicht_Renderer::keyPressEvent(QKeyEvent* P_Event) {
+	if (P_Event->key() == Qt::Key::Key_W) {
+		Render_Camera.f_moveForward(0.05);
+	}
+	if (P_Event->key() == Qt::Key::Key_A) {
+		Render_Camera.f_moveRight(-0.05);
+	}
+	if (P_Event->key() == Qt::Key::Key_S) {
+		Render_Camera.f_moveForward(-0.05);
+	}
+	if (P_Event->key() == Qt::Key::Key_D) {
+		Render_Camera.f_moveRight(0.05);
+	}
+	if (P_Event->key() == Qt::Key::Key_E) {
+		Render_Camera.f_moveUp(0.05);
+	}
+	if (P_Event->key() == Qt::Key::Key_Q) {
+		Render_Camera.f_moveUp(-0.05);
+	}
+	if (P_Event->key() == Qt::Key::Key_Right) {
+		Render_Camera.f_rotate(0, 0.05,0);
+	}
+	if (P_Event->key() == Qt::Key::Key_Left) {
+		Render_Camera.f_rotate(0, -0.05, 0);
+	}
+	if (P_Event->key() == Qt::Key::Key_Up) {
+		Render_Camera.f_rotate(0.05, 0, 0);
+	}
+	if (P_Event->key() == Qt::Key::Key_Down) {
+		Render_Camera.f_rotate(-0.05, 0, 0);
+	}
+	renderFrame();
 }
 
 void Kerzenlicht_Renderer::resizeEvent(QResizeEvent* P_Event) {
@@ -200,7 +142,7 @@ void Kerzenlicht_Renderer::updateProgress(int P_Progress) {
 }
 
 void Kerzenlicht_Renderer::loadObject(Object P_Object) {
-	Object_Array["Imported_Obj"] = P_Object;
+	Render_Object = P_Object;
 	renderFrame();
 }
 
@@ -310,173 +252,100 @@ void Kerzenlicht_Renderer::loadObj(std::string P_File) {
 
 void Kerzenlicht_Renderer::renderWireframe() {
 	setPenColor(Rgba(1, 1, 1, 1));
-	for (auto& Data : Object_Array) {
-		if (Data.second.Type == MESH){
-			for (Mesh_Face tri : Data.second.MeshData.Faces) {
-				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
-					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
-					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
+	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
+		if (tri.I1 > 0 && tri.I1 < Render_Object.MeshData.Vertex_Output.size() &&
+			tri.I2 > 0 && tri.I2 < Render_Object.MeshData.Vertex_Output.size() &&
+			tri.I3 > 0 && tri.I3 < Render_Object.MeshData.Vertex_Output.size()) {
 
-					Vertex v1 = Data.second.MeshData.Vertex_Output[tri.I1];
-					Vertex v2 = Data.second.MeshData.Vertex_Output[tri.I2];
-					Vertex v3 = Data.second.MeshData.Vertex_Output[tri.I3];
+			Vec3 v1 = Render_Object.MeshData.Vertex_Output[tri.I1].Pos;
+			Vec3 v2 = Render_Object.MeshData.Vertex_Output[tri.I2].Pos;
+			Vec3 v3 = Render_Object.MeshData.Vertex_Output[tri.I3].Pos;
 
-					if (Aspect_Ratio >= 1) {
-						int x1 = static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
-						int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY);
-						int x2 = static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
-						int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY);
-						int x3 = static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
-						int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY);
+			int x1 = static_cast<int>((v1.X + 1.0f) * 0.5f * ResX);
+			int y1 = static_cast<int>((v1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+			int x2 = static_cast<int>((v2.X + 1.0f) * 0.5f * ResX);
+			int y2 = static_cast<int>((v2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+			int x3 = static_cast<int>((v3.X + 1.0f) * 0.5f * ResX);
+			int y3 = static_cast<int>((v3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
 
-						renderLine(x1, y1, x2, y2);
-						renderLine(x2, y2, x3, y3);
-						renderLine(x3, y3, x1, y1);
-					}
-					else {
-						int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX);
-						int y1 = static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-						int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX);
-						int y2 = static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-						int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX);
-						int y3 = static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-
-						renderLine(x1, y1, x2, y2);
-						renderLine(x2, y2, x3, y3);
-						renderLine(x3, y3, x1, y1);
-					}
-				}
-			}
+			renderLine(x1, y1, x2, y2);
+			renderLine(x2, y2, x3, y3);
+			renderLine(x3, y3, x1, y1);
 		}
 	}
 }
 
 void Kerzenlicht_Renderer::renderEdgeVisualizer() {
-	for (auto& Data : Object_Array) {
-		if (Data.second.Type == MESH) {
-			for (Mesh_Face tri : Data.second.MeshData.Faces) {
-				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
-					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
-					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
+	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
+		if (tri.I1 > 0 && tri.I1 < Render_Object.MeshData.Vertex_Output.size() &&
+			tri.I2 > 0 && tri.I2 < Render_Object.MeshData.Vertex_Output.size() &&
+			tri.I3 > 0 && tri.I3 < Render_Object.MeshData.Vertex_Output.size()) {
 
-					Vertex v1 = Data.second.MeshData.Vertex_Output[tri.I1];
-					Vertex v2 = Data.second.MeshData.Vertex_Output[tri.I2];
-					Vertex v3 = Data.second.MeshData.Vertex_Output[tri.I3];
+			Vec3 v1 = Render_Object.MeshData.Vertex_Output[tri.I1].Pos;
+			Vec3 v2 = Render_Object.MeshData.Vertex_Output[tri.I2].Pos;
+			Vec3 v3 = Render_Object.MeshData.Vertex_Output[tri.I3].Pos;
 
-					if (Aspect_Ratio >= 1) {
-						int x1 = static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
-						int y1 = static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY);
-						int x2 = static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
-						int y2 = static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY);
-						int x3 = static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX);
-						int y3 = static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY);
+			int x1 = static_cast<int>((v1.X + 1.0f) * 0.5f * ResX);
+			int y1 = static_cast<int>((v1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+			int x2 = static_cast<int>((v2.X + 1.0f) * 0.5f * ResX);
+			int y2 = static_cast<int>((v2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
+			int x3 = static_cast<int>((v3.X + 1.0f) * 0.5f * ResX);
+			int y3 = static_cast<int>((v3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
 
-						setPenColor(Rgba::random());
-						renderLine(x1, y1, x2, y2);
-						renderLine(x2, y2, x3, y3);
-						renderLine(x3, y3, x1, y1);
-					}
-					else {
-						int x1 = static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX);
-						int y1 = static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-						int x2 = static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX);
-						int y2 = static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-						int x3 = static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX);
-						int y3 = static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY);
-
-						setPenColor(Rgba::random());
-						renderLine(x1, y1, x2, y2);
-						renderLine(x2, y2, x3, y3);
-						renderLine(x3, y3, x1, y1);
-					}
-				}
-			}
+			setPenColor(Rgba::random());
+			renderLine(x1, y1, x2, y2);
+			renderLine(x2, y2, x3, y3);
+			renderLine(x3, y3, x1, y1);
 		}
 	}
 }
 
 void Kerzenlicht_Renderer::renderPointCloud() {
 	setPenColor(Rgba(1, 1, 1, 1));
-	for (auto& Data : Object_Array) {
-		if (Data.second.Type == MESH) {
-			for (Mesh_Face tri : Data.second.MeshData.Faces) {
-				if (tri.I1 > 0 && tri.I1 < Data.second.MeshData.Vertex_Output.size() &&
-					tri.I2 > 0 && tri.I2 < Data.second.MeshData.Vertex_Output.size() &&
-					tri.I3 > 0 && tri.I3 < Data.second.MeshData.Vertex_Output.size()) {
+	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
+		if (tri.I1 > 0 && tri.I1 < Render_Object.MeshData.Vertex_Output.size() &&
+			tri.I2 > 0 && tri.I2 < Render_Object.MeshData.Vertex_Output.size() &&
+			tri.I3 > 0 && tri.I3 < Render_Object.MeshData.Vertex_Output.size()) {
 
-					Vertex v1 = Data.second.MeshData.Vertex_Output[tri.I1];
-					Vertex v2 = Data.second.MeshData.Vertex_Output[tri.I2];
-					Vertex v3 = Data.second.MeshData.Vertex_Output[tri.I3];
-					
-					if (Aspect_Ratio >= 1) {
-						if (Data.second.MeshData.Vertex_Colors.size() > 0) {
-							setPenColor(Rgba::fromRgb(v1.Color));
-							renderPixel(
-								static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
-							);
-							setPenColor(Rgba::fromRgb(v2.Color));
-							renderPixel(
-								static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
-							);
-							setPenColor(Rgba::fromRgb(v3.Color));
-							renderPixel(
-								static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
-							);
-						}
-						else {
-							renderPixel(
-								static_cast<int>((v1.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v1.Pos.Y + 1.0f) * 0.5f * ResY)
-							);
-							renderPixel(
-								static_cast<int>((v2.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v2.Pos.Y + 1.0f) * 0.5f * ResY)
-							);
-							renderPixel(
-								static_cast<int>((v3.Pos.X / Aspect_Ratio + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v3.Pos.Y + 1.0f) * 0.5f * ResY)
-							);
-						}
-					}
-					else {
-						if (Data.second.MeshData.Vertex_Colors.size() > 0) {
-							setPenColor(Rgba::fromRgb(v1.Color));
-							renderPixel(
-								static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-							);
+			Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
+			Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
+			Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
+			Vec2 p1 = v1.project(Render_Camera.position, Render_Camera.forward_vec, 5);
+			Vec2 p2 = v2.project(Render_Camera.position, Render_Camera.forward_vec, 5);
+			Vec2 p3 = v3.project(Render_Camera.position, Render_Camera.forward_vec, 5);
 
-							setPenColor(Rgba::fromRgb(v2.Color));
-							renderPixel(
-								static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-							);
+			if (Render_Object.MeshData.Vertex_Colors.size() > 0) {
+				setPenColor(Rgba::fromRgb(v1.Color));
+				renderPixel(
+					static_cast<int>((p1.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((p1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+				);
 
-							setPenColor(Rgba::fromRgb(v3.Color));
-							renderPixel(
-								static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-							);
-						}
-						else {
-							renderPixel(
-								static_cast<int>((v1.Pos.X + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v1.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-							);
-							renderPixel(
-								static_cast<int>((v2.Pos.X + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v2.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-							);
-							renderPixel(
-								static_cast<int>((v3.Pos.X + 1.0f) * 0.5f * ResX),
-								static_cast<int>((v3.Pos.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
-							);
-						}
-					}
-				}
+				setPenColor(Rgba::fromRgb(v2.Color));
+				renderPixel(
+					static_cast<int>((p2.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((p2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+				);
+
+				setPenColor(Rgba::fromRgb(v3.Color));
+				renderPixel(
+					static_cast<int>((p3.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((p3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+				);
+			}
+			else {
+				renderPixel(
+					static_cast<int>((p1.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((p1.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+				);
+				renderPixel(
+					static_cast<int>((p2.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((p2.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+				);
+				renderPixel(
+					static_cast<int>((p3.X + 1.0f) * 0.5f * ResX),
+					static_cast<int>((p3.Y * Aspect_Ratio + 1.0f) * 0.5f * ResY)
+				);
 			}
 		}
 	}

@@ -157,6 +157,14 @@ Vec3& Vec3::operator/=(const Vec3& other) {
 	return *this;
 }
 
+Vec3& Vec3::operator*(const double& other) {
+	Vec3 Result = Vec3();
+	Result.X = X * other;
+	Result.Y = Y * other;
+	Result.Z = Z * other;
+	return Result;
+}
+
 double Vec3::dot(const Vec3& other) {
 	return X * other.X + Y * other.Y + Z * other.Z;
 }

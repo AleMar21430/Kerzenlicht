@@ -4,14 +4,8 @@
 
 #include "Mesh.h"
 
-enum Object_Type {
-	EMPTY,
-	MESH,
-};
-
 struct Object {
 	std::string Name;
-	Object_Type Type;
 
 	Mesh MeshData;
 
@@ -21,7 +15,7 @@ struct Object {
 	Vec3 Scale;
 
 	Object();
-	Object(std::string P_Name, Object_Type P_Type);
+	Object(std::string P_Name);
 
 	void loadBuffers();
 	void scale(Vec3 P_Scale);

@@ -93,6 +93,9 @@
     <ClInclude Include="src\Mesh.h">
       <Filter>Header Files\Core\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>Header Files\Core\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\R_Workspace_Vulkan_Viewport.h">
@@ -143,6 +146,9 @@
       <Filter>Source Files\Core\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Object.cpp">
+      <Filter>Source Files\Core\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files\Core\Objects</Filter>
     </ClCompile>
   </ItemGroup>

@@ -29,7 +29,8 @@ public:
 	Render_Mode View_Mode;
 
 	std::vector<QThread*> Thread_Storage;
-	std::map<std::string, Object> Object_Array;
+	Object Render_Object;
+	Camera Render_Camera;
 
 	QGraphicsScene* Scene;
 	Renderer_Menu* Menu;
@@ -51,12 +52,12 @@ public:
 
 	void loadObj(std::string P_File);
 	void storeBmp(std::string P_File);
-	void setImage(std::string P_File);
 	
 	void wheelEvent(QWheelEvent* P_Event) override;
 	void mousePressEvent(QMouseEvent* P_Event) override;
 	void mouseMoveEvent(QMouseEvent* P_Event) override;
 	void mouseReleaseEvent(QMouseEvent* P_Event) override;
+	void keyPressEvent(QKeyEvent* P_Event) override;
 	void resizeEvent(QResizeEvent* P_Event) override;
 	void closeEvent(QCloseEvent* P_Event) override;
 

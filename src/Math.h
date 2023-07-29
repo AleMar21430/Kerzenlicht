@@ -54,6 +54,8 @@ struct Vec3 {
 	Vec3& operator*=(const Vec3& other);
 	Vec3& operator/=(const Vec3& other);
 
+	Vec3& operator*(const double& other);
+
 	double dot(const Vec3& other);
 	Vec3 cross(const Vec3& other);
 	double len();

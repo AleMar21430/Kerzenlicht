@@ -15,6 +15,23 @@ Vertex::Vertex(Vec3 P_Pos, Rgb P_Color) {
 	Color = P_Color;
 }
 
+Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) {
+	Vec3 relative = Vec3(Pos.X - cameraPos.X, Pos.Y - cameraPos.Y, Pos.Z - cameraPos.Z);
+
+	double cosYaw = cos(cameraDir.Y);
+	double sinYaw = sin(cameraDir.Y);
+	double cosPitch = cos(cameraDir.X);
+	double sinPitch = sin(cameraDir.X);
+
+	double x = relative.X * cosYaw - relative.Z * sinYaw;
+	double z = relative.X * sinYaw + relative.Z * cosYaw;
+	double y = relative.Y * cosPitch - z * sinPitch;
+
+	double f = FOV / (y + FOV);
+
+	return Vec2(f * x, f * z);
+}
+
 Mesh_Face::Mesh_Face(uint32_t P_I1, uint32_t P_I2, uint32_t P_I3) {
 	I1 = P_I1;
 	I2 = P_I2;

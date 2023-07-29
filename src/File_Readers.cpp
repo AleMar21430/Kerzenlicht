@@ -25,7 +25,7 @@ void Obj_File_Loader::run() {
 	}
 	const int linesPerUpdate = Temp;
 
-	Object Imported_Mesh = Object("Imported", Object_Type::MESH);
+	Object Imported_Mesh = Object("Imported");
 
 	std::string line;
 	while (std::getline(file, line)) {
@@ -34,8 +34,8 @@ void Obj_File_Loader::run() {
 			if (Tokens[0] == "v") {
 				Vec3 Pos(
 					std::stod(Tokens[1]),
-					std::stod(Tokens[2]),
-					std::stod(Tokens[3])
+					std::stod(Tokens[3]),
+					std::stod(Tokens[2])
 				);
 				Imported_Mesh.MeshData.Vertex_Positions.push_back(Pos);
 				if (Tokens.size() > 6) {
