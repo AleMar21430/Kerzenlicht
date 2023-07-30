@@ -3,6 +3,8 @@
 #include <sstream>
 #include <fstream>
 
+using namespace std;
+
 struct R_String {
 	stringstream S_String;
 

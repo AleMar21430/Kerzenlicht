@@ -48,7 +48,7 @@ Mesh::Mesh() {
 }
 
 void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, const Vec3& P_Scale) {
-	Vertex_Output = vector<Vertex>();
+	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
 
 	Matrix_4x4 translation = Matrix_4x4({
 		{ 1, 0, 0, P_Translate.X },
@@ -57,22 +57,22 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 		{ 0, 0, 0, 1             }
 	});
 
-	double Yaw   = P_Rotate.X + PI / 180;
-	double Pitch = P_Rotate.Y + PI / 180;
-	double Roll  = P_Rotate.Z + PI / 180;
-
-	Matrix_4x4 pitchMat = Matrix_4x4({
-		{ 1, 0         , 0          , 0 },
-		{ 0, cos(Pitch), -sin(Pitch), 0 },
-		{ 0, sin(Pitch), cos(Pitch) , 0 },
-		{ 0, 0         , 0          , 1 }
-	});
+	double Yaw   = P_Rotate.X + PI / 180.0;
+	double Pitch = P_Rotate.Y * PI / 180.0;
+	double Roll  = P_Rotate.Z * PI / 180.0;
 
 	Matrix_4x4 yawMat = Matrix_4x4({
 		{ cos(Yaw) , 0, sin(Yaw), 0 },
 		{ 0        , 1, 0       , 0 },
 		{ -sin(Yaw), 0, cos(Yaw), 0 },
 		{ 0        , 0, 0       , 1 }
+	});
+
+	Matrix_4x4 pitchMat = Matrix_4x4({
+		{ 1, 0         , 0          , 0 },
+		{ 0, cos(Pitch), -sin(Pitch), 0 },
+		{ 0, sin(Pitch), cos(Pitch) , 0 },
+		{ 0, 0         , 0          , 1 }
 	});
 
 	Matrix_4x4 rollMat = Matrix_4x4({
@@ -82,8 +82,6 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 		{ 0        , 0         , 0, 1 }
 	});
 
-	Matrix_4x4 rotation = pitchMat * yawMat * rollMat;
-
 	Matrix_4x4 scale = Matrix_4x4({
 		{ P_Scale.X, 0, 0, 0 },
 		{ 0, P_Scale.Y, 0, 0 },
@@ -91,7 +89,7 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 		{ 0, 0, 0        , 1 }
 	});
 
-	Matrix_4x4 Model_Matrix = translation * rotation * scale;
+	Matrix_4x4 Model_Matrix = translation * (pitchMat * yawMat * rollMat) * scale;
 
 	if (Vertex_Colors["Col"].size() == Vertex_Positions.size()) {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
@@ -102,7 +100,7 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 				vertShader.Y / vertShader.W,
 				vertShader.Z / vertShader.W
 			);
-			Vertex_Output.push_back(Vert);
+			Vertex_Output[i] = Vert;
 		}
 	}
 	else {
@@ -114,7 +112,7 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 				vertShader.Y / vertShader.W,
 				vertShader.Z / vertShader.W
 			);
-			Vertex_Output.push_back(Vert);
+			Vertex_Output[i] = Vert;
 		}
 	}
 }

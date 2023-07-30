@@ -17,9 +17,9 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	Pixmap = vector(ResX, vector<Rgba>(ResY));
 	ZBuffer = vector(ResX, vector<double>(ResY));
 
-	View_Mode = Render_Mode::POINTCLOUD;//static_cast<Render_Mode>(settings.value("Render_Mode", Render_Mode::POINTCLOUD).toInt());
+	View_Mode = static_cast<Render_Mode>(settings.value("Render_Mode", Render_Mode::POINTCLOUD).toInt());
 
-	Thread_Storage = vector<QThread*>(); // for loading
+	Thread_Storage = vector<QThread*>(); // for obj loading
 
 	Render_Object = Object();
 	Render_Camera = Camera();
@@ -165,8 +165,9 @@ void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Render_Object = P_Object;
 	Render_Object.Pos = Vec3(0, 0, 0);
 	Render_Object.Rot_Euler = Vec3(0, 0, 0);
-	Render_Object.Scale = Vec3(300, 300, 300);
+
 	Render_Object.translate(Vec3(ResX / 2.0, ResY / 2.0, 0));
+	Render_Object.scale(Vec3(299, 299, 299));
 	renderFrame();
 }
 
@@ -179,14 +180,19 @@ void Kerzenlicht_Renderer::setPenOpacity(float P_Opacity) {
 }
 
 void Kerzenlicht_Renderer::renderClear() {
-	const double inf = numeric_limits<double>::infinity();
-	ZBuffer = vector(ResX, vector(ResY, inf));
+	ZBuffer = vector(ResX, vector(ResY, 1'000'000.0));
 	Pixmap = vector(ResX, vector(ResY, Rgba(0.1, 0.1, 0.1, 1)));
 }
 
 void Kerzenlicht_Renderer::renderPixel(uint32_t P_X, uint32_t P_Y) {
 	if (P_X < ResX && P_X >= 0 && P_Y < ResY && P_Y >= 0) {
 		Pixmap[P_X][P_Y] = Pen_Color;
+	}
+}
+
+void Kerzenlicht_Renderer::renderPixel(uint32_t P_X, uint32_t P_Y, Rgba P_Color) {
+	if (P_X < ResX && P_X >= 0 && P_Y < ResY && P_Y >= 0) {
+		Pixmap[P_X][P_Y] = P_Color;
 	}
 }
 
@@ -262,16 +268,14 @@ void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex
 			if (x >= 0 && x < ResX && y >= 0 && y < ResY) {
 				double u, v, w;
 				tie(u, v, w) = barycentricCoords(P_Vert1.Pos, P_Vert2.Pos, P_Vert3.Pos, x, y);
-
-				double Depth = u * P_Vert1.Pos.Z + v * P_Vert2.Pos.Z + w * P_Vert3.Pos.Z;
-				if (Depth < ZBuffer[x][y]) {
-					ZBuffer[x][y] = Depth;
-					if (u >= 0 && u < 1 && v >= 0 && v < 1 && w >= 0 && w < 1) {
-						setPenColor(Rgba(
+				if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
+					double Depth = u * P_Vert1.Pos.Z + v * P_Vert2.Pos.Z + w * P_Vert3.Pos.Z;
+					if (Depth < ZBuffer[x][y]) {
+						ZBuffer[x][y] = Depth;
+						renderPixel(x, y, Rgba(
 							P_Vert1.Color * u + P_Vert2.Color * v + P_Vert3.Color * w,
 							1.0
 						));
-						renderPixel(x, y);
 					}
 				}
 			}
@@ -308,7 +312,7 @@ void Kerzenlicht_Renderer::loadObj(string P_File) {
 void Kerzenlicht_Renderer::renderWireframe() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
-	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
+	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
 		Vec3 v1 = Render_Object.MeshData.Vertex_Output[tri.I1].Pos;
 		Vec3 v2 = Render_Object.MeshData.Vertex_Output[tri.I2].Pos;
 		Vec3 v3 = Render_Object.MeshData.Vertex_Output[tri.I3].Pos;
@@ -321,11 +325,46 @@ void Kerzenlicht_Renderer::renderWireframe() {
 
 void Kerzenlicht_Renderer::renderVisualizer() {
 	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
-	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
+	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
 		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
 		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
 		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
 		renderTriangle(v1, v2, v3);
+	}
+}
+
+void Kerzenlicht_Renderer::renderZBuffer() {
+	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
+	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
+
+		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
+		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
+		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
+
+		int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+		int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+		int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+		int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+
+		for (int x = minX; x < maxX; x++) {
+			for (int y = minY; y < maxY; y++) {
+				if (x >= 0 && x < ResX && y >= 0 && y < ResY) {
+					double u, v, w;
+					tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+					if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
+						double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+						if (Depth < ZBuffer[x][y]) {
+							ZBuffer[x][y] = Depth;
+
+							renderPixel(x, y, Rgba(
+								Rgb(1,1,1) * (sqrt(Depth) / sqrt(1000.0)),
+								1.0
+							));
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -390,7 +429,7 @@ void Kerzenlicht_Renderer::renderPathTracer() {
 void Kerzenlicht_Renderer::renderPointCloud() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
-	for (Mesh_Face tri : Render_Object.MeshData.Faces) {
+	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
 		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
 		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
 		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];

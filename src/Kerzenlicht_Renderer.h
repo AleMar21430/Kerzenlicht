@@ -45,6 +45,7 @@ public:
 
 	void renderClear();
 	void renderPixel(uint32_t P_X, uint32_t P_Y);
+	void renderPixel(uint32_t P_X, uint32_t P_Y, Rgba P_Color);
 	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
 	void render2DPoly(vector<pair<int, int>> P_Poly);
 	
@@ -54,6 +55,7 @@ public:
 	void renderWireframe();
 	void renderPointCloud();
 	void renderVisualizer();
+	void renderZBuffer();
 	void renderPathTracer();
 	void renderFrame();
 	void drawToSurface();
