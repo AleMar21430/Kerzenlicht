@@ -126,7 +126,7 @@ struct Rgba {
 
 struct Math {
 	static float fastInvSqrt(float number);
-	static std::vector<std::string> splitString(std::string& input, std::string delimiter);
-	static std::vector<std::string> splitString(std::string& input);
-	static void centerPointsToOrigin(std::vector<std::pair<int, int>>& points);
+	static vector<string> splitString(string& input, string delimiter);
+	static vector<string> splitString(string& input);
+	static void centerPointsToOrigin(vector<pair<int, int>>& points);
 };

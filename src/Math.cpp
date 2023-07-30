@@ -196,18 +196,18 @@ Vec3 Vec3::rotate(Vec3 P_Pos, const Vec3 P_Anchor, const Vec3 P_Rotation) {
 	Result.Y -= P_Anchor.Y;
 	Result.Z -= P_Anchor.Z;
 
-	double cosX = std::cos(P_Rotation.X);
-	double sinX = std::sin(P_Rotation.X);
+	double cosX = cos(P_Rotation.X);
+	double sinX = sin(P_Rotation.X);
 	double newY = Result.Y * cosX - Result.Z * sinX;
 	double newZ = Result.Y * sinX + Result.Z * cosX;
 
-	double cosY = std::cos(P_Rotation.Y);
-	double sinY = std::sin(P_Rotation.Y);
+	double cosY = cos(P_Rotation.Y);
+	double sinY = sin(P_Rotation.Y);
 	double newX = Result.X * cosY + newZ * sinY;
 	newZ = -Result.X * sinY + newZ * cosY;
 
-	double cosZ = std::cos(P_Rotation.Z);
-	double sinZ = std::sin(P_Rotation.Z);
+	double cosZ = cos(P_Rotation.Z);
+	double sinZ = sin(P_Rotation.Z);
 	double finalX = newX * cosZ - newY * sinZ;
 	double finalY = newX * sinZ + newY * cosZ;
 
@@ -222,18 +222,18 @@ void Vec3::rotate(const Vec3 P_Anchor, const Vec3 P_Rotation) {
 	Y -= P_Anchor.Y;
 	Z -= P_Anchor.Z;
 
-	double cosX = std::cos(P_Rotation.X);
-	double sinX = std::sin(P_Rotation.X);
+	double cosX = cos(P_Rotation.X);
+	double sinX = sin(P_Rotation.X);
 	double newY = Y * cosX - Z * sinX;
 	double newZ = Y * sinX + Z * cosX;
 
-	double cosY = std::cos(P_Rotation.Y);
-	double sinY = std::sin(P_Rotation.Y);
+	double cosY = cos(P_Rotation.Y);
+	double sinY = sin(P_Rotation.Y);
 	double newX = X * cosY + newZ * sinY;
 	newZ = -X * sinY + newZ * cosY;
 
-	double cosZ = std::cos(P_Rotation.Z);
-	double sinZ = std::sin(P_Rotation.Z);
+	double cosZ = cos(P_Rotation.Z);
+	double sinZ = sin(P_Rotation.Z);
 	double finalX = newX * cosZ - newY * sinZ;
 	double finalY = newX * sinZ + newY * cosZ;
 
@@ -336,12 +336,12 @@ float Math::fastInvSqrt(float number) {
 	return y;
 }
 
-std::vector<std::string> Math::splitString(std::string& input, std::string delimiter) {
-	std::vector<std::string> tokens;
-	std::string::size_type start = 0;
-	std::string::size_type end = input.find(delimiter);
+vector<string> Math::splitString(string& input, string delimiter) {
+	vector<string> tokens;
+	string::size_type start = 0;
+	string::size_type end = input.find(delimiter);
 
-	while (end != std::string::npos) {
+	while (end != string::npos) {
 		tokens.push_back(input.substr(start, end - start));
 		start = end + 1;
 		end = input.find(delimiter, start);
@@ -351,10 +351,10 @@ std::vector<std::string> Math::splitString(std::string& input, std::string delim
 	return tokens;
 }
 
-std::vector<std::string> Math::splitString(std::string& input) {
-	std::vector<std::string> result;
-	std::istringstream iss(input);
-	std::string token;
+vector<string> Math::splitString(string& input) {
+	vector<string> result;
+	istringstream iss(input);
+	string token;
 
 	while (iss >> token) {
 		result.push_back(token);
@@ -363,7 +363,7 @@ std::vector<std::string> Math::splitString(std::string& input) {
 	return result;
 }
 
-void Math::centerPointsToOrigin(std::vector<std::pair<int, int>>& points) {
+void Math::centerPointsToOrigin(vector<pair<int, int>>& points) {
 	// Find the minimum and maximum x and y coordinates
 	int minX = points[0].first;
 	int maxX = points[0].first;
@@ -371,10 +371,10 @@ void Math::centerPointsToOrigin(std::vector<std::pair<int, int>>& points) {
 	int maxY = points[0].second;
 
 	for (const auto& point : points) {
-		minX = std::min(minX, point.first);
-		maxX = std::max(maxX, point.first);
-		minY = std::min(minY, point.second);
-		maxY = std::max(maxY, point.second);
+		minX = min(minX, point.first);
+		maxX = max(maxX, point.first);
+		minY = min(minY, point.second);
+		maxY = max(maxY, point.second);
 	}
 
 	// Calculate the center of the bounding box

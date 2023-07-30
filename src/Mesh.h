@@ -6,12 +6,12 @@ struct Vertex;
 struct Mesh_Face;
 
 struct Mesh {
-	std::vector<Mesh_Face> Faces;
-	std::vector<Vec3> Vertex_Positions;
-	std::map<std::string, std::vector<Rgb>> Vertex_Colors;
-	std::map<std::string, std::map<std::string, double>> Vertex_Weights;
+	vector<Mesh_Face> Faces;
+	vector<Vec3> Vertex_Positions;
+	map<string, vector<Rgb>> Vertex_Colors;
+	map<string, map<string, double>> Vertex_Weights;
 
-	std::vector<Vertex> Vertex_Output;
+	vector<Vertex> Vertex_Output;
 
 	Mesh();
 	void applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, const Vec3& P_Scale);
@@ -29,7 +29,7 @@ struct Vertex {
 };
 
 struct Mesh_Face {
-	uint32_t I1, I2, I3;
+	size_t I1, I2, I3;
 
-	Mesh_Face(uint32_t P_I1, uint32_t P_I2, uint32_t P_I3);
+	Mesh_Face(size_t P_I1, size_t P_I2, size_t P_I3);
 };

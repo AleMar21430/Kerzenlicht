@@ -85,7 +85,7 @@ void Workspace_Dock_Header::selectWorkspaceTypeClick() {
 	Workspace_Menu->exec(mapToGlobal(QPoint(Workspace_Type_Button->pos().x(), Workspace_Type_Button->pos().y() + 25)));
 }
 
-void Workspace_Dock_Header::setWorkspace(std::string P_Type) {
+void Workspace_Dock_Header::setWorkspace(string P_Type) {
 	if (Parent->windowTitle() != "Log") {
 		try {Parent->widget()->deleteLater(); } catch(...) {}
 	}

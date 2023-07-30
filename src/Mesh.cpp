@@ -32,23 +32,23 @@ Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) {
 	return Vec2(f * x, f * z);
 }
 
-Mesh_Face::Mesh_Face(uint32_t P_I1, uint32_t P_I2, uint32_t P_I3) {
+Mesh_Face::Mesh_Face(size_t P_I1, size_t P_I2, size_t P_I3) {
 	I1 = P_I1;
 	I2 = P_I2;
 	I3 = P_I3;
 }
 
 Mesh::Mesh() {
-	Faces = std::vector<Mesh_Face>();
-	Vertex_Positions = std::vector<Vec3>();
-	Vertex_Colors = std::map<std::string, std::vector<Rgb>>();
-	Vertex_Weights = std::map<std::string, std::map<std::string, double>>();
+	Faces = vector<Mesh_Face>();
+	Vertex_Positions = vector<Vec3>();
+	Vertex_Colors = map<string, vector<Rgb>>();
+	Vertex_Weights = map<string, map<string, double>>();
 
-	Vertex_Output = std::vector<Vertex>();
+	Vertex_Output = vector<Vertex>();
 }
 
 void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, const Vec3& P_Scale) {
-	Vertex_Output = std::vector<Vertex>();
+	Vertex_Output = vector<Vertex>();
 
 	Matrix_4x4 translation = Matrix_4x4({
 		{ 1, 0, 0, P_Translate.X },
@@ -107,7 +107,7 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 	}
 	else {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
-			Vertex Vert = Vertex(Vertex_Positions[i], Rgb(0,0,0));
+			Vertex Vert = Vertex(Vertex_Positions[i], Rgb(1,1,1));
 			Vec4 vertShader = Vec4(Vert.Pos, 1) * Model_Matrix;
 			Vert.Pos = Vec3(
 				vertShader.X / vertShader.W,

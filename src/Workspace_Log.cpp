@@ -19,12 +19,12 @@ Workspace_Log::Workspace_Log(QT_Text_Stream* P_Log) : QT_Linear_Contents("_Conta
 	this->Layout->addWidget(Log);
 }
 
-void Workspace_Log::append(std::string P_Text) {
+void Workspace_Log::append(string P_Text) {
 	Log->append(QString::fromStdString(P_Text));
 }
 
 void Workspace_Log::exportLog() {
-	/*std::ofstream file(QT_File_Browser::getSaveFileName(nullptr,"Save Log").toStdString());
+	/*ofstream file(QT_File_Browser::getSaveFileName(nullptr,"Save Log").toStdString());
 	if (file.is_open()){
 		file << "Log->toPlainText().toStdString()";
 		file.close();

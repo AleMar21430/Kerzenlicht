@@ -5,7 +5,7 @@
 #include "Mesh.h"
 
 struct Object {
-	std::string Name;
+	string Name;
 
 	Mesh MeshData;
 
@@ -15,7 +15,7 @@ struct Object {
 	Vec3 Scale;
 
 	Object();
-	Object(std::string P_Name);
+	Object(string P_Name);
 
 	void scale(Vec3 P_Scale);
 	void rotate(Vec3 P_Rot);

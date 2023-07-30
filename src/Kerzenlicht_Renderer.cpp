@@ -39,7 +39,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	renderClear();
 	drawToSurface();
-	loadObj("./Monke.obj");
+	loadObj("./Logo.obj");
 }
 
 void Kerzenlicht_Renderer::drawToSurface() {
@@ -259,14 +259,14 @@ void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex
 
 	for (int x = minX; x < maxX; x++) {
 		for (int y = minY; y < maxY; y++) {
-			if (x > 0 && x < ResX && y > 0 && y < ResY) {
+			if (x >= 0 && x < ResX && y >= 0 && y < ResY) {
 				double u, v, w;
 				tie(u, v, w) = barycentricCoords(P_Vert1.Pos, P_Vert2.Pos, P_Vert3.Pos, x, y);
 
 				double Depth = u * P_Vert1.Pos.Z + v * P_Vert2.Pos.Z + w * P_Vert3.Pos.Z;
 				if (Depth < ZBuffer[x][y]) {
 					ZBuffer[x][y] = Depth;
-					if (u > 0 && u <= 1 && v > 0 && v <= 1 && w > 0 && w <= 1) {
+					if (u >= 0 && u < 1 && v >= 0 && v < 1 && w >= 0 && w < 1) {
 						setPenColor(Rgba(
 							P_Vert1.Color * u + P_Vert2.Color * v + P_Vert3.Color * w,
 							1.0
@@ -301,14 +301,7 @@ void Kerzenlicht_Renderer::loadObj(string P_File) {
 	connect(thread, SIGNAL( loadingFinished_Signal(Object) ), SLOT( loadObject(Object) ));
 	connect(thread, SIGNAL( updateProgress_Signal(int) ), SLOT( updateProgress(int) ));
 	connect(thread, &Obj_File_Loader::finished, thread, &Obj_File_Loader::deleteLater);
-	/*Obj_File_Loader::connect(objLoader, &Obj_File_Loader::loadingFinished, [objLoader, thread, this]() {
-		objLoader->deleteLater();
-		thread->quit();
-		thread->wait();
-		thread->deleteLater();
-		Thread_Storage.erase(remove(Thread_Storage.begin(), Thread_Storage.end(), thread), Thread_Storage.end());
-		}
-	);*/ // TODO Threads can be destroyed while creatingObject after finished if file is too large
+
 	thread->start();
 }
 

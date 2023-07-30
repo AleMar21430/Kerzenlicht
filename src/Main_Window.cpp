@@ -17,8 +17,8 @@ Main_Window::Main_Window(QT_Application* P_App) : QT_Main_Window() {
 }
 
 void Main_Window::readStyle() {
-	std::ifstream File("resources/Style.txt");
-	std::stringstream Temp;
+	ifstream File("resources/Style.txt");
+	stringstream Temp;
 	Temp << File.rdbuf();
 	App->setStyleSheet(QString::fromUtf8(Temp.str()));
 	File.close();

@@ -7,6 +7,6 @@ struct Workspace_Log : QT_Linear_Contents {
 
 	Workspace_Log(QT_Text_Stream* P_Log);
 
-	void append(std::string P_Text);
+	void append(string P_Text);
 	void exportLog();
 };

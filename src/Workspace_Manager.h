@@ -36,7 +36,7 @@ struct Workspace_Dock_Header : QT_Linear_Contents {
 
 	void initWorkspacesMenu();
 	void selectWorkspaceTypeClick();
-	void setWorkspace(std::string P_Type = "Manager");
+	void setWorkspace(string P_Type = "Manager");
 	void showHideSettings(bool P_Toggle);
 	void initCloseConfirmationMenu();
 	void closeClick();

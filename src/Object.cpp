@@ -10,7 +10,7 @@ Object::Object() {
 	MeshData = Mesh();
 }
 
-Object::Object(std::string P_Name) {
+Object::Object(string P_Name) {
 	Name = P_Name;
 
 	Pos = Vec3();

@@ -4,10 +4,10 @@
 #include <fstream>
 
 struct R_String {
-	std::stringstream S_String;
+	stringstream S_String;
 
 	R_String() {
-		std::stringstream S_String;
+		stringstream S_String;
 	}
 
 	R_String& nl(uint8_t Write_Tab = 0, uint8_t Local_Tab = 0, uint8_t Lines = 1) {
@@ -23,7 +23,7 @@ struct R_String {
 		return *this;
 	}
 
-	R_String& operator<< (std::stringstream& Input) {
+	R_String& operator<< (stringstream& Input) {
 		S_String << Input.str();
 		return *this;
 	}
@@ -43,7 +43,7 @@ struct R_String {
 		return *this;
 	}
 
-	R_String& operator<< (std::string Input) {
+	R_String& operator<< (string Input) {
 		S_String << Input;
 		return *this;
 	}
@@ -78,8 +78,8 @@ struct R_String {
 		return *this;
 	}
 
-	std::string write() {
-		std::string string = S_String.str();
+	string write() {
+		string string = S_String.str();
 		return string;
 	}
 };

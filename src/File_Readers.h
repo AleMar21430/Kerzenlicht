@@ -9,9 +9,9 @@
 
 struct Obj_File_Loader : QThread {
 	Q_OBJECT
-	std::string File_Path;
+	string File_Path;
 public:
-	explicit Obj_File_Loader(QObject* parent = nullptr, std::string P_File_Path = "");
+	explicit Obj_File_Loader(QObject* parent = nullptr, string P_File_Path = "");
 	void run() override;
 
 signals:
