@@ -248,6 +248,12 @@ Rgb::Rgb() {
 	B = 1;
 }
 
+Rgb::Rgb(float P_Gray) {
+	R = P_Gray;
+	G = P_Gray;
+	B = P_Gray;
+}
+
 Rgb::Rgb(float P_R, float P_G, float P_B) {
 	R = P_R;
 	G = P_G;
@@ -386,6 +392,12 @@ void Math::centerPointsToOrigin(vector<pair<int, int>>& points) {
 		point.first -= centerX;
 		point.second -= centerY;
 	}
+}
+
+double Math::clamp(double P_Value, double P_Min, double P_Max) {
+	if (P_Value >= P_Min && P_Value <= P_Max) return P_Value;
+	else if (P_Value < P_Min) return P_Min;
+	else return P_Max;
 }
 
 Matrix_3x3 Matrix_3x3::operator*(Matrix_3x3 other) {

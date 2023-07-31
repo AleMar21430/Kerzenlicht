@@ -5,8 +5,9 @@
 enum Render_Mode {
 	PATHTRACING,
 	POINTCLOUD,
-	VISUALIZER,
-	WIREFRAME
+	PREVIEW,
+	WIREFRAME,
+	ZDEPTH
 };
 
 struct Renderer_Menu;
@@ -54,7 +55,7 @@ public:
 
 	void renderWireframe();
 	void renderPointCloud();
-	void renderVisualizer();
+	void renderPreview();
 	void renderZBuffer();
 	void renderPathTracer();
 	void renderFrame();
@@ -87,9 +88,7 @@ struct Renderer_Menu : QT_Linear_Contents {
 
 	Renderer_Menu(Kerzenlicht_Renderer* P_Parent);
 	void openObjFile();
-	void renderWireframe();
-	void renderPointCloud();
-	void renderEdgeVisualizer();
+	void renderSwitch(int Index);
 	void changeXResolution(int P_Value);
 	void changeYResolution(int P_Value);
 	void save();

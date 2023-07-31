@@ -100,6 +100,7 @@ struct Rgb {
 	float R, G, B;
 
 	Rgb();
+	Rgb(float P_Gray);
 	Rgb(float P_R, float P_G, float P_B);
 
 	Rgb operator+(Rgb other);
@@ -129,4 +130,5 @@ struct Math {
 	static vector<string> splitString(string& input, string delimiter);
 	static vector<string> splitString(string& input);
 	static void centerPointsToOrigin(vector<pair<int, int>>& points);
+	static double clamp(double P_Value, double P_Min, double P_Max);
 };

@@ -17,7 +17,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	Pixmap = vector(ResX, vector<Rgba>(ResY));
 	ZBuffer = vector(ResX, vector<double>(ResY));
 
-	View_Mode = static_cast<Render_Mode>(settings.value("Render_Mode", Render_Mode::POINTCLOUD).toInt());
+	View_Mode = static_cast<Render_Mode>(settings.value("Render_Mode", Render_Mode::PREVIEW).toInt());
 
 	Thread_Storage = vector<QThread*>(); // for obj loading
 
@@ -323,7 +323,7 @@ void Kerzenlicht_Renderer::renderWireframe() {
 	}
 }
 
-void Kerzenlicht_Renderer::renderVisualizer() {
+void Kerzenlicht_Renderer::renderPreview() {
 	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
 	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
 		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
@@ -335,8 +335,14 @@ void Kerzenlicht_Renderer::renderVisualizer() {
 
 void Kerzenlicht_Renderer::renderZBuffer() {
 	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
-	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
+	vector<double> Z_Positions;
+	for (const Vertex& vert : Render_Object.MeshData.Vertex_Output) {
+		Z_Positions.push_back(vert.Pos.Z);
+	}
+	double minZ = *min_element(Z_Positions.begin(), Z_Positions.end());
+	double maxZ = *max_element(Z_Positions.begin(), Z_Positions.end());
 
+	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
 		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
 		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
 		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
@@ -355,9 +361,9 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 						double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 						if (Depth < ZBuffer[x][y]) {
 							ZBuffer[x][y] = Depth;
-
+							Rgb Val = Rgb(Math::clamp(-(Depth - maxZ) / (maxZ - minZ), 0.0, 1.0));
 							renderPixel(x, y, Rgba(
-								Rgb(1,1,1) * (sqrt(Depth) / sqrt(1000.0)),
+								Val,
 								1.0
 							));
 						}
@@ -454,14 +460,20 @@ void Kerzenlicht_Renderer::renderPointCloud() {
 
 void Kerzenlicht_Renderer::renderFrame() {
 	renderClear();
-	if (View_Mode == Render_Mode::WIREFRAME) {
-		renderWireframe();
-	}
-	else if (View_Mode == Render_Mode::POINTCLOUD) {
+	if (View_Mode == Render_Mode::POINTCLOUD) {
 		renderPointCloud();
 	}
-	else if (View_Mode == Render_Mode::VISUALIZER) {
-		renderVisualizer();
+	else if (View_Mode == Render_Mode::PREVIEW) {
+		renderPreview();
+	}
+	else if (View_Mode == Render_Mode::WIREFRAME) {
+		renderWireframe();
+	}
+	else if (View_Mode == Render_Mode::ZDEPTH) {
+		renderZBuffer();
+	}
+	else {
+		renderPreview();
 	}
 	drawToSurface();
 }
@@ -533,17 +545,15 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Load_File_Button->setText("Import Obj File");
 	connect(Load_File_Button, &QT_Button::clicked, this, &Renderer_Menu::openObjFile);
 
-	QT_Button* Render_Wire_Button = new QT_Button();
-	Render_Wire_Button->setText("Render Wireframe");
-	connect(Render_Wire_Button, &QT_Button::clicked, this, &Renderer_Menu::renderWireframe);
+	QT_Option* Render_Mode_Select = new QT_Option();
 
-	QT_Button* Render_Points_Button = new QT_Button();
-	Render_Points_Button->setText("Render Points");
-	connect(Render_Points_Button, &QT_Button::clicked, this, &Renderer_Menu::renderPointCloud);
+	Render_Mode_Select->addItem("Path Tracer", 0);
+	Render_Mode_Select->addItem("Point Cloud", 1);
+	Render_Mode_Select->addItem("Preview", 2);
+	Render_Mode_Select->addItem("Wireframe", 3);
+	Render_Mode_Select->addItem("Z-Depth Debug", 4);
 
-	QT_Button* Render_Visualizer_Button = new QT_Button();
-	Render_Visualizer_Button->setText("Render Visualizer");
-	connect(Render_Visualizer_Button, &QT_Button::clicked, this, &Renderer_Menu::renderEdgeVisualizer);
+	connect(Render_Mode_Select, &QT_Option::currentIndexChanged, [this](int Index) { renderSwitch(Index); });
 
 	QT_Value_Input* ResX_Input = new QT_Value_Input();
 	QIntValidator* ValidatorX = new QIntValidator();
@@ -562,9 +572,7 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	connect(Save_Button, &QT_Button::clicked, this, &Renderer_Menu::save);
 
 	Layout->addWidget(Load_File_Button);
-	Layout->addWidget(Render_Wire_Button);
-	Layout->addWidget(Render_Points_Button);
-	Layout->addWidget(Render_Visualizer_Button);
+	Layout->addWidget(Render_Mode_Select);
 	Layout->addWidget(ResX_Input);
 	Layout->addWidget(ResY_Input);
 	Layout->addWidget(Save_Button);
@@ -576,26 +584,10 @@ void Renderer_Menu::openObjFile() {
 	Parent->loadObj(fileName.toStdString());
 }
 
-void Renderer_Menu::renderWireframe() {
-	Parent->View_Mode = Render_Mode::WIREFRAME;
-	Parent->renderClear();
-	Parent->renderWireframe();
-	Parent->drawToSurface();
-	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", Render_Mode::WIREFRAME);
-}
-void Renderer_Menu::renderPointCloud() {
-	Parent->View_Mode = Render_Mode::POINTCLOUD;
-	Parent->renderClear();
-	Parent->renderPointCloud();
-	Parent->drawToSurface();
-	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", Render_Mode::POINTCLOUD);
-}
-void Renderer_Menu::renderEdgeVisualizer() {
-	Parent->View_Mode = Render_Mode::VISUALIZER;
-	Parent->renderClear();
-	Parent->renderVisualizer();
-	Parent->drawToSurface();
-	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", Render_Mode::VISUALIZER);
+void Renderer_Menu::renderSwitch(int Index) {
+	Parent->View_Mode = static_cast<Render_Mode>(Index);
+	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", static_cast<Render_Mode>(Index));
+	Parent->renderFrame();
 }
 
 void Renderer_Menu::changeXResolution(int value) {
