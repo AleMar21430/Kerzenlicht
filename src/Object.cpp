@@ -8,6 +8,7 @@ Object::Object() {
 	Rot_Euler = Vec3();
 	Scale = Vec3(1, 1, 1);
 	MeshData = Mesh();
+	MeshShader = Shader();
 }
 
 Object::Object(string P_Name) {
@@ -18,6 +19,7 @@ Object::Object(string P_Name) {
 	Rot_Euler = Vec3();
 	Scale = Vec3(1, 1, 1);
 	MeshData = Mesh();
+	MeshShader = Shader();
 }
 
 void Object::scale(Vec3 P_Scale) {

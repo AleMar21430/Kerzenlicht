@@ -22,6 +22,8 @@ struct Mesh {
 struct Vertex {
 	Vec3 Pos;
 	Rgb Color;
+	Vec3 Normal;
+	Vec2 UV;
 
 	Vertex();
 	Vertex(Vec3 P_Pos);

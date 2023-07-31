@@ -3,16 +3,22 @@
 Vertex::Vertex() {
 	Pos = Vec3();
 	Color = Rgb();
+	Normal = Vec3();
+	UV = Vec2();
 }
 
 Vertex::Vertex(Vec3 P_Pos) {
 	Pos = P_Pos;
 	Color = Rgb();
+	Normal = Vec3();
+	UV = Vec2();
 }
 
 Vertex::Vertex(Vec3 P_Pos, Rgb P_Color) {
 	Pos = P_Pos;
 	Color = P_Color;
+	Normal = Vec3();
+	UV = Vec2();
 }
 
 Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) {
@@ -58,8 +64,6 @@ Mesh::Mesh() {
 }
 
 void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, const Vec3& P_Scale) {
-	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
-
 	Matrix_4x4 translation = Matrix_4x4({
 		{ 1, 0, 0, P_Translate.X },
 		{ 0, 1, 0, P_Translate.Y },
@@ -101,7 +105,45 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 
 	Matrix_4x4 Model_Matrix = translation * (pitchMat * yawMat * rollMat) * scale;
 
-	if (Vertex_Colors["Color"].size() == Vertex_Positions.size()) {
+	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
+
+	if (Vertex_UV_Coords["UV"].size() > 0) {
+		for (const Mesh_Triangle& Tri: Faces) {
+
+			Vertex Vert1 = Vertex(Vertex_Positions[Tri.Index1]);
+			Vertex Vert2 = Vertex(Vertex_Positions[Tri.Index2]);
+			Vertex Vert3 = Vertex(Vertex_Positions[Tri.Index3]);
+
+			Vert1.UV = Vertex_UV_Coords["UV"][Tri.UV_1];
+			Vert2.UV = Vertex_UV_Coords["UV"][Tri.UV_2];
+			Vert3.UV = Vertex_UV_Coords["UV"][Tri.UV_3];
+
+			Vec4 vertShader1 = Vec4(Vert1.Pos, 1) * Model_Matrix;
+			Vec4 vertShader2 = Vec4(Vert2.Pos, 1) * Model_Matrix;
+			Vec4 vertShader3 = Vec4(Vert3.Pos, 1) * Model_Matrix;
+
+			Vert1.Pos = Vec3(
+				vertShader1.X / vertShader1.W,
+				vertShader1.Y / vertShader1.W,
+				vertShader1.Z / vertShader1.W
+			);
+			Vert2.Pos = Vec3(
+				vertShader2.X / vertShader2.W,
+				vertShader2.Y / vertShader2.W,
+				vertShader2.Z / vertShader2.W
+			);
+			Vert3.Pos = Vec3(
+				vertShader3.X / vertShader3.W,
+				vertShader3.Y / vertShader3.W,
+				vertShader3.Z / vertShader3.W
+			);
+
+			Vertex_Output[Tri.Index1] = Vert1;
+			Vertex_Output[Tri.Index2] = Vert2;
+			Vertex_Output[Tri.Index3] = Vert3;
+		}
+	}
+	else if (Vertex_Colors["Color"].size() > 0) {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
 			Vertex Vert = Vertex(Vertex_Positions[i], Vertex_Colors["Color"][i]);
 			Vec4 vertShader = Vec4(Vert.Pos, 1) * Model_Matrix;

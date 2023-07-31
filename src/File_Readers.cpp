@@ -47,14 +47,14 @@ void Obj_File_Loader::run() {
 					Imported_Mesh.MeshData.Vertex_Colors["Color"].push_back(Color);
 				}
 			}
-			if (Tokens[0] == "vt") {
+			else if (Tokens[0] == "vt") {
 				Vec2 Pos(
 					stod(Tokens[1]),
 					stod(Tokens[2])
 				);
 				Imported_Mesh.MeshData.Vertex_UV_Coords["UV"].push_back(Pos);
 			}
-			if (Tokens[0] == "vn") {
+			else if (Tokens[0] == "vn") {
 				Vec3 Normal(
 					stod(Tokens[1]),
 					stod(Tokens[2]),
@@ -75,10 +75,14 @@ void Obj_File_Loader::run() {
 				if (Vert1.size() == 3) {
 					if (!Vert1[1].empty()) {
 						triangle.UV_1 = stoull(Vert1[1]) - 1;
+						triangle.UV_2 = stoull(Vert2[1]) - 1;
+						triangle.UV_3 = stoull(Vert3[1]) - 1;
 					}
 
 					if (!Vert1[2].empty()) {
-						triangle.UV_1 = stoull(Vert1[2]) - 1;
+						triangle.Normal_1 = stoull(Vert1[2]) - 1;
+						triangle.Normal_2 = stoull(Vert2[2]) - 1;
+						triangle.Normal_3 = stoull(Vert3[2]) - 1;
 					}
 				}
 				Imported_Mesh.MeshData.Faces.push_back(triangle);

@@ -99,7 +99,6 @@ struct Renderer_Menu : QT_Linear_Contents {
 struct Ray {
 	Vec3 org, dir;
 
-	/* Origin and direction */
 	Ray(const Vec3 org, const Vec3& dir) : org(org), dir(dir) {}
 	Ray() : org(Vec3(0, 0, 0)), dir(Vec3(0, 0, 0)) {}
 };

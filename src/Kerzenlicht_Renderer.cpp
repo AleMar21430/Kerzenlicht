@@ -166,6 +166,7 @@ void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Render_Object.Pos = Vec3(0, 0, 0);
 	Render_Object.Scale = Vec3(600, 600, 600);
 	Render_Object.Rot_Euler = Vec3(180, 0, 0);
+	Render_Object.MeshShader.Albedo.loadfromBitmap("./Koharu.bmp");
 
 	Render_Object.translate(Vec3(ResX / 2.0, 100, 0));
 	renderFrame();
@@ -366,6 +367,40 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 								Val,
 								1.0
 							));
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void Kerzenlicht_Renderer::renderTextured() {
+	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
+	for (const Mesh_Triangle& tri : Render_Object.MeshData.Faces) {
+		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.Index1];
+		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.Index2];
+		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.Index3];
+		
+		int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+		int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+		int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+		int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+
+		for (int x = minX; x < maxX; x++) {
+			for (int y = minY; y < maxY; y++) {
+				if (x >= 0 && x < ResX && y >= 0 && y < ResY) {
+					double u, v, w;
+					tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+					if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
+						double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+						if (Depth < ZBuffer[x][y]) {
+							ZBuffer[x][y] = Depth;
+							Vec2 UVs = Vec2(
+								u * v1.UV.X + v * v2.UV.X + w * v3.UV.X,
+								u * v1.UV.Y + v * v2.UV.Y + w * v3.UV.Y
+							);
+							renderPixel(x, y, Render_Object.MeshShader.Albedo.getColor(UVs));
 						}
 					}
 				}

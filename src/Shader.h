@@ -2,9 +2,6 @@
 
 #include "Math.h"
 
-struct Shader {
-};
-
 struct Texture {
 	uint16_t Width, Height;
 	vector<vector<Rgba>> Pixmap;
@@ -12,4 +9,10 @@ struct Texture {
 	Texture();
 	
 	void loadfromBitmap(string P_File_Path);
+	Rgba getColor(Vec2 P_Pos);
+};
+
+struct Shader {
+	Texture Albedo;
+	Shader();
 };
