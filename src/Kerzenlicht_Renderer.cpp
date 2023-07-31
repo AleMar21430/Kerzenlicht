@@ -39,7 +39,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	renderClear();
 	drawToSurface();
-	loadObj("./Logo.obj");
+	loadObj("./Koharu.obj");
 }
 
 void Kerzenlicht_Renderer::drawToSurface() {
@@ -164,10 +164,10 @@ void Kerzenlicht_Renderer::updateProgress(int P_Progress) {
 void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Render_Object = P_Object;
 	Render_Object.Pos = Vec3(0, 0, 0);
-	Render_Object.Rot_Euler = Vec3(0, 0, 0);
+	Render_Object.Scale = Vec3(600, 600, 600);
+	Render_Object.Rot_Euler = Vec3(180, 0, 0);
 
-	Render_Object.translate(Vec3(ResX / 2.0, ResY / 2.0, 0));
-	Render_Object.scale(Vec3(299, 299, 299));
+	Render_Object.translate(Vec3(ResX / 2.0, 100, 0));
 	renderFrame();
 }
 
@@ -312,10 +312,10 @@ void Kerzenlicht_Renderer::loadObj(string P_File) {
 void Kerzenlicht_Renderer::renderWireframe() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
-	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
-		Vec3 v1 = Render_Object.MeshData.Vertex_Output[tri.I1].Pos;
-		Vec3 v2 = Render_Object.MeshData.Vertex_Output[tri.I2].Pos;
-		Vec3 v3 = Render_Object.MeshData.Vertex_Output[tri.I3].Pos;
+	for (const Mesh_Triangle& tri : Render_Object.MeshData.Faces) {
+		Vec3 v1 = Render_Object.MeshData.Vertex_Output[tri.Index1].Pos;
+		Vec3 v2 = Render_Object.MeshData.Vertex_Output[tri.Index2].Pos;
+		Vec3 v3 = Render_Object.MeshData.Vertex_Output[tri.Index3].Pos;
 
 		renderLine(v1.X, v1.Y, v2.X, v2.Y);
 		renderLine(v2.X, v2.Y, v3.X, v3.Y);
@@ -325,10 +325,10 @@ void Kerzenlicht_Renderer::renderWireframe() {
 
 void Kerzenlicht_Renderer::renderPreview() {
 	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
-	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
-		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
-		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
-		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
+	for (const Mesh_Triangle& tri : Render_Object.MeshData.Faces) {
+		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.Index1];
+		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.Index2];
+		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.Index3];
 		renderTriangle(v1, v2, v3);
 	}
 }
@@ -342,10 +342,10 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 	double minZ = *min_element(Z_Positions.begin(), Z_Positions.end());
 	double maxZ = *max_element(Z_Positions.begin(), Z_Positions.end());
 
-	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
-		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
-		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
-		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
+	for (const Mesh_Triangle& tri : Render_Object.MeshData.Faces) {
+		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.Index1];
+		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.Index2];
+		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.Index3];
 
 		int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
 		int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
@@ -435,10 +435,10 @@ void Kerzenlicht_Renderer::renderPathTracer() {
 void Kerzenlicht_Renderer::renderPointCloud() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	Render_Object.MeshData.applyTransformMatrix(Render_Object.Pos, Render_Object.Rot_Euler, Render_Object.Scale);
-	for (const Mesh_Face& tri : Render_Object.MeshData.Faces) {
-		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.I1];
-		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.I2];
-		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.I3];
+	for (const Mesh_Triangle& tri : Render_Object.MeshData.Faces) {
+		Vertex v1 = Render_Object.MeshData.Vertex_Output[tri.Index1];
+		Vertex v2 = Render_Object.MeshData.Vertex_Output[tri.Index2];
+		Vertex v3 = Render_Object.MeshData.Vertex_Output[tri.Index3];
 
 		if (Render_Object.MeshData.Vertex_Colors.size() > 0) {
 			setPenColor(Rgba::fromRgb(v1.Color));
@@ -465,6 +465,9 @@ void Kerzenlicht_Renderer::renderFrame() {
 	}
 	else if (View_Mode == Render_Mode::PREVIEW) {
 		renderPreview();
+	}
+	else if (View_Mode == Render_Mode::TEXTURED) {
+		renderTextured();
 	}
 	else if (View_Mode == Render_Mode::WIREFRAME) {
 		renderWireframe();
@@ -550,8 +553,11 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Render_Mode_Select->addItem("Path Tracer", 0);
 	Render_Mode_Select->addItem("Point Cloud", 1);
 	Render_Mode_Select->addItem("Preview", 2);
-	Render_Mode_Select->addItem("Wireframe", 3);
-	Render_Mode_Select->addItem("Z-Depth Debug", 4);
+	Render_Mode_Select->addItem("Textured", 3);
+	Render_Mode_Select->addItem("Wireframe", 4);
+	Render_Mode_Select->addItem("Z-Depth Debug", 5);
+
+	Render_Mode_Select->setCurrentIndex(Parent->View_Mode);
 
 	connect(Render_Mode_Select, &QT_Option::currentIndexChanged, [this](int Index) { renderSwitch(Index); });
 
@@ -581,7 +587,7 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 
 void Renderer_Menu::openObjFile() {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Object (*.obj)"));
-	Parent->loadObj(fileName.toStdString());
+	if (!fileName.isEmpty()) Parent->loadObj(fileName.toStdString());
 }
 
 void Renderer_Menu::renderSwitch(int Index) {

@@ -44,15 +44,43 @@ void Obj_File_Loader::run() {
 						stod(Tokens[5]),
 						stod(Tokens[6])
 					);
-					Imported_Mesh.MeshData.Vertex_Colors["Col"].push_back(Color);
+					Imported_Mesh.MeshData.Vertex_Colors["Color"].push_back(Color);
 				}
 			}
-			else if (Tokens[0] == "f") {
-				Mesh_Face triangle(
-					stoull(Math::splitString(Tokens[1], "/")[0]) - 1,
-					stoull(Math::splitString(Tokens[2], "/")[0]) - 1,
-					stoull(Math::splitString(Tokens[3], "/")[0]) - 1
+			if (Tokens[0] == "vt") {
+				Vec2 Pos(
+					stod(Tokens[1]),
+					stod(Tokens[2])
 				);
+				Imported_Mesh.MeshData.Vertex_UV_Coords["UV"].push_back(Pos);
+			}
+			if (Tokens[0] == "vn") {
+				Vec3 Normal(
+					stod(Tokens[1]),
+					stod(Tokens[2]),
+					stod(Tokens[3])
+				);
+				Imported_Mesh.MeshData.Vertex_Normals["Normal"].push_back(Normal);
+			}
+			else if (Tokens[0] == "f") {
+				vector<string> Vert1 = Math::splitString(Tokens[1], "/");
+				vector<string> Vert2 = Math::splitString(Tokens[2], "/");
+				vector<string> Vert3 = Math::splitString(Tokens[3], "/");
+
+				Mesh_Triangle triangle = Mesh_Triangle (
+					stoull(Vert1[0]) - 1,
+					stoull(Vert2[0]) - 1,
+					stoull(Vert3[0]) - 1
+				);
+				if (Vert1.size() == 3) {
+					if (!Vert1[1].empty()) {
+						triangle.UV_1 = stoull(Vert1[1]) - 1;
+					}
+
+					if (!Vert1[2].empty()) {
+						triangle.UV_1 = stoull(Vert1[2]) - 1;
+					}
+				}
 				Imported_Mesh.MeshData.Faces.push_back(triangle);
 			}
 		}

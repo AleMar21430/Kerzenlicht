@@ -3,11 +3,13 @@
 #include "Math.h"
 
 struct Vertex;
-struct Mesh_Face;
+struct Mesh_Triangle;
 
 struct Mesh {
-	vector<Mesh_Face> Faces;
+	vector<Mesh_Triangle> Faces;
 	vector<Vec3> Vertex_Positions;
+	map<string, vector<Vec3>> Vertex_Normals;
+	map<string, vector<Vec2>> Vertex_UV_Coords;
 	map<string, vector<Rgb>> Vertex_Colors;
 	map<string, map<string, double>> Vertex_Weights;
 
@@ -28,8 +30,10 @@ struct Vertex {
 	Vec2 project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV);
 };
 
-struct Mesh_Face {
-	size_t I1, I2, I3;
+struct Mesh_Triangle {
+	size_t Index1, Index2, Index3;
+	size_t Normal_1, Normal_2, Normal_3;
+	size_t UV_1, UV_2, UV_3;
 
-	Mesh_Face(size_t P_I1, size_t P_I2, size_t P_I3);
+	Mesh_Triangle(size_t P_I1, size_t P_I2, size_t P_I3);
 };

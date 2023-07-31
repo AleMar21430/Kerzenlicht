@@ -32,15 +32,25 @@ Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) {
 	return Vec2(f * x, f * z);
 }
 
-Mesh_Face::Mesh_Face(size_t P_I1, size_t P_I2, size_t P_I3) {
-	I1 = P_I1;
-	I2 = P_I2;
-	I3 = P_I3;
+Mesh_Triangle::Mesh_Triangle(size_t P_I1, size_t P_I2, size_t P_I3) {
+	Index1 = P_I1;
+	Index2 = P_I2;
+	Index3 = P_I3;
+
+	Normal_1 = 0;
+	Normal_2 = 0;
+	Normal_3 = 0;
+
+	UV_1 = 0;
+	UV_2 = 0;
+	UV_3 = 0;
 }
 
 Mesh::Mesh() {
-	Faces = vector<Mesh_Face>();
+	Faces = vector<Mesh_Triangle>();
 	Vertex_Positions = vector<Vec3>();
+	Vertex_Normals = map<string, vector<Vec3>>();
+	Vertex_UV_Coords = map<string, vector<Vec2>>();
 	Vertex_Colors = map<string, vector<Rgb>>();
 	Vertex_Weights = map<string, map<string, double>>();
 
@@ -57,7 +67,7 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 		{ 0, 0, 0, 1             }
 	});
 
-	double Yaw   = P_Rotate.X + PI / 180.0;
+	double Yaw   = P_Rotate.X * PI / 180.0;
 	double Pitch = P_Rotate.Y * PI / 180.0;
 	double Roll  = P_Rotate.Z * PI / 180.0;
 
@@ -91,9 +101,9 @@ void Mesh::applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 
 	Matrix_4x4 Model_Matrix = translation * (pitchMat * yawMat * rollMat) * scale;
 
-	if (Vertex_Colors["Col"].size() == Vertex_Positions.size()) {
+	if (Vertex_Colors["Color"].size() == Vertex_Positions.size()) {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
-			Vertex Vert = Vertex(Vertex_Positions[i], Vertex_Colors["Col"][i]);
+			Vertex Vert = Vertex(Vertex_Positions[i], Vertex_Colors["Color"][i]);
 			Vec4 vertShader = Vec4(Vert.Pos, 1) * Model_Matrix;
 			Vert.Pos = Vec3(
 				vertShader.X / vertShader.W,

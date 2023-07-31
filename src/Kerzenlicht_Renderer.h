@@ -6,6 +6,7 @@ enum Render_Mode {
 	PATHTRACING,
 	POINTCLOUD,
 	PREVIEW,
+	TEXTURED,
 	WIREFRAME,
 	ZDEPTH
 };
@@ -57,6 +58,7 @@ public:
 	void renderPointCloud();
 	void renderPreview();
 	void renderZBuffer();
+	void renderTextured();
 	void renderPathTracer();
 	void renderFrame();
 	void drawToSurface();
