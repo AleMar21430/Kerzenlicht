@@ -9,8 +9,8 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 
 	QSettings settings("Raylight", "KerzenLicht");
 
-	ResX = settings.value("ResX", 1800).toInt();
-	ResY = settings.value("ResY", 1120).toInt();
+	ResX = settings.value("ResX", 3600).toInt();
+	ResY = settings.value("ResY", 2200).toInt();
 	Aspect_Ratio = static_cast<double>(ResX) / static_cast<double>(ResY);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
@@ -39,7 +39,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	renderClear();
 	drawToSurface();
-	loadObj("./Koharu.obj");
+	loadObj("./Mika.obj");
 }
 
 void Kerzenlicht_Renderer::drawToSurface() {
@@ -74,12 +74,9 @@ void Kerzenlicht_Renderer::wheelEvent(QWheelEvent* P_Event) {
 }
 
 void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
-	if (P_Event->button() == Qt::LeftButton) {
-		Left_Mouse_Pressed = true;
-	}
-	if (P_Event->button() == Qt::RightButton) {
-		Right_Mouse_Pressed = true;
-	}
+	if (P_Event->button() == Qt::LeftButton) Left_Mouse_Pressed = true;
+	if (P_Event->button() == Qt::RightButton) Right_Mouse_Pressed = true;
+
 	Mouse_Down_Pos = P_Event->pos();
 }
 
@@ -101,12 +98,8 @@ void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
 }
 
 void Kerzenlicht_Renderer::mouseReleaseEvent(QMouseEvent* P_Event) {
-	if (P_Event->button() == Qt::LeftButton) {
-		Left_Mouse_Pressed = false;
-	}
-	if (P_Event->button() == Qt::RightButton) {
-		Right_Mouse_Pressed = false;
-	}
+	if (P_Event->button() == Qt::LeftButton) Left_Mouse_Pressed = false;
+	if (P_Event->button() == Qt::RightButton) Right_Mouse_Pressed = false;
 }
 
 void Kerzenlicht_Renderer::keyPressEvent(QKeyEvent* P_Event) {
@@ -164,11 +157,11 @@ void Kerzenlicht_Renderer::updateProgress(int P_Progress) {
 void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Render_Object = P_Object;
 	Render_Object.Pos = Vec3(0, 0, 0);
-	Render_Object.Scale = Vec3(600, 600, 600);
-	Render_Object.Rot_Euler = Vec3(180, 0, 0);
-	Render_Object.MeshShader.Albedo.loadfromBitmap("./Koharu.bmp");
+	Render_Object.Scale = Vec3(-1000, 1000, 1000);
+	Render_Object.Rot_Euler = Vec3(180, -10, 0);
+	Render_Object.MeshShader.Albedo.loadfromBitmap("./Mika.bmp");
 
-	Render_Object.translate(Vec3(ResX / 2.0, 100, 0));
+	Render_Object.translate(Vec3(ResX / 2.0, 150, 0));
 	renderFrame();
 }
 
