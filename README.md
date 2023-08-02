@@ -11,5 +11,4 @@ Vulkan SDK    1.3.239.0
 ```
 
 ![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/c6a11ec8-4178-4530-9ede-79b2fb39ae44)
-![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/a2ea3b3b-91fc-4e31-9f1d-39eff8b43633)
-![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/8e9a43a9-0f17-4e2e-b4e7-99b27e78bee9)
+![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/ae279c28-e641-413e-b5c5-40e37db4b58f)
