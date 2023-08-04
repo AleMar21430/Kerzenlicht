@@ -13,10 +13,12 @@ struct Mesh {
 	map<string, vector<Rgb>> Vertex_Colors;
 	map<string, map<string, double>> Vertex_Weights;
 
+	Matrix_4x4 model_matrix;
 	vector<Vertex> Vertex_Output;
 
 	Mesh();
-	void applyTransformMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, const Vec3& P_Scale);
+	void f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, const Vec3& P_Scale);
+	void f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix);
 };
 
 struct Vertex {

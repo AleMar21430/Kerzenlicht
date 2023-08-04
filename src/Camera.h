@@ -4,14 +4,11 @@
 
 struct Camera {
 	Vec3 position, forward_vec, up_vec, right_vec;
+	Matrix_4x4 camera_matrix, view_matrix, projection_matrix;
 
-	double Fov;
-	double sensor_size;
+	double Fov, aspect_ratio;
+	double sensor_size, near_clip, far_clip;
 	uint32_t x_resolution, y_resolution;
-
-	bool depth_of_field;
-	double depth_of_field_focus_distance;
-	double depth_of_field_f_stops;
 	
 	Camera();
 
@@ -23,4 +20,6 @@ struct Camera {
 	void f_moveForward(double P_Distance);
 	void f_moveRight(double P_Distance);
 	void f_moveUp(double P_Distance);
+
+	void f_processMatrix();
 };

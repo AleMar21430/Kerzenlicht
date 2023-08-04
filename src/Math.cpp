@@ -433,6 +433,62 @@ Matrix_4x4 Matrix_4x4::operator*(Matrix_4x4 other) {
 	return Result;
 }
 
+Matrix_4x4 Matrix_4x4::inv() {
+	Matrix_4x4 mat_copy = *this;
+
+	// Size of the matrix (assumed to be 4x4)
+	const int n = 4;
+
+	// Augmenting the matrix with an identity matrix
+	for (int i = 0; i < n; ++i) {
+		mat_copy.m[i].resize(2 * n);
+		mat_copy.m[i][n + i] = 1.0;
+	}
+
+	// Applying Gauss-Jordan elimination
+	for (int i = 0; i < n; ++i) {
+		// Find the pivot row
+		int pivot = i;
+		for (int j = i + 1; j < n; ++j) {
+			if (abs(mat_copy.m[j][i]) > abs(mat_copy.m[pivot][i])) {
+				pivot = j;
+			}
+		}
+
+		// Swap the rows
+		if (pivot != i) {
+			swap(mat_copy.m[i], mat_copy.m[pivot]);
+		}
+
+		// Make the diagonal element 1
+		double diagonal_factor = mat_copy.m[i][i];
+		for (int j = 0; j < 2 * n; ++j) {
+			mat_copy.m[i][j] /= diagonal_factor;
+		}
+
+		// Eliminate other rows
+		for (int j = 0; j < n; ++j) {
+			if (j != i) {
+				double factor = mat_copy.m[j][i];
+				for (int k = 0; k < 2 * n; ++k) {
+					mat_copy.m[j][k] -= factor * mat_copy.m[i][k];
+				}
+			}
+		}
+	}
+
+	// Extract the inverse matrix from the augmented matrix
+	Matrix_4x4 result;
+	result.m.resize(n, std::vector<double>(n));
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < n; ++j) {
+			result.m[i][j] = mat_copy.m[i][n + j];
+		}
+	}
+
+	return result;
+}
+
 Vec4& Vec4::operator*(const Matrix_4x4& other) {
 	Vec4 Result = Vec4();
 	Result.X = other.m[0][0] * X + other.m[0][1] * Y + other.m[0][2] * Z + other.m[0][3] * W;

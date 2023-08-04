@@ -23,8 +23,6 @@ public:
 	bool Right_Mouse_Pressed;
 	QPoint Mouse_Down_Pos;
 
-	uint32_t ResX;
-	uint32_t ResY;
 	double Aspect_Ratio;
 	Rgba Pen_Color;
 	float Pen_Opacity;
@@ -34,7 +32,7 @@ public:
 	Render_Mode View_Mode;
 
 	vector<QThread*> Thread_Storage;
-	Object Render_Object;
+	vector<Object> Render_Scene;
 	Camera Render_Camera;
 
 	QGraphicsScene* Scene;
