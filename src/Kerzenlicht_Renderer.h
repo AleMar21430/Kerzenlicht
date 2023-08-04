@@ -23,7 +23,6 @@ public:
 	bool Right_Mouse_Pressed;
 	QPoint Mouse_Down_Pos;
 
-	double Aspect_Ratio;
 	Rgba Pen_Color;
 	float Pen_Opacity;
 	vector<vector<Rgba>> Pixmap;

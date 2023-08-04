@@ -11,10 +11,9 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	
 	Render_Scene = vector<Object>();
 	Render_Camera = Camera();
-	Render_Camera.position = Vec3(-1,0,0);
+	Render_Camera.position = Vec3(0,0,-5);
 	Render_Camera.f_processMatrix();
 
-	Aspect_Ratio = static_cast<double>(Render_Camera.x_resolution) / static_cast<double>(Render_Camera.y_resolution);
 	Pen_Color = Rgba();
 	Pen_Opacity = 1.0f;
 	Pixmap = vector(Render_Camera.x_resolution, vector<Rgba>(Render_Camera.y_resolution));
@@ -40,7 +39,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	renderClear();
 	drawToSurface();
-	loadObj("./Mika.obj");
+	loadObj("./Logo.obj");
 }
 
 void Kerzenlicht_Renderer::drawToSurface() {
@@ -105,35 +104,36 @@ void Kerzenlicht_Renderer::mouseReleaseEvent(QMouseEvent* P_Event) {
 
 void Kerzenlicht_Renderer::keyPressEvent(QKeyEvent* P_Event) {
 	if (P_Event->key() == Qt::Key::Key_W) {
-		Render_Camera.f_moveForward(0.05);
+		Render_Camera.f_moveForward(0.25);
 	}
 	if (P_Event->key() == Qt::Key::Key_A) {
-		Render_Camera.f_moveRight(-0.05);
+		Render_Camera.f_moveRight(-0.25);
 	}
 	if (P_Event->key() == Qt::Key::Key_S) {
-		Render_Camera.f_moveForward(-0.05);
+		Render_Camera.f_moveForward(-0.25);
 	}
 	if (P_Event->key() == Qt::Key::Key_D) {
-		Render_Camera.f_moveRight(0.05);
+		Render_Camera.f_moveRight(0.25);
 	}
 	if (P_Event->key() == Qt::Key::Key_E) {
-		Render_Camera.f_moveUp(0.05);
+		Render_Camera.f_moveUp(0.25);
 	}
 	if (P_Event->key() == Qt::Key::Key_Q) {
-		Render_Camera.f_moveUp(-0.05);
+		Render_Camera.f_moveUp(-0.25);
 	}
 	if (P_Event->key() == Qt::Key::Key_Right) {
-		Render_Camera.f_rotate(0, 0.05,0);
+		Render_Camera.rotation += Vec3(0, 0.25, 0);
 	}
 	if (P_Event->key() == Qt::Key::Key_Left) {
-		Render_Camera.f_rotate(0, -0.05, 0);
+		Render_Camera.rotation += Vec3(0, -0.25, 0);
 	}
 	if (P_Event->key() == Qt::Key::Key_Up) {
-		Render_Camera.f_rotate(0.05, 0, 0);
+		Render_Camera.rotation += Vec3(0.25, 0, 0);
 	}
 	if (P_Event->key() == Qt::Key::Key_Down) {
-		Render_Camera.f_rotate(-0.05, 0, 0);
+		Render_Camera.rotation += Vec3(-0.25, 0, 0);
 	}
+	Render_Camera.f_processMatrix();
 	renderFrame();
 }
 
@@ -158,10 +158,10 @@ void Kerzenlicht_Renderer::updateProgress(int P_Progress) {
 void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Object Import_Obj = P_Object;
 	Import_Obj.Pos = Vec3(0, 0, 0);
-	Import_Obj.Scale = Vec3(-1000, 1000, 1000);
-	Import_Obj.Rot_Euler = Vec3(180, -10, 0);
-	Import_Obj.MeshShader.Albedo.loadfromBitmap("./Mika.bmp");
-	Import_Obj.translate(Vec3(Render_Camera.x_resolution / 2.0, 150, 0));
+	Import_Obj.Scale = Vec3(1, 1, 1);
+	Import_Obj.Rot_Euler = Vec3(0, 0, 0);
+	//Import_Obj.MeshShader.Albedo.loadfromBitmap("./Mika.bmp");
+	Import_Obj.translate(Vec3(Render_Camera.x_resolution, Render_Camera.y_resolution, 0));
 
 	Render_Scene.push_back(Import_Obj);
 	renderFrame();
@@ -292,10 +292,6 @@ tuple<double, double, double> Kerzenlicht_Renderer::barycentricCoords(const Vec3
 }
 
 void Kerzenlicht_Renderer::loadObj(string P_File) {
-	R_String log;
-	log << "Loading Obj Model, File: " << P_File << ".";
-	Log->append(QString::fromStdString(log.write()));
-
 	Obj_File_Loader* thread = new Obj_File_Loader(this, P_File);
 	
 	connect(thread, SIGNAL( loadingFinished_Signal(Object) ), SLOT( loadObject(Object) ));

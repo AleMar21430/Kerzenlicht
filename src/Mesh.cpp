@@ -107,7 +107,7 @@ void Mesh::f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 }
 
 void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix) {
-	Matrix_4x4 View_Matrix = P_Camera_Matrix.inv();
+	Matrix_4x4 View_Matrix = model_matrix * P_Projection_Matrix * P_Viewport_Matrix * P_Camera_Matrix.inv();
 
 	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
 
@@ -122,9 +122,9 @@ void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& 
 			Vert2.UV = Vertex_UV_Coords["UV"][Tri.UV_2];
 			Vert3.UV = Vertex_UV_Coords["UV"][Tri.UV_3];
 
-			Vec4 vertShader1 = Vec4(Vert1.Pos, 1) * (model_matrix * P_Projection_Matrix * View_Matrix * P_Viewport_Matrix);
-			Vec4 vertShader2 = Vec4(Vert2.Pos, 1) * (model_matrix * P_Projection_Matrix * View_Matrix * P_Viewport_Matrix);
-			Vec4 vertShader3 = Vec4(Vert3.Pos, 1) * (model_matrix * P_Projection_Matrix * View_Matrix * P_Viewport_Matrix);
+			Vec4 vertShader1 = Vec4(Vert1.Pos, 1) * View_Matrix;
+			Vec4 vertShader2 = Vec4(Vert2.Pos, 1) * View_Matrix;
+			Vec4 vertShader3 = Vec4(Vert3.Pos, 1) * View_Matrix;
 
 			Vert1.Pos = Vec3(
 				vertShader1.X / vertShader1.W,
@@ -150,7 +150,7 @@ void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& 
 	else if (Vertex_Colors["Color"].size() > 0) {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
 			Vertex Vert = Vertex(Vertex_Positions[i], Vertex_Colors["Color"][i]);
-			Vec4 vertShader = Vec4(Vert.Pos, 1) * (model_matrix * P_Projection_Matrix * View_Matrix * P_Viewport_Matrix);
+			Vec4 vertShader = Vec4(Vert.Pos, 1) * View_Matrix;
 			Vert.Pos = Vec3(
 				vertShader.X / vertShader.W,
 				vertShader.Y / vertShader.W,
@@ -162,7 +162,7 @@ void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& 
 	else {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
 			Vertex Vert = Vertex(Vertex_Positions[i], Rgb(1, 1, 1));
-			Vec4 vertShader = Vec4(Vert.Pos, 1) * (model_matrix * P_Projection_Matrix * View_Matrix * P_Viewport_Matrix);
+			Vec4 vertShader = Vec4(Vert.Pos, 1) * View_Matrix;
 			Vert.Pos = Vec3(
 				vertShader.X / vertShader.W,
 				vertShader.Y / vertShader.W,
