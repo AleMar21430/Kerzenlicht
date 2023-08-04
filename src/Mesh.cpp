@@ -71,9 +71,9 @@ void Mesh::f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 		{ 0, 0, 0, 1             }
 	});
 
-	double Yaw   = P_Rotate.X * PI / 180.0;
-	double Pitch = P_Rotate.Y * PI / 180.0;
-	double Roll  = P_Rotate.Z * PI / 180.0;
+	double Yaw   = P_Rotate.X * RAD;
+	double Pitch = P_Rotate.Y * RAD;
+	double Roll  = P_Rotate.Z * RAD;
 
 	Matrix_4x4 yawMat = Matrix_4x4({
 		{ cos(Yaw) , 0, sin(Yaw), 0 },

@@ -181,12 +181,11 @@ double Vec3::len() {
 	return sqrt(X * X + Y * Y + Z * Z);
 }
 
-Vec3 Vec3::normalize() {
-	double Length = 1L / this->len();
+void Vec3::normalize() {
+	double  Length = 1.0 / len();
 	X = X * Length;
 	Y = Y * Length;
 	Z = Z * Length;
-	return *this;
 }
 
 Vec3 Vec3::rotate(Vec3 P_Pos, const Vec3 P_Anchor, const Vec3 P_Rotation) {
@@ -398,19 +397,6 @@ double Math::clamp(double P_Value, double P_Min, double P_Max) {
 	if (P_Value >= P_Min && P_Value <= P_Max) return P_Value;
 	else if (P_Value < P_Min) return P_Min;
 	else return P_Max;
-}
-
-Matrix_3x3 Matrix_3x3::operator*(Matrix_3x3 other) {
-	Matrix_3x3 Result = Matrix_3x3();
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
-			Result.matrix[i][j] =
-			matrix[i][0] * other.matrix[0][j] +
-			matrix[i][1] * other.matrix[1][j] +
-			matrix[i][2] * other.matrix[2][j] ;
-		}
-	}
-	return Result;
 }
 
 Matrix_4x4::Matrix_4x4() {

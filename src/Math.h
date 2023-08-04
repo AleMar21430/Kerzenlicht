@@ -17,6 +17,7 @@
 #define PI          3.141592653589793
 #define TWO_PI      6.283185307179586
 #define INVERTED_PI 0.318309886183791
+#define RAD         0.017453292519943
 
 using namespace std;
 
@@ -66,15 +67,9 @@ struct Vec3 {
 	double dot(const Vec3& other);
 	Vec3 cross(const Vec3& other);
 	double len();
-	Vec3 normalize();
+	void normalize();
 	Vec3 rotate(Vec3 P_Pos, const Vec3 P_Anchor, const Vec3 P_Rotation);
 	void rotate(const Vec3 P_Anchor, const Vec3 P_Rotation);
-};
-
-struct Matrix_3x3 {
-	double matrix[3][3];
-
-	Matrix_3x3 operator*(Matrix_3x3 other);
 };
 
 struct Vec4 {
