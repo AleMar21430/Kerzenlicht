@@ -94,8 +94,11 @@ struct Matrix_4x4 {
 	Matrix_4x4(vector<vector<double>> P_Input);
 
 	Matrix_4x4 operator*(Matrix_4x4 other);
+	Matrix_4x4 operator/(double other);
 	
 	Matrix_4x4 inv();
+	Matrix_4x4 adjugate();
+	double determinant();
 };
 
 struct Rgb {

@@ -1,8 +1,8 @@
 #include "Camera.h"
 
 Camera::Camera() {
-	position =    Vec3(0, -1, 0);
-	rotation =    Vec3(0, 0, 0);
+	position =    Vec3(0, 0, 0);
+	rotation =    Vec3(0, 0, 180);
 	right_vec =   Vec3(1, 0, 0);
 	up_vec =      Vec3(0, 1, 0);
 	forward_vec = Vec3(0, 0, 1);
@@ -70,13 +70,6 @@ void Camera::f_processMatrix() {
 
 	double t = tan((Fov * PI / 180) / 2) * near_clip;
 	double r = t * aspect_ratio;
-
-	/*camera_matrix = Matrix_4x4({
-		{ right_vec.X , up_vec.X , forward_vec.X , position.X },
-		{ right_vec.Y , up_vec.Y , forward_vec.Y , position.Y },
-		{ right_vec.Z , up_vec.Z , forward_vec.Z , position.Z },
-		{ 0           , 0        , 0             , 1          }
-	});*/
 
 	projection_matrix = Matrix_4x4({
 		{ near_clip / r , 0             , 0                                                , 0                                                   },

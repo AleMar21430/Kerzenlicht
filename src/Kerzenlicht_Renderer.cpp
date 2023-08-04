@@ -81,18 +81,11 @@ void Kerzenlicht_Renderer::mousePressEvent(QMouseEvent* P_Event) {
 }
 
 void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
-	if (Left_Mouse_Pressed) {
-		/*Render_Scene.rotate(Vec3(
-			(P_Event->pos().x() - Mouse_Down_Pos.x()) * -0.001,
-			(P_Event->pos().y() - Mouse_Down_Pos.y()) * -0.001,
-			0)
-		);*/
-		renderFrame();
-	}
 	if (Right_Mouse_Pressed) {
 		double DeltaX = P_Event->pos().x() - Mouse_Down_Pos.x();
 		double DeltaY = P_Event->pos().y() - Mouse_Down_Pos.y();
-		//Render_Scene.translate(Vec3(DeltaX * 0.05, DeltaY * -0.05, 0));
+		Render_Camera.rotation += Vec3(DeltaX * 0.025, DeltaY * 0.025, 0);
+		Render_Camera.f_processMatrix();
 		renderFrame();
 	}
 }
@@ -120,18 +113,6 @@ void Kerzenlicht_Renderer::keyPressEvent(QKeyEvent* P_Event) {
 	}
 	if (P_Event->key() == Qt::Key::Key_Q) {
 		Render_Camera.f_moveUp(-0.25);
-	}
-	if (P_Event->key() == Qt::Key::Key_Right) {
-		Render_Camera.rotation += Vec3(0, 0.25, 0);
-	}
-	if (P_Event->key() == Qt::Key::Key_Left) {
-		Render_Camera.rotation += Vec3(0, -0.25, 0);
-	}
-	if (P_Event->key() == Qt::Key::Key_Up) {
-		Render_Camera.rotation += Vec3(0.25, 0, 0);
-	}
-	if (P_Event->key() == Qt::Key::Key_Down) {
-		Render_Camera.rotation += Vec3(-0.25, 0, 0);
 	}
 	Render_Camera.f_processMatrix();
 	renderFrame();
