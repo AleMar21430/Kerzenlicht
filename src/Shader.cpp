@@ -35,7 +35,7 @@ void Texture::loadfromBitmap(string P_File_Path) {
 	file.close();
 }
 
-Rgba Texture::getColor(Vec2 P_UV) {
+Rgba Texture::getColor(Vec2 P_UV) const {
 	if (P_UV.X >= 0 && P_UV.X <= 1 && P_UV.Y >= 0 && P_UV.Y <= 1)
 		return Pixmap[uint16_t(P_UV.X * double(Width))][uint16_t(P_UV.Y * double(Height))];
 	else

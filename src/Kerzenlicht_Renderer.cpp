@@ -365,7 +365,10 @@ void Kerzenlicht_Renderer::renderTextured() {
 		if (Obj.MeshShader.Albedo.Width != 0) {
 			Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
 			Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-			for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
+			#pragma omp parallel for
+			for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
+				const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
+
 				Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
 				Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
 				Vertex v3 = Obj.MeshData.Vertex_Output[tri.Index3];

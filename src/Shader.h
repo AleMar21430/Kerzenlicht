@@ -9,7 +9,7 @@ struct Texture {
 	Texture();
 	
 	void loadfromBitmap(string P_File_Path);
-	Rgba getColor(Vec2 P_Pos);
+	Rgba getColor(Vec2 P_Pos) const;
 };
 
 struct Shader {
