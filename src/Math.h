@@ -39,18 +39,19 @@ struct Vec2 {
 	Vec2();
 	Vec2(double P_X, double P_Y);
 
-	Vec2 operator+(const Vec2& other);
-	Vec2 operator-(const Vec2& other);
-	Vec2 operator*(const Vec2& other);
-	Vec2 operator/(const Vec2& other);
+	Vec2 operator+(const Vec2& other) const;
+	Vec2 operator-(const Vec2& other) const;
+	Vec2 operator*(const Vec2& other) const;
+	Vec2 operator/(const Vec2& other) const;
+
 	Vec2& operator+=(const Vec2& other);
 	Vec2& operator-=(const Vec2& other);
 	Vec2& operator*=(const Vec2& other);
 	Vec2& operator/=(const Vec2& other);
 
-	double dot(const Vec2& other);
-	Vec2 cross(const Vec2& other);
-	double len();
+	double dot(const Vec2& other) const;
+	Vec2 cross(const Vec2& other) const;
+	double len() const;
 	Vec2 normalize();
 };
 
@@ -60,22 +61,23 @@ struct Vec3 {
 	Vec3();
 	Vec3(double P_X, double P_Y, double P_Z);
 
-	Vec3 operator+(const Vec3& other);
-	Vec3 operator-(const Vec3& other);
-	Vec3 operator*(const Vec3& other);
-	Vec3 operator/(const Vec3& other);
+	Vec3 operator+(const Vec3& other) const;
+	Vec3 operator-(const Vec3& other) const;
+	Vec3 operator*(const Vec3& other) const;
+	Vec3 operator/(const Vec3& other) const;
+
 	Vec3& operator+=(const Vec3& other);
 	Vec3& operator-=(const Vec3& other);
 	Vec3& operator*=(const Vec3& other);
 	Vec3& operator/=(const Vec3& other);
 
-	Vec3& operator*(const double& other);
+	Vec3 operator*(const double& other) const;
 
-	double dot(const Vec3& other);
-	Vec3 cross(const Vec3& other);
-	double len();
-	void normalize();
-	Vec3 rotate(Vec3 P_Pos, const Vec3 P_Anchor, const Vec3 P_Rotation);
+	double dot(const Vec3& other) const;
+	Vec3 cross(const Vec3& other) const;
+	double len() const;
+	Vec3 normalize();
+	Vec3 rotate(Vec3 P_Pos, const Vec3 P_Anchor, const Vec3 P_Rotation) const;
 	void rotate(const Vec3 P_Anchor, const Vec3 P_Rotation);
 };
 
@@ -86,7 +88,7 @@ struct Vec4 {
 	Vec4(const Vec3& P_XYZ, double P_W);
 	Vec4(double P_X, double P_Y, double P_Z, double P_W);
 
-	Vec4& operator*(const Matrix_4x4& other);
+	Vec4 operator*(const Matrix_4x4& other) const;
 };
 
 struct Matrix_4x4 {
@@ -95,36 +97,36 @@ struct Matrix_4x4 {
 	Matrix_4x4();
 	Matrix_4x4(vector<vector<double>> P_Input);
 
-	Matrix_4x4 operator*(Matrix_4x4 other);
-	Matrix_4x4 operator/(double other);
+	Matrix_4x4 operator*(Matrix_4x4 other) const;
+	Matrix_4x4 operator/(double other) const;
 	
-	Matrix_4x4 inv();
-	Matrix_4x4 adjugate();
-	double determinant();
+	Matrix_4x4 inv() const;
+	Matrix_4x4 adjugate() const;
+	double determinant() const;
 };
 
 struct Rgb {
-	float R, G, B;
+	double R, G, B;
 
 	Rgb();
-	Rgb(float P_Gray);
-	Rgb(float P_R, float P_G, float P_B);
+	Rgb(double P_Gray);
+	Rgb(double P_R, double P_G, double P_B);
 
-	Rgb operator+(Rgb other);
+	Rgb operator+(Rgb other) const;
 
-	Rgb operator*(float other);
+	Rgb operator*(double other) const;
 
 	static Rgb random();
 };
 
 struct Rgba {
-	float R, G, B, A;
+	double R, G, B, A;
 
 	Rgba();
-	Rgba(Rgb P_Color, float P_Alpha);
-	Rgba(float P_R, float P_G, float P_B, float P_A);
+	Rgba(Rgb P_Color, double P_Alpha);
+	Rgba(double P_R, double P_G, double P_B, double P_A);
 
-	Rgba& operator*(const float& other);
+	Rgba& operator*(const double& other) const;
 
 	Rgba clamp();
 
@@ -133,7 +135,7 @@ struct Rgba {
 };
 
 struct Math {
-	static float fastInvSqrt(const float& number);
+	static double fastInvSqrt(const double& number);
 	static vector<string> splitString(const string& input, const string& delimiter);
 	static vector<string> splitString(const string& input);
 	static string strEnd(const vector<string>& P_Vec, const size_t& P_Start);

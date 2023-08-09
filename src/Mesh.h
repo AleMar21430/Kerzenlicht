@@ -31,7 +31,7 @@ struct Vertex {
 	Vertex(Vec3 P_Pos);
 	Vertex(Vec3 P_Pos, Rgb P_Color);
 
-	Vec2 project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV);
+	Vec2 project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) const;
 };
 
 struct Mesh_Triangle {

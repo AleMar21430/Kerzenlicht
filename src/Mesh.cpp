@@ -21,7 +21,7 @@ Vertex::Vertex(Vec3 P_Pos, Rgb P_Color) {
 	UV = Vec2();
 }
 
-Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) {
+Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) const {
 	Vec3 relative = Vec3(Pos.X - cameraPos.X, Pos.Y - cameraPos.Y, Pos.Z - cameraPos.Z);
 
 	double cosYaw = cos(cameraDir.Y);
