@@ -119,6 +119,12 @@ void Kerzenlicht_Renderer::keyPressEvent(QKeyEvent* P_Event) {
 	if (P_Event->key() == Qt::Key::Key_Down) {
 		Render_Camera.rotation += Vec3(0, -1, 0);
 	}
+	if (P_Event->key() == Qt::Key::Key_Comma) {
+		Render_Camera.rotation += Vec3(0, 0, 2.5);
+	}
+	if (P_Event->key() == Qt::Key::Key_Period) {
+		Render_Camera.rotation += Vec3(0, 0, -2.5);
+	}
 	Render_Camera.f_processMatrix();
 	renderFrame();
 }
