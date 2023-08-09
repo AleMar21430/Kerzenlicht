@@ -11,7 +11,7 @@ Object::Object() {
 	MeshShader = Shader();
 }
 
-Object::Object(string P_Name) {
+Object::Object(const string& P_Name) {
 	Name = P_Name;
 
 	Pos = Vec3();
@@ -22,14 +22,14 @@ Object::Object(string P_Name) {
 	MeshShader = Shader();
 }
 
-void Object::scale(Vec3 P_Scale) {
+void Object::scale(const Vec3& P_Scale) {
 	Scale += P_Scale;
 }
 
-void Object::rotate(Vec3 P_Rot) {
+void Object::rotate(const Vec3& P_Rot) {
 	Rot_Euler += P_Rot;
 }
 
-void Object::translate(Vec3 P_Pos) {
+void Object::translate(const Vec3& P_Pos) {
 	Pos += P_Pos;
 }

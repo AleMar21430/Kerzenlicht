@@ -17,9 +17,9 @@ struct Object {
 	Vec3 Scale;
 
 	Object();
-	Object(string P_Name);
+	Object(const string& P_Name);
 
-	void scale(Vec3 P_Scale);
-	void rotate(Vec3 P_Rot);
-	void translate(Vec3 P_Pos = Vec3());
+	void scale(const Vec3& P_Scale);
+	void rotate(const Vec3& P_Rot);
+	void translate(const Vec3& P_Pos = Vec3());
 };

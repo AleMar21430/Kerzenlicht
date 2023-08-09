@@ -18,7 +18,7 @@ struct Mesh {
 
 	Mesh();
 	void f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, const Vec3& P_Scale);
-	void f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix);
+	void f_processVertexShader(const Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix);
 };
 
 struct Vertex {
@@ -40,5 +40,5 @@ struct Mesh_Triangle {
 	size_t Normal_1, Normal_2, Normal_3;
 	size_t UV_1, UV_2, UV_3;
 
-	Mesh_Triangle(size_t P_I1, size_t P_I2, size_t P_I3);
+	Mesh_Triangle(const size_t& P_I1, const size_t& P_I2, const size_t& P_I3);
 };

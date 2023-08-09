@@ -21,45 +21,45 @@ Camera::Camera() {
 	projection_matrix = Matrix_4x4();
 }
 
-void Camera::f_moveForward(double P_Distance) {
+void Camera::f_moveForward(const double& P_Distance) {
 	position += forward_vec * P_Distance;
 }
 
-void Camera::f_moveRight(double P_Distance) {
+void Camera::f_moveRight(const double& P_Distance) {
 	position += right_vec * P_Distance;
 }
 
-void Camera::f_moveUp(double P_Distance) {
+void Camera::f_moveUp(const double& P_Distance) {
 	position += up_vec * P_Distance;
 }
 
 void Camera::f_processMatrix() {
-	Matrix_4x4 translation = Matrix_4x4({
+	const Matrix_4x4 translation = Matrix_4x4({
 		{ 1 , 0 , 0 , position.X },
 		{ 0 , 1 , 0 , position.Y },
 		{ 0 , 0 , 1 , position.Z },
 		{ 0 , 0 , 0 , 1          }
 	});
 
-	double Yaw =   rotation.X * RAD;
-	double Pitch = rotation.Y * RAD;
-	double Roll =  rotation.Z * RAD;
+	const double Yaw =   rotation.X * RAD;
+	const double Pitch = rotation.Y * RAD;
+	const double Roll =  rotation.Z * RAD;
 
-	Matrix_4x4 yawMat = Matrix_4x4({
+	const Matrix_4x4 yawMat = Matrix_4x4({
 		{ cos(Yaw)  , 0 , sin(Yaw) , 0 },
 		{ 0         , 1 , 0        , 0 },
 		{ -sin(Yaw) , 0 , cos(Yaw) , 0 },
 		{ 0         , 0 , 0        , 1 }
 	});
 
-	Matrix_4x4 pitchMat = Matrix_4x4({
+	const Matrix_4x4 pitchMat = Matrix_4x4({
 		{ 1 , 0          , 0           , 0 },
 		{ 0 , cos(Pitch) , -sin(Pitch) , 0 },
 		{ 0 , sin(Pitch) , cos(Pitch)  , 0 },
 		{ 0 , 0          , 0           , 1 }
 	});
 
-	Matrix_4x4 rollMat = Matrix_4x4({
+	const Matrix_4x4 rollMat = Matrix_4x4({
 		{ cos(Roll) , -sin(Roll) , 0 , 0 },
 		{ sin(Roll) , cos(Roll)  , 0 , 0 },
 		{ 0         , 0          , 1 , 0 },
@@ -79,8 +79,8 @@ void Camera::f_processMatrix() {
 
 	aspect_ratio = double(x_resolution) / double(y_resolution);
 
-	double top = tan((fov * RAD) / 2.0) * near_clip;
-	double right = top * aspect_ratio;
+	const double top = tan((fov * RAD) / 2.0) * near_clip;
+	const double right = top * aspect_ratio;
 
 	if (!orthogonal) {
 		projection_matrix = Matrix_4x4({

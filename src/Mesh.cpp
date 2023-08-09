@@ -45,7 +45,7 @@ Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, const double&
 	return Vec2(f * x, f * z);
 }
 
-Mesh_Triangle::Mesh_Triangle(size_t P_I1, size_t P_I2, size_t P_I3) {
+Mesh_Triangle::Mesh_Triangle(const size_t& P_I1, const size_t& P_I2, const size_t& P_I3) {
 	Index1 = P_I1;
 	Index2 = P_I2;
 	Index3 = P_I3;
@@ -113,7 +113,7 @@ void Mesh::f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 	model_matrix = translation * (pitchMat * yawMat * rollMat) * scale;
 }
 
-void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix) {
+void Mesh::f_processVertexShader(const Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix) {
 	const Matrix_4x4 View_Matrix = model_matrix * P_Viewport_Matrix * P_Projection_Matrix * P_Camera_Matrix.inv(); // Multiplication order is important
 
 	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
@@ -141,7 +141,7 @@ void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& 
 				),
 				Vertex_UV_Coords["UV"][Tri.UV_2]
 			);
-			Vertex_Output[Tri.Index2] = Vertex(
+			Vertex_Output[Tri.Index3] = Vertex(
 				Vec3(
 					vertShader3.X / vertShader3.W,
 					vertShader3.Y / vertShader3.W,
@@ -167,7 +167,7 @@ void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& 
 	}
 	else {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
-			Vec4 vertShader = Vec4(Vertex_Positions[i], 1) * View_Matrix;
+			const Vec4 vertShader = Vec4(Vertex_Positions[i], 1) * View_Matrix;
 			Vertex_Output[i] = Vertex(
 				Vec3(
 					vertShader.X / vertShader.W,

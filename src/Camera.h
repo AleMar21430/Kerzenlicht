@@ -14,9 +14,9 @@ struct Camera {
 	
 	Camera();
 
-	void f_moveForward(double P_Distance);
-	void f_moveRight(double P_Distance);
-	void f_moveUp(double P_Distance);
+	void f_moveForward(const double& P_Distance);
+	void f_moveRight(const double& P_Distance);
+	void f_moveUp(const double& P_Distance);
 
 	void f_processMatrix();
 };

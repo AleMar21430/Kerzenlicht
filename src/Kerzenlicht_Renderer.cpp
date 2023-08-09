@@ -250,7 +250,7 @@ void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex
 				double u, v, w;
 				tie(u, v, w) = barycentricCoords(P_Vert1.Pos, P_Vert2.Pos, P_Vert3.Pos, x, y);
 				if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
-					double Depth = u * P_Vert1.Pos.Z + v * P_Vert2.Pos.Z + w * P_Vert3.Pos.Z;
+					const double Depth = u * P_Vert1.Pos.Z + v * P_Vert2.Pos.Z + w * P_Vert3.Pos.Z;
 					if (Depth < ZBuffer[x][y]) {
 						ZBuffer[x][y] = Depth;
 						renderPixel(x, y, Rgba(
@@ -332,8 +332,8 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 		for (const Vertex& vert : Obj.MeshData.Vertex_Output) {
 			Z_Positions.push_back(vert.Pos.Z);
 		}
-		double minZ = *min_element(Z_Positions.begin(), Z_Positions.end());
-		double maxZ = *max_element(Z_Positions.begin(), Z_Positions.end());
+		const double minZ = *min_element(Z_Positions.begin(), Z_Positions.end());
+		const double maxZ = *max_element(Z_Positions.begin(), Z_Positions.end());
 
 		#pragma omp parallel for
 		for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
@@ -353,12 +353,11 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 						double u, v, w;
 						tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
 						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
-							double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 							if (Depth < ZBuffer[x][y]) {
 								ZBuffer[x][y] = Depth;
-								const Rgb Val = Rgb(Math::clamp(-(Depth - maxZ) / (maxZ - minZ), 0.0, 1.0));
 								renderPixel(x, y, Rgba(
-									Val,
+									Rgb(Math::clamp(-(Depth - maxZ) / (maxZ - minZ), 0.0, 1.0)),
 									1.0
 								));
 							}
@@ -395,10 +394,10 @@ void Kerzenlicht_Renderer::renderTextured() {
 							double u, v, w;
 							tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
 							if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
-								double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+								const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 								if (Depth < ZBuffer[x][y]) {
 									ZBuffer[x][y] = Depth;
-									const Vec2 UVs = Vec2(
+									Vec2 UVs = Vec2(
 										u * v1.UV.X + v * v2.UV.X + w * v3.UV.X,
 										u * v1.UV.Y + v * v2.UV.Y + w * v3.UV.Y
 									);
