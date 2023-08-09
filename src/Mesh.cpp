@@ -107,13 +107,12 @@ void Mesh::f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 }
 
 void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix) {
-	Matrix_4x4 View_Matrix = model_matrix * P_Projection_Matrix * P_Viewport_Matrix * P_Camera_Matrix.inv();
+	Matrix_4x4 View_Matrix = model_matrix * P_Viewport_Matrix * P_Projection_Matrix * P_Camera_Matrix.inv(); // Multiplication order is important
 
 	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
 
 	if (Vertex_UV_Coords["UV"].size() > 0) {
 		for (const Mesh_Triangle& Tri : Faces) {
-
 			Vertex Vert1 = Vertex(Vertex_Positions[Tri.Index1]);
 			Vertex Vert2 = Vertex(Vertex_Positions[Tri.Index2]);
 			Vertex Vert3 = Vertex(Vertex_Positions[Tri.Index3]);

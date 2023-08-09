@@ -1,10 +1,10 @@
 #include "Camera.h"
 
 Camera::Camera() {
-	position =    Vec3(0, 0, 15);
-	rotation =    Vec3(0, 0,  0);
-	right_vec =   Vec3(1, 0,  0);
-	up_vec =      Vec3(0, 1,  0);
+	position =    Vec3(0, 0, 5);
+	rotation =    Vec3(0, 0, 0);
+	right_vec =   Vec3(1, 0, 0);
+	up_vec =      Vec3(0, 1, 0);
 	forward_vec = Vec3(0, 0, 1);
 
 	fov = 40.0;
@@ -17,7 +17,7 @@ Camera::Camera() {
 	aspect_ratio = double(x_resolution) / double(y_resolution);
 
 	camera_matrix = Matrix_4x4();
-	view_matrix = Matrix_4x4();
+	viewport_matrix = Matrix_4x4();
 	projection_matrix = Matrix_4x4();
 }
 
@@ -66,8 +66,8 @@ void Camera::f_processMatrix() {
 		{ 0         , 0          , 0 , 1 }
 	});
 
-	//camera_matrix = translation * (pitchMat * yawMat * rollMat);
-	right_vec.normalize();
+	camera_matrix = translation * (pitchMat * yawMat * rollMat);
+	/*right_vec.normalize();
 	up_vec.normalize();
 	forward_vec.normalize();
 	camera_matrix = Matrix_4x4({
@@ -75,19 +75,17 @@ void Camera::f_processMatrix() {
 		{ right_vec.Y , up_vec.Y , forward_vec.Y , position.Y },
 		{ right_vec.Z , up_vec.Z , forward_vec.Z , position.Z },
 		{ 0           , 0        , 0             , 1          }
-	});
+	});*/
 
 	aspect_ratio = double(x_resolution) / double(y_resolution);
 
 	double top = tan((fov * RAD) / 2.0) * near_clip;
-	double bottom = -top;
 	double right = top * aspect_ratio;
-	double left = -right;
 
 	if (!orthogonal) {
 		projection_matrix = Matrix_4x4({
-			{ near_clip / right , 0               , (right + left) / (right - left)                  , 0                                                      },
-			{ 0                 , near_clip / top , (top + bottom) / (top - bottom)                  , 0                                                      },
+			{ near_clip / right , 0               , 0                                                , 0                                                      },
+			{ 0                 , near_clip / top , 0                                                , 0                                                      },
 			{ 0                 , 0               , -(far_clip + near_clip) / (far_clip - near_clip) , -(2.0 * far_clip * near_clip) / (far_clip - near_clip) },
 			{ 0                 , 0               , -1                                               , 0                                                      }
 		});
@@ -96,7 +94,7 @@ void Camera::f_processMatrix() {
 		projection_matrix = Matrix_4x4();
 	}
 
-	view_matrix = Matrix_4x4({
+	viewport_matrix = Matrix_4x4({
 		{ double(x_resolution) / 2.0 , 0                          , 0   , double(x_resolution) / 2.0 },
 		{ 0                          , double(y_resolution) / 2.0 , 0   , double(y_resolution) / 2.0 },
 		{ 0                          , 0                          , 0.5 , 0.5                        },

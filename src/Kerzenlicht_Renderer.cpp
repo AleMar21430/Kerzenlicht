@@ -31,7 +31,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	renderClear();
 	drawToSurface();
-	loadObj("./Logo.obj");
+	loadObj("./Mika.obj");
 }
 
 void Kerzenlicht_Renderer::drawToSurface() {
@@ -77,7 +77,7 @@ void Kerzenlicht_Renderer::mouseMoveEvent(QMouseEvent* P_Event) {
 	if (Right_Mouse_Pressed) {
 		double DeltaX = P_Event->pos().x() - Mouse_Down_Pos.x();
 		double DeltaY = P_Event->pos().y() - Mouse_Down_Pos.y();
-		Render_Camera.rotation += Vec3(DeltaX * 0.025, DeltaY * 0.025, 0);
+		Render_Camera.rotation += Vec3(DeltaX * 0.005, DeltaY * 0.005, 0);
 		Render_Camera.f_processMatrix();
 		renderFrame();
 	}
@@ -107,6 +107,18 @@ void Kerzenlicht_Renderer::keyPressEvent(QKeyEvent* P_Event) {
 	if (P_Event->key() == Qt::Key::Key_Q) {
 		Render_Camera.f_moveUp(-0.25);
 	}
+	if (P_Event->key() == Qt::Key::Key_Right) {
+		Render_Camera.rotation += Vec3(-1, 0, 0);
+	}
+	if (P_Event->key() == Qt::Key::Key_Left) {
+		Render_Camera.rotation += Vec3(1, 0, 0);
+	}
+	if (P_Event->key() == Qt::Key::Key_Up) {
+		Render_Camera.rotation += Vec3(0, 1, 0);
+	}
+	if (P_Event->key() == Qt::Key::Key_Down) {
+		Render_Camera.rotation += Vec3(0, -1, 0);
+	}
 	Render_Camera.f_processMatrix();
 	renderFrame();
 }
@@ -134,8 +146,7 @@ void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Import_Obj.Pos = Vec3(0, 0, 0);
 	Import_Obj.Scale = Vec3(1, 1, 1);
 	Import_Obj.Rot_Euler = Vec3(0, 0, 0);
-	//Import_Obj.MeshShader.Albedo.loadfromBitmap("./Mika.bmp");
-	//Import_Obj.translate(Vec3(0, 0, 0));
+	Import_Obj.MeshShader.Albedo.loadfromBitmap("./Mika.bmp");
 
 	Render_Scene.push_back(Import_Obj);
 	renderFrame();
@@ -279,7 +290,7 @@ void Kerzenlicht_Renderer::renderWireframe() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	for (Object& Obj : Render_Scene) {
 		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.view_matrix);
+		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
 		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
 			Vec3 v1 = Obj.MeshData.Vertex_Output[tri.Index1].Pos;
 			Vec3 v2 = Obj.MeshData.Vertex_Output[tri.Index2].Pos;
@@ -295,7 +306,7 @@ void Kerzenlicht_Renderer::renderWireframe() {
 void Kerzenlicht_Renderer::renderPreview() {
 	for (Object& Obj : Render_Scene) {
 		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.view_matrix);
+		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
 		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
 			Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
 			Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
@@ -308,7 +319,7 @@ void Kerzenlicht_Renderer::renderPreview() {
 void Kerzenlicht_Renderer::renderZBuffer() {
 	for (Object& Obj : Render_Scene) {
 		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.view_matrix);
+		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
 		vector<double> Z_Positions;
 		for (const Vertex& vert : Obj.MeshData.Vertex_Output) {
 			Z_Positions.push_back(vert.Pos.Z);
@@ -351,9 +362,9 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 
 void Kerzenlicht_Renderer::renderTextured() {
 	for (Object& Obj : Render_Scene) {
-		if (Obj.MeshShader.Albedo.Width != 0)
+		if (Obj.MeshShader.Albedo.Width != 0) {
 			Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-			Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.view_matrix);
+			Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
 			for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
 				Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
 				Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
@@ -384,6 +395,7 @@ void Kerzenlicht_Renderer::renderTextured() {
 					}
 				}
 			}
+		}
 	}
 }
 
@@ -394,7 +406,7 @@ void Kerzenlicht_Renderer::renderPointCloud() {
 	setPenColor(Rgba(1, 1, 1, 1));
 	for (Object& Obj : Render_Scene) {
 		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.view_matrix);
+		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
 		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
 			Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
 			Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];

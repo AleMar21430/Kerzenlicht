@@ -325,80 +325,6 @@ Rgba Rgba::fromRgb(Rgb P_Rgb) {
 	return Rgba(P_Rgb.R, P_Rgb.G, P_Rgb.B, 1);
 }
 
-float Math::fastInvSqrt(float number) {
-	long i;
-	float x2, y;
-	const float threehalfs = 1.5F;
-
-	x2 = number * 0.5F;
-	y = number;
-	i = *(long*)&y;							// get bits for floating value
-	i = 0x5f3759df - (i >> 1);				// gives initial guess y0
-	y = *(float*)&i;						// convert bits back to float
-	y = y * (threehalfs - (x2 * y * y));	// Newton step, repeating increases accuracy
-	y = y * (threehalfs - (x2 * y * y));
-	y = y * (threehalfs - (x2 * y * y));
-	return y;
-}
-
-vector<string> Math::splitString(string& input, string delimiter) {
-	vector<string> tokens;
-	string::size_type start = 0;
-	string::size_type end = input.find(delimiter);
-
-	while (end != string::npos) {
-		tokens.push_back(input.substr(start, end - start));
-		start = end + 1;
-		end = input.find(delimiter, start);
-	}
-	tokens.push_back(input.substr(start));
-
-	return tokens;
-}
-
-vector<string> Math::splitString(string& input) {
-	vector<string> result;
-	istringstream iss(input);
-	string token;
-
-	while (iss >> token) {
-		result.push_back(token);
-	}
-
-	return result;
-}
-
-void Math::centerPointsToOrigin(vector<pair<int, int>>& points) {
-	// Find the minimum and maximum x and y coordinates
-	int minX = points[0].first;
-	int maxX = points[0].first;
-	int minY = points[0].second;
-	int maxY = points[0].second;
-
-	for (const auto& point : points) {
-		minX = min(minX, point.first);
-		maxX = max(maxX, point.first);
-		minY = min(minY, point.second);
-		maxY = max(maxY, point.second);
-	}
-
-	// Calculate the center of the bounding box
-	int centerX = (minX + maxX) / 2;
-	int centerY = (minY + maxY) / 2;
-
-	// Shift all points to center them around the origin
-	for (auto& point : points) {
-		point.first -= centerX;
-		point.second -= centerY;
-	}
-}
-
-double Math::clamp(double P_Value, double P_Min, double P_Max) {
-	if (P_Value >= P_Min && P_Value <= P_Max) return P_Value;
-	else if (P_Value < P_Min) return P_Min;
-	else return P_Max;
-}
-
 Matrix_4x4::Matrix_4x4() {
 	m = vector(4, vector(4, 0.0));
 }
@@ -451,7 +377,8 @@ Matrix_4x4 Matrix_4x4::adjugate() {
 		  m[0][0] * m[2][1] * m[3][2] + m[3][0] * m[0][1] * m[2][2] + m[2][0] * m[3][1] * m[0][2] - m[0][0] * m[3][1] * m[2][2] - m[2][0] * m[0][1] * m[3][2] - m[3][0] * m[2][1] * m[0][2],
 		  m[0][0] * m[3][1] * m[1][2] + m[1][0] * m[0][1] * m[3][2] + m[3][0] * m[1][1] * m[0][2] - m[0][0] * m[1][1] * m[3][2] - m[3][0] * m[0][1] * m[1][2] - m[1][0] * m[3][1] * m[0][2],
 		  m[0][0] * m[1][1] * m[2][2] + m[2][0] * m[0][1] * m[1][2] + m[1][0] * m[2][1] * m[0][2] - m[0][0] * m[2][1] * m[1][2] - m[1][0] * m[0][1] * m[2][2] - m[2][0] * m[1][1] * m[0][2]}
-		});
+		}
+	);
 }
 
 double Matrix_4x4::determinant() {
@@ -489,4 +416,101 @@ Vec4::Vec4(double P_X, double P_Y, double P_Z, double P_W) {
 	Y = P_Y;
 	Z = P_Z;
 	W = P_W;
+}
+
+float Math::fastInvSqrt(const float& number) {
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5F;
+	x2 = number * 0.5F;
+	y = number;
+	i = *(long*)&y;							// get bits for floating value
+	i = 0x5f3759df - (i >> 1);				// gives initial guess y0
+	y = *(float*)&i;						// convert bits back to float
+	y = y * (threehalfs - (x2 * y * y));	// Newton step, repeating increases accuracy
+	y = y * (threehalfs - (x2 * y * y));
+	y = y * (threehalfs - (x2 * y * y));
+	return y;
+}
+
+vector<string> Math::splitString(const string& input, const string& delimiter) {
+	vector<string> tokens;
+	string::size_type start = 0;
+	string::size_type end = input.find(delimiter);
+	while (end != string::npos) {
+		tokens.push_back(input.substr(start, end - start));
+		start = end + 1;
+		end = input.find(delimiter, start);
+	}
+	tokens.push_back(input.substr(start));
+	return tokens;
+}
+vector<string> Math::splitString(const string& input) {
+	vector<string> result;
+	istringstream iss(input);
+	string token;
+	while (iss >> token) {
+		result.push_back(token);
+	}
+	return result;
+}
+string Math::strEnd(const vector<string>& P_Vec, const size_t& P_Start) {
+	return accumulate(P_Vec.begin() + P_Start, P_Vec.end(), string());
+}
+string Math::strEndSpace(const vector<string>& P_Vec, const size_t& P_Start) {
+	return accumulate(
+		P_Vec.begin() + P_Start, P_Vec.end(), string(),
+		[](const string& accumulator, const string& current) {
+			return accumulator.empty() ? current : accumulator + " " + current;
+		}
+	);
+}
+string Math::strSpaced(const vector<size_t>& P_Vec) {
+	std::ostringstream oss;
+	for (size_t i = 0; i < P_Vec.size(); ++i) {
+		oss << P_Vec[i];
+		if (i < P_Vec.size() - 1) {
+			oss << " ";
+		}
+	}
+	return oss.str();
+}
+
+string Math::vecToStringLines(const vector<string>& P_Vec) {
+	if (P_Vec.empty())
+		return "";
+	string result = P_Vec[0];
+	for (size_t i = 1; i < P_Vec.size(); ++i) {
+		result += "\n";
+		result += P_Vec[i];
+	}
+	return result;
+}
+vector<string> Math::splitStringToLines(const string& P_Lines) {
+	vector<string> lines;
+	istringstream iss(P_Lines);
+	string line;
+	while (getline(iss, line)) {
+		lines.push_back(line);
+	}
+	return lines;
+}
+string Math::addTabsToStr(const string& input, const int& tabs) {
+	istringstream iss(input);
+	ostringstream oss;
+	string line;
+	while (getline(iss, line)) {
+		int Tab = tabs;
+		while (Tab--) {
+			oss << "\t";
+		}
+		oss << line << "\n";
+	}
+	return oss.str().substr(0, oss.str().length() - 1);
+}
+
+double Math::clamp(double P_Value, double P_Min, double P_Max) {
+	if (P_Value >= P_Min && P_Value <= P_Max) return P_Value;
+	else if (P_Value < P_Min) return P_Min;
+	else return P_Max;
 }

@@ -2,17 +2,24 @@
 
 #include "R_String.h"
 
+#include <unordered_map>
+#include <unordered_set>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <fstream>
 #include <variant>
 #include <cstdlib>
-#include <utility>
+#include <numeric>
 #include <vector>
 #include <thread>
 #include <future>
-#include <map>
+#include <math.h>
+#include <array>
 #include <omp.h>
+#include <any>
+#include <map>
+#include <set>
 
 #define PI          3.141592653589793
 #define TWO_PI      6.283185307179586
@@ -126,9 +133,14 @@ struct Rgba {
 };
 
 struct Math {
-	static float fastInvSqrt(float number);
-	static vector<string> splitString(string& input, string delimiter);
-	static vector<string> splitString(string& input);
-	static void centerPointsToOrigin(vector<pair<int, int>>& points);
+	static float fastInvSqrt(const float& number);
+	static vector<string> splitString(const string& input, const string& delimiter);
+	static vector<string> splitString(const string& input);
+	static string strEnd(const vector<string>& P_Vec, const size_t& P_Start);
+	static string strEndSpace(const vector<string>& P_Vec, const size_t& P_Start);
+	static string strSpaced(const vector<size_t>& P_Vec);
+	static string vecToStringLines(const vector<string>& P_Vec);
+	static vector<string> splitStringToLines(const string& P_Lines);
+	static string addTabsToStr(const string& input, const int& tabs);
 	static double clamp(double P_Value, double P_Min, double P_Max);
 };
