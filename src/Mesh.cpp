@@ -121,28 +121,28 @@ void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& 
 	if (Vertex_UV_Coords["UV"].size() > 0) {
 		for (const Mesh_Triangle& Tri : Faces) {
 
-			const Vec4 vertShader1 = const Vec4(Vertex_Positions[Tri.Index1], 1) * View_Matrix;
-			const Vec4 vertShader2 = const Vec4(Vertex_Positions[Tri.Index2], 1) * View_Matrix;
-			const Vec4 vertShader3 = const Vec4(Vertex_Positions[Tri.Index3], 1) * View_Matrix;
+			const Vec4 vertShader1 = Vec4(Vertex_Positions[Tri.Index1], 1) * View_Matrix;
+			const Vec4 vertShader2 = Vec4(Vertex_Positions[Tri.Index2], 1) * View_Matrix;
+			const Vec4 vertShader3 = Vec4(Vertex_Positions[Tri.Index3], 1) * View_Matrix;
 
-			Vertex_Output[Tri.Index1] = const Vertex(
-				const Vec3(
+			Vertex_Output[Tri.Index1] = Vertex(
+				Vec3(
 					vertShader1.X / vertShader1.W,
 					vertShader1.Y / vertShader1.W,
 					vertShader1.Z / vertShader1.W
 				),
 				Vertex_UV_Coords["UV"][Tri.UV_1]
 			);
-			Vertex_Output[Tri.Index2] = const Vertex(
-				const Vec3(
+			Vertex_Output[Tri.Index2] = Vertex(
+				Vec3(
 					vertShader2.X / vertShader2.W,
 					vertShader2.Y / vertShader2.W,
 					vertShader2.Z / vertShader2.W
 				),
 				Vertex_UV_Coords["UV"][Tri.UV_2]
 			);
-			Vertex_Output[Tri.Index2] = const Vertex(
-				const Vec3(
+			Vertex_Output[Tri.Index2] = Vertex(
+				Vec3(
 					vertShader3.X / vertShader3.W,
 					vertShader3.Y / vertShader3.W,
 					vertShader3.Z / vertShader3.W
@@ -153,10 +153,10 @@ void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& 
 	}
 	else if (Vertex_Colors["Color"].size() > 0) {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
-			const Vec4 vertShader = const Vec4(Vertex_Positions[i], 1) * View_Matrix;
+			const Vec4 vertShader = Vec4(Vertex_Positions[i], 1) * View_Matrix;
 
 			Vertex_Output[i] = Vertex(
-				const Vec3(
+				Vec3(
 					vertShader.X / vertShader.W,
 					vertShader.Y / vertShader.W,
 					vertShader.Z / vertShader.W
@@ -167,7 +167,7 @@ void Mesh::f_processVertexShader(Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& 
 	}
 	else {
 		for (int i = 0; i < Vertex_Positions.size(); i++) {
-			const Vec4 vertShader = const Vec4(Vertex_Positions[i], 1) * View_Matrix;
+			Vec4 vertShader = Vec4(Vertex_Positions[i], 1) * View_Matrix;
 			Vertex_Output[i] = Vertex(
 				Vec3(
 					vertShader.X / vertShader.W,
