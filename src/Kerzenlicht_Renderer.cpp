@@ -291,7 +291,11 @@ void Kerzenlicht_Renderer::renderWireframe() {
 	for (Object& Obj : Render_Scene) {
 		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
 		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
+
+		#pragma omp parallel for
+		for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
+			const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
+
 			Vec3 v1 = Obj.MeshData.Vertex_Output[tri.Index1].Pos;
 			Vec3 v2 = Obj.MeshData.Vertex_Output[tri.Index2].Pos;
 			Vec3 v3 = Obj.MeshData.Vertex_Output[tri.Index3].Pos;
@@ -307,7 +311,11 @@ void Kerzenlicht_Renderer::renderPreview() {
 	for (Object& Obj : Render_Scene) {
 		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
 		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
+
+		#pragma omp parallel for
+		for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
+			const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
+
 			Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
 			Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
 			Vertex v3 = Obj.MeshData.Vertex_Output[tri.Index3];
@@ -327,7 +335,9 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 		double minZ = *min_element(Z_Positions.begin(), Z_Positions.end());
 		double maxZ = *max_element(Z_Positions.begin(), Z_Positions.end());
 
-		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
+		#pragma omp parallel for
+		for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
+			const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
 			Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
 			Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
 			Vertex v3 = Obj.MeshData.Vertex_Output[tri.Index3];
@@ -365,6 +375,7 @@ void Kerzenlicht_Renderer::renderTextured() {
 		if (Obj.MeshShader.Albedo.Width != 0) {
 			Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
 			Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
+
 			#pragma omp parallel for
 			for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
 				const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
@@ -410,7 +421,11 @@ void Kerzenlicht_Renderer::renderPointCloud() {
 	for (Object& Obj : Render_Scene) {
 		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
 		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
+
+		#pragma omp parallel for
+		for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
+			const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
+
 			Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
 			Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
 			Vertex v3 = Obj.MeshData.Vertex_Output[tri.Index3];
