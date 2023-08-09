@@ -28,10 +28,11 @@ struct Vertex {
 	Vec2 UV;
 
 	Vertex();
-	Vertex(Vec3 P_Pos);
-	Vertex(Vec3 P_Pos, Rgb P_Color);
+	Vertex(const Vec3& P_Pos);
+	Vertex(const Vec3& P_Pos, const Vec2& P_Uv);
+	Vertex(const Vec3& P_Pos, const Rgb& P_Color);
 
-	Vec2 project(const Vec3& cameraPos, const Vec3& cameraDir, double FOV) const;
+	Vec2 project(const Vec3& cameraPos, const Vec3& cameraDir, const double& FOV) const;
 };
 
 struct Mesh_Triangle {

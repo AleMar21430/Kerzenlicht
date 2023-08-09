@@ -39,17 +39,17 @@ public:
 
 	Kerzenlicht_Renderer(QT_Text_Stream* P_Log);
 
-	void setPenColor(Rgba P_Color);
-	void setPenOpacity(float P_Opacity);
+	void setPenColor(const Rgba& P_Color);
+	void setPenOpacity(const float& P_Opacity);
 
 	void renderClear();
-	void renderPixel(uint32_t P_X, uint32_t P_Y);
-	void renderPixel(uint32_t P_X, uint32_t P_Y, Rgba P_Color);
-	void renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y);
-	void render2DPoly(vector<pair<int, int>> P_Poly);
+	void renderPixel(const uint32_t& P_X, const uint32_t& P_Y);
+	void renderPixel(const uint32_t& P_X, const uint32_t& P_Y, const Rgba& P_Color);
+	void renderLine(const int& P_Start_X, const int& P_Start_Y, const int& P_End_X, const int& P_End_Y);
+	void render2DPoly(const vector<pair<int, int>>& P_Poly);
 	
 	void renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex P_Vert3);
-	tuple<double, double, double> barycentricCoords(const Vec3& P_Pos1, const Vec3& P_Pos2, const Vec3& P_Pos3, double P_X, double P_Y);
+	tuple<double, double, double> barycentricCoords(const Vec3& P_Pos1, const Vec3& P_Pos2, const Vec3& P_Pos3, double P_X, double P_Y) const;
 
 	void renderWireframe();
 	void renderPointCloud();

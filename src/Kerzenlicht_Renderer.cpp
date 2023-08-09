@@ -152,11 +152,11 @@ void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	renderFrame();
 }
 
-void Kerzenlicht_Renderer::setPenColor(Rgba P_Color) {
+void Kerzenlicht_Renderer::setPenColor(const Rgba& P_Color) {
 	Pen_Color = P_Color;
 }
 
-void Kerzenlicht_Renderer::setPenOpacity(float P_Opacity) {
+void Kerzenlicht_Renderer::setPenOpacity(const float& P_Opacity)  {
 	Pen_Opacity = P_Opacity;
 }
 
@@ -165,21 +165,21 @@ void Kerzenlicht_Renderer::renderClear() {
 	Pixmap = vector(Render_Camera.x_resolution, vector(Render_Camera.y_resolution, Rgba(0.1, 0.1, 0.1, 1)));
 }
 
-void Kerzenlicht_Renderer::renderPixel(uint32_t P_X, uint32_t P_Y) {
+void Kerzenlicht_Renderer::renderPixel(const uint32_t& P_X, const uint32_t& P_Y) {
 	if (P_X < Render_Camera.x_resolution && P_X >= 0 && P_Y < Render_Camera.y_resolution && P_Y >= 0) {
 		Pixmap[P_X][P_Y] = Pen_Color;
 	}
 }
 
-void Kerzenlicht_Renderer::renderPixel(uint32_t P_X, uint32_t P_Y, Rgba P_Color) {
+void Kerzenlicht_Renderer::renderPixel(const uint32_t& P_X, const uint32_t& P_Y, const Rgba& P_Color) {
 	if (P_X < Render_Camera.x_resolution && P_X >= 0 && P_Y < Render_Camera.y_resolution && P_Y >= 0) {
 		Pixmap[P_X][P_Y] = P_Color;
 	}
 }
 
-void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X, int P_End_Y) {
-	int dx = abs(P_End_X - P_Start_X);
-	int dy = abs(P_End_Y - P_Start_Y);
+void Kerzenlicht_Renderer::renderLine(const int& P_Start_X, const int& P_Start_Y, const int& P_End_X, const int& P_End_Y) {
+	const int dx = abs(P_End_X - P_Start_X);
+	const int dy = abs(P_End_Y - P_Start_Y);
 	int err = dx - dy;
 	int x = P_Start_X;
 	int y = P_Start_Y;
@@ -200,7 +200,7 @@ void Kerzenlicht_Renderer::renderLine(int P_Start_X, int P_Start_Y, int P_End_X,
 	renderPixel(P_End_X, P_End_Y);
 }
 
-void Kerzenlicht_Renderer::render2DPoly(vector<pair<int,int>> P_Poly) {
+void Kerzenlicht_Renderer::render2DPoly(const  vector<pair<int,int>>& P_Poly) {
 
 	int minY = P_Poly[0].second;
 	int maxY = P_Poly[0].second;
@@ -239,10 +239,10 @@ void Kerzenlicht_Renderer::render2DPoly(vector<pair<int,int>> P_Poly) {
 }
 
 void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex P_Vert3) {
-	int minX = min({ P_Vert1.Pos.X, P_Vert2.Pos.X, P_Vert3.Pos.X });
-	int maxX = max({ P_Vert1.Pos.X, P_Vert2.Pos.X, P_Vert3.Pos.X }) + 1;
-	int minY = min({ P_Vert1.Pos.Y, P_Vert2.Pos.Y, P_Vert3.Pos.Y });
-	int maxY = max({ P_Vert1.Pos.Y, P_Vert2.Pos.Y, P_Vert3.Pos.Y }) + 1;
+	const int minX = min({ P_Vert1.Pos.X, P_Vert2.Pos.X, P_Vert3.Pos.X });
+	const int maxX = max({ P_Vert1.Pos.X, P_Vert2.Pos.X, P_Vert3.Pos.X }) + 1;
+	const int minY = min({ P_Vert1.Pos.Y, P_Vert2.Pos.Y, P_Vert3.Pos.Y });
+	const int maxY = max({ P_Vert1.Pos.Y, P_Vert2.Pos.Y, P_Vert3.Pos.Y }) + 1;
 
 	for (int x = minX; x < maxX; x++) {
 		for (int y = minY; y < maxY; y++) {
@@ -264,14 +264,14 @@ void Kerzenlicht_Renderer::renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex
 	}
 }
 
-tuple<double, double, double> Kerzenlicht_Renderer::barycentricCoords(const Vec3& P_A, const Vec3& P_B, const Vec3& P_C, double P_X, double P_Y) {
-	double AreaPBC = (P_B.Y - P_C.Y) * (P_X   - P_C.X) + (P_C.X - P_B.X) * (P_Y   - P_C.Y);
-	double AreaACP = (P_C.Y - P_A.Y) * (P_X   - P_C.X) + (P_A.X - P_C.X) * (P_Y   - P_C.Y);
-	double AreaABC = (P_B.Y - P_C.Y) * (P_A.X - P_C.X) + (P_C.X - P_B.X) * (P_A.Y - P_C.Y);
+tuple<double, double, double> Kerzenlicht_Renderer::barycentricCoords(const Vec3& P_A, const Vec3& P_B, const Vec3& P_C, double P_X, double P_Y) const {
+	const double AreaPBC = (P_B.Y - P_C.Y) * (P_X   - P_C.X) + (P_C.X - P_B.X) * (P_Y   - P_C.Y);
+	const double AreaACP = (P_C.Y - P_A.Y) * (P_X   - P_C.X) + (P_A.X - P_C.X) * (P_Y   - P_C.Y);
+	const double AreaABC = (P_B.Y - P_C.Y) * (P_A.X - P_C.X) + (P_C.X - P_B.X) * (P_A.Y - P_C.Y);
 	
-	double u = AreaPBC / AreaABC;
-	double v = AreaACP / AreaABC;
-	double w = 1.0 - u - v;
+	const double u = AreaPBC / AreaABC;
+	const double v = AreaACP / AreaABC;
+	const double w = 1.0 - u - v;
 
 	return make_tuple(u,v,w);
 }
@@ -296,9 +296,9 @@ void Kerzenlicht_Renderer::renderWireframe() {
 		for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
 			const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
 
-			Vec3 v1 = Obj.MeshData.Vertex_Output[tri.Index1].Pos;
-			Vec3 v2 = Obj.MeshData.Vertex_Output[tri.Index2].Pos;
-			Vec3 v3 = Obj.MeshData.Vertex_Output[tri.Index3].Pos;
+			const Vec3& v1 = Obj.MeshData.Vertex_Output[tri.Index1].Pos;
+			const Vec3& v2 = Obj.MeshData.Vertex_Output[tri.Index2].Pos;
+			const Vec3& v3 = Obj.MeshData.Vertex_Output[tri.Index3].Pos;
 
 			renderLine(v1.X, v1.Y, v2.X, v2.Y);
 			renderLine(v2.X, v2.Y, v3.X, v3.Y);
@@ -338,14 +338,14 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 		#pragma omp parallel for
 		for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
 			const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
-			Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
-			Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
-			Vertex v3 = Obj.MeshData.Vertex_Output[tri.Index3];
+			const Vertex& v1 = Obj.MeshData.Vertex_Output[tri.Index1];
+			const Vertex& v2 = Obj.MeshData.Vertex_Output[tri.Index2];
+			const Vertex& v3 = Obj.MeshData.Vertex_Output[tri.Index3];
 
-			int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
-			int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
-			int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
-			int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+			const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+			const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+			const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+			const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
 
 			for (int x = minX; x < maxX; x++) {
 				for (int y = minY; y < maxY; y++) {
@@ -356,7 +356,7 @@ void Kerzenlicht_Renderer::renderZBuffer() {
 							double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 							if (Depth < ZBuffer[x][y]) {
 								ZBuffer[x][y] = Depth;
-								Rgb Val = Rgb(Math::clamp(-(Depth - maxZ) / (maxZ - minZ), 0.0, 1.0));
+								const Rgb Val = Rgb(Math::clamp(-(Depth - maxZ) / (maxZ - minZ), 0.0, 1.0));
 								renderPixel(x, y, Rgba(
 									Val,
 									1.0
@@ -380,14 +380,14 @@ void Kerzenlicht_Renderer::renderTextured() {
 			for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
 				const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
 
-				Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
-				Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
-				Vertex v3 = Obj.MeshData.Vertex_Output[tri.Index3];
+				const Vertex& v1 = Obj.MeshData.Vertex_Output[tri.Index1];
+				const Vertex& v2 = Obj.MeshData.Vertex_Output[tri.Index2];
+				const Vertex& v3 = Obj.MeshData.Vertex_Output[tri.Index3];
 
-				int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
-				int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
-				int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
-				int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+				const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+				const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+				const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+				const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
 
 				for (int x = minX; x < maxX; x++) {
 					for (int y = minY; y < maxY; y++) {
@@ -398,7 +398,7 @@ void Kerzenlicht_Renderer::renderTextured() {
 								double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 								if (Depth < ZBuffer[x][y]) {
 									ZBuffer[x][y] = Depth;
-									Vec2 UVs = Vec2(
+									const Vec2 UVs = Vec2(
 										u * v1.UV.X + v * v2.UV.X + w * v3.UV.X,
 										u * v1.UV.Y + v * v2.UV.Y + w * v3.UV.Y
 									);
@@ -426,9 +426,9 @@ void Kerzenlicht_Renderer::renderPointCloud() {
 		for (int i = 0; i < Obj.MeshData.Faces.size(); i++) {
 			const Mesh_Triangle& tri = Obj.MeshData.Faces[i];
 
-			Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
-			Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
-			Vertex v3 = Obj.MeshData.Vertex_Output[tri.Index3];
+			const Vertex& v1 = Obj.MeshData.Vertex_Output[tri.Index1];
+			const Vertex& v2 = Obj.MeshData.Vertex_Output[tri.Index2];
+			const Vertex& v3 = Obj.MeshData.Vertex_Output[tri.Index3];
 
 			if (Obj.MeshData.Vertex_Colors.size() > 0) {
 				setPenColor(Rgba::fromRgb(v1.Color));
