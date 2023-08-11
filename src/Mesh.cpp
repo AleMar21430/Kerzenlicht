@@ -120,7 +120,6 @@ void Mesh::f_processVertexShader(const Matrix_4x4& P_Camera_Matrix, const Matrix
 
 	if (Vertex_UV_Coords["UV"].size() > 0) {
 		for (const Mesh_Triangle& Tri : Faces) {
-
 			const Vec4 vertShader1 = Vec4(Vertex_Positions[Tri.Index1], 1) * View_Matrix;
 			const Vec4 vertShader2 = Vec4(Vertex_Positions[Tri.Index2], 1) * View_Matrix;
 			const Vec4 vertShader3 = Vec4(Vertex_Positions[Tri.Index3], 1) * View_Matrix;

@@ -11,6 +11,7 @@
 #include <variant>
 #include <cstdlib>
 #include <numeric>
+#include <stdio.h>
 #include <vector>
 #include <thread>
 #include <future>
@@ -20,6 +21,9 @@
 #include <any>
 #include <map>
 #include <set>
+
+#include "device_launch_parameters.h"
+#include <cuda_runtime.h>
 
 #define PI          3.141592653589793
 #define TWO_PI      6.283185307179586

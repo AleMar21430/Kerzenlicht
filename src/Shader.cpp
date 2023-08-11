@@ -28,7 +28,7 @@ void Texture::loadfromBitmap(const string& P_File_Path) {
 			pixel.B = float(rowBuffer[x * 3]) / 255.0;
 			pixel.G = float(rowBuffer[x * 3 + 1]) / 255.0;
 			pixel.R = float(rowBuffer[x * 3 + 2]) / 255.0;
-			pixel.A = 1.0; // Assuming no alpha channel in BMP, set alpha to 255 (fully opaque)
+			pixel.A = 1.0;
 			Pixmap[x][y] = pixel;
 		}
 	}

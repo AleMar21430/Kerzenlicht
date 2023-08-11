@@ -55,26 +55,28 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <IncludePath>C:\Programs\Coding\Cuda\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <IncludePath>C:\Programs\Coding\Cuda\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Programs\Coding\VulkanSDK\1.3.239.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Programs\Coding\Cuda\include;C:\Programs\Coding\VulkanSDK\1.3.239.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Programs\Coding\VulkanSDK\1.3.239.0\Include;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Programs\Coding\Cuda\lib;C:\Programs\Coding\VulkanSDK\1.3.239.0\Include</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Programs\Coding\VulkanSDK\1.3.239.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Programs\Coding\Cuda\include;C:\Programs\Coding\VulkanSDK\1.3.239.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Programs\Coding\VulkanSDK\1.3.239.0\Include;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Programs\Coding\Cuda\lib;C:\Programs\Coding\VulkanSDK\1.3.239.0\Include</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -152,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Default Scene.krz" />
+    <None Include="src\Cuda Kernel.cu" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\Style.txt" />

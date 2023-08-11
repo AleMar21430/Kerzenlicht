@@ -197,6 +197,7 @@
     <None Include="resources\Default Scene.krz">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="src\Cuda Kernel.cu" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\Style.txt">
