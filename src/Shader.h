@@ -2,6 +2,17 @@
 
 #include "Math.h"
 
+struct Fragment_Shader_Type {
+	enum Enum {
+		FRESNEL,
+		POINTCLOUD,
+		TEXTURED,
+		VERTEX_COLOR_DEBUG,
+		WIREFRAME,
+		ZBUFFER_DEBUG
+	};
+};
+
 struct Texture {
 	uint16_t Width, Height;
 	vector<vector<Rgba>> Pixmap;
@@ -14,5 +25,6 @@ struct Texture {
 
 struct Shader {
 	Texture Albedo;
+	Fragment_Shader_Type::Enum Frag_Shader;
 	Shader();
 };

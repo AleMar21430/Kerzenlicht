@@ -14,11 +14,9 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	Render_Camera.f_processMatrix();
 
 	Pen_Color = Rgba();
-	Pen_Opacity = 1.0f;
 	Pixmap = vector(Render_Camera.x_resolution, vector<Rgba>(Render_Camera.y_resolution));
 	ZBuffer = vector(Render_Camera.x_resolution, vector<double>(Render_Camera.y_resolution));
 
-	View_Mode = static_cast<Render_Mode>(settings.value("Render_Mode", Render_Mode::PREVIEW).toInt());
 
 	Thread_Storage = vector<QThread*>(); // for obj loading
 
@@ -153,6 +151,7 @@ void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 	Import_Obj.Scale = Vec3(1, 1, 1);
 	Import_Obj.Rot_Euler = Vec3(0, 0, 0);
 	Import_Obj.MeshShader.Albedo.loadfromBitmap("./Mika.bmp");
+	Import_Obj.MeshShader.Frag_Shader = Fragment_Shader_Type::ZBUFFER_DEBUG;
 
 	Render_Scene.push_back(Import_Obj);
 	renderFrame();
@@ -160,10 +159,6 @@ void Kerzenlicht_Renderer::loadObject(Object P_Object) {
 
 void Kerzenlicht_Renderer::setPenColor(const Rgba& P_Color) {
 	Pen_Color = P_Color;
-}
-
-void Kerzenlicht_Renderer::setPenOpacity(const float& P_Opacity)  {
-	Pen_Opacity = P_Opacity;
 }
 
 void Kerzenlicht_Renderer::renderClear() {
@@ -292,168 +287,12 @@ void Kerzenlicht_Renderer::loadObj(string P_File) {
 	thread->start();
 }
 
-void Kerzenlicht_Renderer::renderWireframe() {
-	setPenColor(Rgba(1, 1, 1, 1));
-	for (Object& Obj : Render_Scene) {
-		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
-			const Vec3& v1 = Obj.MeshData.Vertex_Output[tri.Index1].Pos;
-			const Vec3& v2 = Obj.MeshData.Vertex_Output[tri.Index2].Pos;
-			const Vec3& v3 = Obj.MeshData.Vertex_Output[tri.Index3].Pos;
-
-			renderLine(v1.X, v1.Y, v2.X, v2.Y);
-			renderLine(v2.X, v2.Y, v3.X, v3.Y);
-			renderLine(v1.X, v1.Y, v3.X, v3.Y);
-		}
-	}
-}
-
-void Kerzenlicht_Renderer::renderPreview() {
-	for (Object& Obj : Render_Scene) {
-		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
-			Vertex v1 = Obj.MeshData.Vertex_Output[tri.Index1];
-			Vertex v2 = Obj.MeshData.Vertex_Output[tri.Index2];
-			Vertex v3 = Obj.MeshData.Vertex_Output[tri.Index3];
-			renderTriangle(v1, v2, v3);
-		}
-	}
-}
-
-void Kerzenlicht_Renderer::renderZBuffer() {
-	for (Object& Obj : Render_Scene) {
-		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-		vector<double> Z_Positions;
-		for (const Vertex& vert : Obj.MeshData.Vertex_Output) {
-			Z_Positions.push_back(vert.Pos.Z);
-		}
-		const double minZ = *min_element(Z_Positions.begin(), Z_Positions.end());
-		const double maxZ = *max_element(Z_Positions.begin(), Z_Positions.end());
-		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
-			const Vertex& v1 = Obj.MeshData.Vertex_Output[tri.Index1];
-			const Vertex& v2 = Obj.MeshData.Vertex_Output[tri.Index2];
-			const Vertex& v3 = Obj.MeshData.Vertex_Output[tri.Index3];
-
-			const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
-			const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
-			const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
-			const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
-
-			for (int x = minX; x < maxX; x++) {
-				for (int y = minY; y < maxY; y++) {
-					if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
-						double u, v, w;
-						tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
-						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
-							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
-							if (Depth < ZBuffer[x][y]) {
-								ZBuffer[x][y] = Depth;
-								renderPixel(x, y, Rgba(
-									Rgb(Math::clamp(-(Depth - maxZ) / (maxZ - minZ), 0.0, 1.0)),
-									1.0
-								));
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-void Kerzenlicht_Renderer::renderTextured() {
-	for (Object& Obj : Render_Scene) {
-		if (Obj.MeshShader.Albedo.Width != 0) {
-			Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-			Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-			for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
-				const Vertex& v1 = Obj.MeshData.Vertex_Output[tri.Index1];
-				const Vertex& v2 = Obj.MeshData.Vertex_Output[tri.Index2];
-				const Vertex& v3 = Obj.MeshData.Vertex_Output[tri.Index3];
-
-				const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
-				const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
-				const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
-				const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
-
-				for (int x = minX; x < maxX; x++) {
-					for (int y = minY; y < maxY; y++) {
-						if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
-							double u, v, w;
-							tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
-							if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
-								const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
-								if (Depth < ZBuffer[x][y]) {
-									ZBuffer[x][y] = Depth;
-									Vec2 UVs = Vec2(
-										u * v1.UV.X + v * v2.UV.X + w * v3.UV.X,
-										u * v1.UV.Y + v * v2.UV.Y + w * v3.UV.Y
-									);
-									renderPixel(x, y, Obj.MeshShader.Albedo.getColor(UVs));
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-void Kerzenlicht_Renderer::renderPathTracer() {
-}
-
-void Kerzenlicht_Renderer::renderPointCloud() {
-	setPenColor(Rgba(1, 1, 1, 1));
-	for (Object& Obj : Render_Scene) {
-		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
-		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
-		for (const Mesh_Triangle& tri : Obj.MeshData.Faces) {
-			const Vertex& v1 = Obj.MeshData.Vertex_Output[tri.Index1];
-			const Vertex& v2 = Obj.MeshData.Vertex_Output[tri.Index2];
-			const Vertex& v3 = Obj.MeshData.Vertex_Output[tri.Index3];
-
-			if (Obj.MeshData.Vertex_Colors.size() > 0) {
-				setPenColor(Rgba::fromRgb(v1.Color));
-				renderPixel(v1.Pos.X, v1.Pos.Y);
-
-				setPenColor(Rgba::fromRgb(v2.Color));
-				renderPixel(v2.Pos.X, v2.Pos.Y);
-
-				setPenColor(Rgba::fromRgb(v3.Color));
-				renderPixel(v3.Pos.X, v3.Pos.Y);
-			}
-			else {
-				renderPixel(v1.Pos.X, v1.Pos.Y);
-				renderPixel(v2.Pos.X, v2.Pos.Y);
-				renderPixel(v3.Pos.X, v3.Pos.Y);
-			}
-		}
-	}
-}
-
 void Kerzenlicht_Renderer::renderFrame() {
 	renderClear();
-	if (View_Mode == Render_Mode::POINTCLOUD) {
-		renderPointCloud();
-	}
-	else if (View_Mode == Render_Mode::PREVIEW) {
-		renderPreview();
-	}
-	else if (View_Mode == Render_Mode::TEXTURED) {
-		renderTextured();
-	}
-	else if (View_Mode == Render_Mode::WIREFRAME) {
-		renderWireframe();
-	}
-	else if (View_Mode == Render_Mode::ZDEPTH) {
-		renderZBuffer();
-	}
-	else {
-		renderPreview();
+	for (Object& Obj : Render_Scene) {
+		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
+		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
+		f_fragmentShader(Obj);
 	}
 	drawToSurface();
 }
@@ -525,19 +364,6 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	Load_File_Button->setText("Import Obj File");
 	connect(Load_File_Button, &QT_Button::clicked, this, &Renderer_Menu::openObjFile);
 
-	QT_Option* Render_Mode_Select = new QT_Option();
-
-	Render_Mode_Select->addItem("Path Tracer", 0);
-	Render_Mode_Select->addItem("Point Cloud", 1);
-	Render_Mode_Select->addItem("Preview", 2);
-	Render_Mode_Select->addItem("Textured", 3);
-	Render_Mode_Select->addItem("Wireframe", 4);
-	Render_Mode_Select->addItem("Z-Depth Debug", 5);
-
-	Render_Mode_Select->setCurrentIndex(Parent->View_Mode);
-
-	connect(Render_Mode_Select, &QT_Option::currentIndexChanged, [this](int Index) { renderSwitch(Index); });
-
 	QT_Value_Input* ResX = new QT_Value_Input();
 	QIntValidator* ValidatorX = new QIntValidator();
 	ResX->setValidator(ValidatorX);
@@ -555,7 +381,6 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 	connect(Save_Button, &QT_Button::clicked, this, &Renderer_Menu::save);
 
 	Layout->addWidget(Load_File_Button);
-	Layout->addWidget(Render_Mode_Select);
 	Layout->addWidget(ResX);
 	Layout->addWidget(ResY);
 	Layout->addWidget(Save_Button);
@@ -565,12 +390,6 @@ Renderer_Menu::Renderer_Menu(Kerzenlicht_Renderer* P_Parent) : QT_Linear_Content
 void Renderer_Menu::openObjFile() {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Object (*.obj)"));
 	if (!fileName.isEmpty()) Parent->loadObj(fileName.toStdString());
-}
-
-void Renderer_Menu::renderSwitch(int Index) {
-	Parent->View_Mode = static_cast<Render_Mode>(Index);
-	QSettings("Raylight", "KerzenLicht").setValue("Render_Mode", static_cast<Render_Mode>(Index));
-	Parent->renderFrame();
 }
 
 void Renderer_Menu::changeXResolution(int value) {
@@ -592,4 +411,107 @@ void Renderer_Menu::changeYResolution(int value) {
 void Renderer_Menu::save() {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Create New File"), "", tr("BitMap (*.bmp)"));
 	Parent->storeBmp(fileName.toStdString());
+}
+
+void Kerzenlicht_Renderer::f_fragmentShader(Object& i_object) {
+	if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::FRESNEL) {
+	}
+	else if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::POINTCLOUD) {
+		for (const Mesh_Triangle& tri : i_object.MeshData.Faces) {
+			const Vertex& v1 = i_object.MeshData.Vertex_Output[tri.Index1];
+			const Vertex& v2 = i_object.MeshData.Vertex_Output[tri.Index2];
+			const Vertex& v3 = i_object.MeshData.Vertex_Output[tri.Index3];
+			if (i_object.MeshData.Vertex_Colors.size() > 0) {
+				renderPixel(v1.Pos.X, v1.Pos.Y, Rgba::fromRgb(v1.Color));
+				renderPixel(v2.Pos.X, v2.Pos.Y, Rgba::fromRgb(v1.Color));
+				renderPixel(v3.Pos.X, v3.Pos.Y, Rgba::fromRgb(v1.Color));
+			}
+			else {
+				renderPixel(v1.Pos.X, v1.Pos.Y, Rgba());
+				renderPixel(v2.Pos.X, v2.Pos.Y, Rgba());
+				renderPixel(v3.Pos.X, v3.Pos.Y, Rgba());
+			}
+		}
+	}
+	else if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::TEXTURED) {
+		if (i_object.MeshShader.Albedo.Width != 0) {
+			i_object.MeshData.f_processModelMatrix(i_object.Pos, i_object.Rot_Euler, i_object.Scale);
+			i_object.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
+			for (const Mesh_Triangle& tri : i_object.MeshData.Faces) {
+				const Vertex& v1 = i_object.MeshData.Vertex_Output[tri.Index1];
+				const Vertex& v2 = i_object.MeshData.Vertex_Output[tri.Index2];
+				const Vertex& v3 = i_object.MeshData.Vertex_Output[tri.Index3];
+				const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+				const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+				const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+				const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+				for (int x = minX; x < maxX; x++) {
+					for (int y = minY; y < maxY; y++) {
+						if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
+							double u, v, w;
+							tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+							if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
+								const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+								if (Depth < ZBuffer[x][y]) {
+									ZBuffer[x][y] = Depth;
+									Vec2 UVs = Vec2(
+										u * v1.UV.X + v * v2.UV.X + w * v3.UV.X,
+										u * v1.UV.Y + v * v2.UV.Y + w * v3.UV.Y
+									);
+									renderPixel(x, y, i_object.MeshShader.Albedo.getColor(UVs));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	else if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::WIREFRAME) {
+		i_object.MeshData.f_processModelMatrix(i_object.Pos, i_object.Rot_Euler, i_object.Scale);
+		i_object.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
+		for (const Mesh_Triangle& tri : i_object.MeshData.Faces) {
+			const Vec3& v1 = i_object.MeshData.Vertex_Output[tri.Index1].Pos;
+			const Vec3& v2 = i_object.MeshData.Vertex_Output[tri.Index2].Pos;
+			const Vec3& v3 = i_object.MeshData.Vertex_Output[tri.Index3].Pos;
+			renderLine(v1.X, v1.Y, v2.X, v2.Y);
+			renderLine(v2.X, v2.Y, v3.X, v3.Y);
+			renderLine(v1.X, v1.Y, v3.X, v3.Y);
+		}
+	}
+	else if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::ZBUFFER_DEBUG) {
+		vector<double> Z_Positions;
+		for (const Vertex& vert : i_object.MeshData.Vertex_Output) {
+			Z_Positions.push_back(vert.Pos.Z);
+		}
+		const double minZ = *min_element(Z_Positions.begin(), Z_Positions.end());
+		const double maxZ = *max_element(Z_Positions.begin(), Z_Positions.end());
+		for (const Mesh_Triangle& tri : i_object.MeshData.Faces) {
+			const Vertex& v1 = i_object.MeshData.Vertex_Output[tri.Index1];
+			const Vertex& v2 = i_object.MeshData.Vertex_Output[tri.Index2];
+			const Vertex& v3 = i_object.MeshData.Vertex_Output[tri.Index3];
+			const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+			const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+			const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+			const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+			for (int x = minX; x < maxX; x++) {
+				for (int y = minY; y < maxY; y++) {
+					if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
+						double u, v, w;
+						tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
+							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+							if (Depth < ZBuffer[x][y]) {
+								ZBuffer[x][y] = Depth;
+								renderPixel(x, y, Rgba(
+									Rgb(Math::clamp(-(Depth - maxZ) / (maxZ - minZ), 0.0, 1.0)),
+									1.0
+								));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

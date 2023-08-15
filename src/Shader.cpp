@@ -44,4 +44,5 @@ Rgba Texture::getColor(const Vec2& P_UV) const {
 
 Shader::Shader() {
 	Albedo = Texture();
+	Frag_Shader = Fragment_Shader_Type::WIREFRAME;
 }
