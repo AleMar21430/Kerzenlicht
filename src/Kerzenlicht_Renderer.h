@@ -2,14 +2,6 @@
 
 #include "QT_Core.h"
 
-enum Render_Mode {
-	PATHTRACING,
-	POINTCLOUD,
-	PREVIEW,
-	TEXTURED,
-	WIREFRAME,
-	ZDEPTH
-};
 
 struct Renderer_Menu;
 struct Ray;
@@ -24,11 +16,8 @@ public:
 	QPoint Mouse_Down_Pos;
 
 	Rgba Pen_Color;
-	float Pen_Opacity;
 	vector<vector<Rgba>> Pixmap;
 	vector<vector<double>> ZBuffer;
-
-	Render_Mode View_Mode;
 
 	vector<QThread*> Thread_Storage;
 	vector<Object> Render_Scene;
@@ -40,7 +29,6 @@ public:
 	Kerzenlicht_Renderer(QT_Text_Stream* P_Log);
 
 	void setPenColor(const Rgba& P_Color);
-	void setPenOpacity(const float& P_Opacity);
 
 	void renderClear();
 	void renderPixel(const uint32_t& P_X, const uint32_t& P_Y);
@@ -51,17 +39,13 @@ public:
 	void renderTriangle(Vertex P_Vert1, Vertex P_Vert2, Vertex P_Vert3);
 	tuple<double, double, double> barycentricCoords(const Vec3& P_Pos1, const Vec3& P_Pos2, const Vec3& P_Pos3, double P_X, double P_Y) const;
 
-	void renderWireframe();
-	void renderPointCloud();
-	void renderPreview();
-	void renderZBuffer();
-	void renderTextured();
-	void renderPathTracer();
 	void renderFrame();
 	void drawToSurface();
 
 	void loadObj(string P_File);
 	void storeBmp(string P_File);
+
+	void f_fragmentShader(Object& i_object);
 	
 	void wheelEvent(QWheelEvent* P_Event) override;
 	void mousePressEvent(QMouseEvent* P_Event) override;
@@ -87,7 +71,6 @@ struct Renderer_Menu : QT_Linear_Contents {
 
 	Renderer_Menu(Kerzenlicht_Renderer* P_Parent);
 	void openObjFile();
-	void renderSwitch(int Index);
 	void changeXResolution(int P_Value);
 	void changeYResolution(int P_Value);
 	void save();
