@@ -1,7 +1,12 @@
 #include "File_Readers.h"
 
-Obj_File_Loader::Obj_File_Loader(QObject* parent, string P_File_Path) : QThread(parent) {
-	File_Path = P_File_Path;
+Obj_File_Loader::Obj_File_Loader(QObject* parent, string iobj, const Vec3& ipos, const Vec3& irot, const Vec3& iscale, const string itexture, const Fragment_Shader_Type::Enum ishader) : QThread(parent) {
+	File_Path = iobj;
+	pos = ipos;
+	rot = irot;
+	scale = iscale;
+	tex = itexture;
+	shader = ishader;
 }
 
 void Obj_File_Loader::run() {
@@ -95,6 +100,11 @@ void Obj_File_Loader::run() {
 			linesRead = 0;
 		}
 	}
+	Imported_Mesh.Pos = pos;
+	Imported_Mesh.Scale = scale;
+	Imported_Mesh.Rot_Euler = rot;
+	Imported_Mesh.MeshShader.Frag_Shader = shader;
+	if (tex != "") Imported_Mesh.MeshShader.Albedo.loadfromBitmap(tex);
 
 	emit updateProgress_Signal(100);
 

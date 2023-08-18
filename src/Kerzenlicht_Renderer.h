@@ -2,7 +2,6 @@
 
 #include "QT_Core.h"
 
-
 struct Renderer_Menu;
 struct Ray;
 
@@ -42,7 +41,7 @@ public:
 	void renderFrame();
 	void drawToSurface();
 
-	void loadObj(string P_File);
+	void loadObj(const string P_File, const Vec3& pos, const Vec3& rot, const Vec3& scale, const string texture, const Fragment_Shader_Type::Enum shader);
 	void storeBmp(string P_File);
 
 	void f_fragmentShader(Object& i_object);
