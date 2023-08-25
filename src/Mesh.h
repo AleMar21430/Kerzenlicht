@@ -31,6 +31,9 @@ struct Vertex {
 	Vertex(const Vec3& P_Pos);
 	Vertex(const Vec3& P_Pos, const Vec2& P_Uv);
 	Vertex(const Vec3& P_Pos, const Rgb& P_Color);
+	Vertex(const Vec3& P_Pos, const Vec3& P_Normal);
+	Vertex(const Vec3& P_Pos, const Rgb& P_Color, const Vec3& P_Normal);
+	Vertex(const Vec3& P_Pos, const Vec2& P_Uv, const Vec3& P_Normal);
 
 	Vec2 project(const Vec3& cameraPos, const Vec3& cameraDir, const double& FOV) const;
 };

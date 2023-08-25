@@ -7,6 +7,7 @@ struct Fragment_Shader_Type {
 		FRESNEL,
 		POINTCLOUD,
 		TEXTURED,
+		SMOOTH,
 		VERTEX_COLOR_DEBUG,
 		WIREFRAME,
 		ZBUFFER_DEBUG

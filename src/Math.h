@@ -76,13 +76,19 @@ struct Vec3 {
 	Vec3& operator/=(const Vec3& other);
 
 	Vec3 operator*(const double& other) const;
+	friend Vec3 operator*(const double& input, const Vec3& vec) { return vec * input; };
 
 	double dot(const Vec3& other) const;
 	Vec3 cross(const Vec3& other) const;
 	double len() const;
-	Vec3 normalize();
+	Vec3 normalized();
 	Vec3 rotate(Vec3 P_Pos, const Vec3 P_Anchor, const Vec3 P_Rotation) const;
 	void rotate(const Vec3 P_Anchor, const Vec3 P_Rotation);
+
+	Vec3 operator-() const;
+
+	static Vec3 normalize(const Vec3& P_i);
+	static double dot(const Vec3& P_a, const Vec3& P_b);
 };
 
 struct Vec4 {

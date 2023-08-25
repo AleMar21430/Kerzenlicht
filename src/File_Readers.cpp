@@ -65,7 +65,7 @@ void Obj_File_Loader::run() {
 					stod(Tokens[2]),
 					stod(Tokens[3])
 				);
-				Imported_Mesh.MeshData.Vertex_Normals["Normal"].push_back(Normal);
+				Imported_Mesh.MeshData.Vertex_Normals["Normals"].push_back(Normal);
 			}
 			else if (Tokens[0] == "f") {
 				vector<string> Vert1 = Math::splitString(Tokens[1], "/");

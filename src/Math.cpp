@@ -181,7 +181,7 @@ double Vec3::len()  const {
 	return sqrt(X * X + Y * Y + Z * Z);
 }
 
-Vec3 Vec3::normalize() {
+Vec3 Vec3::normalized() {
 	double  Length = 1.0 / len();
 	X = X * Length;
 	Y = Y * Length;
@@ -240,6 +240,23 @@ void Vec3::rotate(const Vec3 P_Anchor, const Vec3 P_Rotation) {
 	X = finalX + P_Anchor.X;
 	Y = finalY + P_Anchor.Y;
 	Z = newZ + P_Anchor.Z;
+}
+
+Vec3 Vec3::operator-() const {
+	return Vec3(-X, -Y, -Z);
+}
+
+Vec3 Vec3::normalize(const Vec3& P_i) {
+	double  Length = 1.0 / P_i.len();
+	return Vec3(
+		P_i.X * Length,
+		P_i.Y * Length,
+		P_i.Z * Length
+	);
+}
+
+double Vec3::dot(const Vec3& P_a, const Vec3& P_b) {
+	return P_a.X * P_b.X + P_a.Y * P_b.Y + P_a.Z * P_b.Z;
 }
 
 Rgb::Rgb() {

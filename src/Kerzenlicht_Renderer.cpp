@@ -30,14 +30,6 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	renderClear();
 	drawToSurface();
 	loadObj(
-		"./Mika.obj",
-		Vec3(-500, -250, 0),
-		Vec3(0, 0, 0),
-		Vec3(1, 1, 1),
-		"./Mika.bmp",
-		Fragment_Shader_Type::TEXTURED
-	);
-	loadObj(
 		"./Logo.obj",
 		Vec3(500, 0, 0),
 		Vec3(0, 0, 0),
@@ -46,12 +38,28 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 		Fragment_Shader_Type::VERTEX_COLOR_DEBUG
 	);
 	loadObj(
+		"./Mika.obj",
+		Vec3(-500, -250, 0),
+		Vec3(0, 0, 0),
+		Vec3(1, 1, 1),
+		"./Mika.bmp",
+		Fragment_Shader_Type::TEXTURED
+	);
+	loadObj(
 		"./Kafka.obj",
 		Vec3(0, -250, 0),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
 		"",
 		Fragment_Shader_Type::ZBUFFER_DEBUG
+	);
+	loadObj(
+		"./Logo.obj",
+		Vec3(0, 250, 0),
+		Vec3(0, 0, 0),
+		Vec3(1, 1, 1),
+		"",
+		Fragment_Shader_Type::SMOOTH
 	);
 }
 
@@ -306,6 +314,7 @@ void Kerzenlicht_Renderer::loadObj(const string P_File, const Vec3& pos, const V
 
 void Kerzenlicht_Renderer::renderFrame() {
 	renderClear();
+	Render_Camera.f_processMatrix();
 	for (Object& Obj : Render_Scene) {
 		Obj.MeshData.f_processModelMatrix(Obj.Pos, Obj.Rot_Euler, Obj.Scale);
 		Obj.MeshData.f_processVertexShader(Render_Camera.camera_matrix, Render_Camera.projection_matrix, Render_Camera.viewport_matrix);
@@ -459,6 +468,34 @@ void Kerzenlicht_Renderer::f_fragmentShader(Object& i_object) {
 			}
 		}
 	}
+	else if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::SMOOTH) {
+		for (const Mesh_Triangle& tri : i_object.MeshData.Faces) {
+			const Vertex& v1 = i_object.MeshData.Vertex_Output[tri.Index1];
+			const Vertex& v2 = i_object.MeshData.Vertex_Output[tri.Index2];
+			const Vertex& v3 = i_object.MeshData.Vertex_Output[tri.Index3];
+			const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+			const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+			const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+			const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+			for (int x = minX; x < maxX; x++) {
+				for (int y = minY; y < maxY; y++) {
+					if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
+						auto [u, v, w] = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
+							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+							if (Depth < ZBuffer[x][y]) {
+								ZBuffer[x][y] = Depth;
+								Rgb Color = v1.Color * u + v2.Color * v + v3.Color * w;
+								double Sun_Intensity = Vec3::dot(u * v1.Normal + v * v2.Normal + w * v3.Normal, -Vec3::normalize(Vec3(1,0.5,0)));
+								Color = Color * Math::clamp(Sun_Intensity, 0.0, 1.0);
+								renderPixel(x, y, Rgba(Color, 1.0));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	else if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::TEXTURED) {
 		for (const Mesh_Triangle& tri : i_object.MeshData.Faces) {
 			const Vertex& v1 = i_object.MeshData.Vertex_Output[tri.Index1];
@@ -471,8 +508,7 @@ void Kerzenlicht_Renderer::f_fragmentShader(Object& i_object) {
 			for (int x = minX; x < maxX; x++) {
 				for (int y = minY; y < maxY; y++) {
 					if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
-						double u, v, w;
-						tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+						auto [u, v, w] = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
 						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
 							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 							if (Depth < ZBuffer[x][y]) {
@@ -501,8 +537,7 @@ void Kerzenlicht_Renderer::f_fragmentShader(Object& i_object) {
 			for (int x = minX; x < maxX; x++) {
 				for (int y = minY; y < maxY; y++) {
 					if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
-						double u, v, w;
-						tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+						auto [u, v, w] = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
 						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
 							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 							if (Depth < ZBuffer[x][y]) {
@@ -543,8 +578,41 @@ void Kerzenlicht_Renderer::f_fragmentShader(Object& i_object) {
 			for (int x = minX; x < maxX; x++) {
 				for (int y = minY; y < maxY; y++) {
 					if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
-						double u, v, w;
-						tie(u, v, w) = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+						auto [u, v, w] = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
+							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+							if (Depth < ZBuffer[x][y]) {
+								ZBuffer[x][y] = Depth;
+								renderPixel(x, y, Rgba(
+									Rgb(Math::clamp(-(Depth - maxZ) / (maxZ - minZ), 0.0, 1.0)),
+									1.0
+								));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	else if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::ZBUFFER_DEBUG) {
+		vector<double> Z_Positions;
+		for (const Vertex& vert : i_object.MeshData.Vertex_Output) {
+			Z_Positions.push_back(vert.Pos.Z);
+		}
+		const double minZ = *min_element(Z_Positions.begin(), Z_Positions.end());
+		const double maxZ = *max_element(Z_Positions.begin(), Z_Positions.end());
+		for (const Mesh_Triangle& tri : i_object.MeshData.Faces) {
+			const Vertex& v1 = i_object.MeshData.Vertex_Output[tri.Index1];
+			const Vertex& v2 = i_object.MeshData.Vertex_Output[tri.Index2];
+			const Vertex& v3 = i_object.MeshData.Vertex_Output[tri.Index3];
+			const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+			const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+			const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+			const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+			for (int x = minX; x < maxX; x++) {
+				for (int y = minY; y < maxY; y++) {
+					if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
+						auto [u, v, w] = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
 						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
 							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 							if (Depth < ZBuffer[x][y]) {

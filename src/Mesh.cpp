@@ -28,6 +28,27 @@ Vertex::Vertex(const Vec3& P_Pos, const Rgb& P_Color) {
 	UV = Vec2();
 }
 
+Vertex::Vertex(const Vec3& P_Pos, const Vec3& P_Normal) {
+	Pos = P_Pos;
+	Color = Rgb();
+	Normal = P_Normal;
+	UV = Vec2();
+}
+
+Vertex::Vertex(const Vec3& P_Pos, const Rgb& P_Color, const Vec3& P_Normal) {
+	Pos = P_Pos;
+	Color = P_Color;
+	Normal = P_Normal;
+	UV = Vec2();
+}
+
+Vertex::Vertex(const Vec3& P_Pos, const Vec2& P_Uv, const Vec3& P_Normal) {
+	Pos = P_Pos;
+	Color = Rgb();
+	Normal = P_Normal;
+	UV = P_Uv;
+}
+
 Vec2 Vertex::project(const Vec3& cameraPos, const Vec3& cameraDir, const double& FOV) const {
 	const Vec3 relative = Vec3(Pos.X - cameraPos.X, Pos.Y - cameraPos.Y, Pos.Z - cameraPos.Z);
 
@@ -117,8 +138,74 @@ void Mesh::f_processVertexShader(const Matrix_4x4& P_Camera_Matrix, const Matrix
 	const Matrix_4x4 View_Matrix = model_matrix * P_Viewport_Matrix * P_Projection_Matrix * P_Camera_Matrix.inv(); // Multiplication order is important
 
 	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
+	if (Vertex_Normals["Normals"].size() > 0 && Vertex_Colors["Color"].size() > 0) {
+		for (const Mesh_Triangle& Tri : Faces) {
+			const Vec4 vertShader1 = Vec4(Vertex_Positions[Tri.Index1], 1) * View_Matrix;
+			const Vec4 vertShader2 = Vec4(Vertex_Positions[Tri.Index2], 1) * View_Matrix;
+			const Vec4 vertShader3 = Vec4(Vertex_Positions[Tri.Index3], 1) * View_Matrix;
 
-	if (Vertex_UV_Coords["UV"].size() > 0) {
+			Vertex_Output[Tri.Index1] = Vertex(
+				Vec3(
+					vertShader1.X / vertShader1.W,
+					vertShader1.Y / vertShader1.W,
+					vertShader1.Z / vertShader1.W
+				),
+				Vertex_Colors["Color"][Tri.Index1],
+				Vertex_Normals["Normals"][Tri.Normal_1]
+			);
+			Vertex_Output[Tri.Index2] = Vertex(
+				Vec3(
+					vertShader2.X / vertShader2.W,
+					vertShader2.Y / vertShader2.W,
+					vertShader2.Z / vertShader2.W
+				),
+				Vertex_Colors["Color"][Tri.Index2],
+				Vertex_Normals["Normals"][Tri.Normal_2]
+			);
+			Vertex_Output[Tri.Index3] = Vertex(
+				Vec3(
+					vertShader3.X / vertShader3.W,
+					vertShader3.Y / vertShader3.W,
+					vertShader3.Z / vertShader3.W
+				),
+				Vertex_Colors["Color"][Tri.Index3],
+				Vertex_Normals["Normals"][Tri.Normal_3]
+			);
+		}
+	}
+	else if (Vertex_Normals["Normals"].size() > 0) {
+		for (const Mesh_Triangle& Tri : Faces) {
+			const Vec4 vertShader1 = Vec4(Vertex_Positions[Tri.Index1], 1) * View_Matrix;
+			const Vec4 vertShader2 = Vec4(Vertex_Positions[Tri.Index2], 1) * View_Matrix;
+			const Vec4 vertShader3 = Vec4(Vertex_Positions[Tri.Index3], 1) * View_Matrix;
+
+			Vertex_Output[Tri.Index1] = Vertex(
+				Vec3(
+					vertShader1.X / vertShader1.W,
+					vertShader1.Y / vertShader1.W,
+					vertShader1.Z / vertShader1.W
+				),
+				Vertex_Normals["Normals"][Tri.Normal_1]
+			);
+			Vertex_Output[Tri.Index2] = Vertex(
+				Vec3(
+					vertShader2.X / vertShader2.W,
+					vertShader2.Y / vertShader2.W,
+					vertShader2.Z / vertShader2.W
+				),
+				Vertex_Normals["Normals"][Tri.Normal_2]
+			);
+			Vertex_Output[Tri.Index3] = Vertex(
+				Vec3(
+					vertShader3.X / vertShader3.W,
+					vertShader3.Y / vertShader3.W,
+					vertShader3.Z / vertShader3.W
+				),
+				Vertex_Normals["Normals"][Tri.Normal_3]
+			);
+		}
+	}
+	else if (Vertex_UV_Coords["UV"].size() > 0) {
 		for (const Mesh_Triangle& Tri : Faces) {
 			const Vec4 vertShader1 = Vec4(Vertex_Positions[Tri.Index1], 1) * View_Matrix;
 			const Vec4 vertShader2 = Vec4(Vertex_Positions[Tri.Index2], 1) * View_Matrix;
