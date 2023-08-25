@@ -486,7 +486,7 @@ void Kerzenlicht_Renderer::f_fragmentShader(Object& i_object) {
 							if (Depth < ZBuffer[x][y]) {
 								ZBuffer[x][y] = Depth;
 								Rgb Color = v1.Color * u + v2.Color * v + v3.Color * w;
-								double Sun_Intensity = Vec3::dot(u * v1.Normal + v * v2.Normal + w * v3.Normal, -Vec3::normalize(Vec3(1,0.5,0)));
+								double Sun_Intensity = Vec3::dot(u * v1.Normal + v * v2.Normal + w * v3.Normal, -Vec3::normalize(Vec3(0.5,0.25,-0.5)));
 								Color = Color * Math::clamp(Sun_Intensity, 0.0, 1.0);
 								renderPixel(x, y, Rgba(Color, 1.0));
 							}
