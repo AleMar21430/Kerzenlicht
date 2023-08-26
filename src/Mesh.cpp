@@ -99,22 +99,22 @@ void Mesh::f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 		{ 0, 0, 0, 1             }
 	});
 
-	const double Yaw   = P_Rotate.X * RAD;
-	const double Pitch = P_Rotate.Y * RAD;
+	const double Pitch = P_Rotate.X * RAD;
+	const double Yaw   = P_Rotate.Y * RAD;
 	const double Roll  = P_Rotate.Z * RAD;
-
-	const Matrix_4x4 yawMat = Matrix_4x4({
-		{ cos(Yaw) , 0, sin(Yaw), 0 },
-		{ 0        , 1, 0       , 0 },
-		{ -sin(Yaw), 0, cos(Yaw), 0 },
-		{ 0        , 0, 0       , 1 }
-	});
 
 	const Matrix_4x4 pitchMat = Matrix_4x4({
 		{ 1, 0         , 0          , 0 },
 		{ 0, cos(Pitch), -sin(Pitch), 0 },
 		{ 0, sin(Pitch), cos(Pitch) , 0 },
 		{ 0, 0         , 0          , 1 }
+	});
+
+	const Matrix_4x4 yawMat = Matrix_4x4({
+		{ cos(Yaw) , 0, sin(Yaw), 0 },
+		{ 0        , 1, 0       , 0 },
+		{ -sin(Yaw), 0, cos(Yaw), 0 },
+		{ 0        , 0, 0       , 1 }
 	});
 
 	const Matrix_4x4 rollMat = Matrix_4x4({
@@ -131,7 +131,8 @@ void Mesh::f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 		{ 0, 0, 0        , 1 }
 	});
 
-	model_matrix = translation * (pitchMat * yawMat * rollMat) * scale;
+	Matrix_4x4 rotation_matrix = pitchMat * yawMat * rollMat;
+	model_matrix = translation * rotation_matrix * scale;
 }
 
 void Mesh::f_processVertexShader(const Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix) {

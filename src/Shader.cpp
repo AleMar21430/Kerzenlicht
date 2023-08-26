@@ -3,7 +3,7 @@
 Texture::Texture() {
 	Width = 0;
 	Height = 0;
-	Pixmap = vector(0, vector(0, Rgba()));
+	Pixmap = vector<vector<Rgba>>();
 }
 
 void Texture::loadfromBitmap(const string& P_File_Path) {

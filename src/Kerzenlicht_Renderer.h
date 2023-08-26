@@ -25,6 +25,8 @@ public:
 	QGraphicsScene* Scene;
 	Renderer_Menu* Menu;
 
+	Texture BG;
+
 	Kerzenlicht_Renderer(QT_Text_Stream* P_Log);
 
 	void setPenColor(const Rgba& P_Color);

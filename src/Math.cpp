@@ -297,6 +297,10 @@ Rgb Rgb::random() {
 	return Rgb(rand() / static_cast<double>(RAND_MAX), rand() / static_cast<double>(RAND_MAX), rand() / static_cast<double>(RAND_MAX));
 }
 
+Rgb Rgb::fromRgba(const Rgba& other) {
+	return Rgb(other.R, other.G, other.B);
+}
+
 Rgba::Rgba() {
 	R = 1;
 	G = 1;

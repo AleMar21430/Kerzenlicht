@@ -36,6 +36,7 @@ struct Vec2;
 struct Vec3;
 struct Matrix_3x3;
 struct Matrix_4x4;
+struct Rgba;
 
 struct Vec2 {
 	double X, Y;
@@ -128,6 +129,7 @@ struct Rgb {
 	Rgb operator*(double other) const;
 
 	static Rgb random();
+	static Rgb fromRgba(const Rgba& other);
 };
 
 struct Rgba {

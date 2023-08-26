@@ -16,8 +16,6 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	Pen_Color = Rgba();
 	Pixmap = vector(Render_Camera.x_resolution, vector<Rgba>(Render_Camera.y_resolution));
 	ZBuffer = vector(Render_Camera.x_resolution, vector<double>(Render_Camera.y_resolution));
-
-
 	Thread_Storage = vector<QThread*>(); // for obj loading
 
 	Scene = new QGraphicsScene();
@@ -27,6 +25,10 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	// Scene //
 	///////////
+
+	Texture BG = Texture();
+	BG.loadfromBitmap("./BG.bmp");
+
 	renderClear();
 	drawToSurface();
 
@@ -44,12 +46,12 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 		Vec3(0, 0, 0),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
-		"./Tex.bmp",
-		Fragment_Shader_Type::TEXTURED
+		"",
+		Fragment_Shader_Type::SMOOTH
 	);
 
 	loadObj(
-		"./Kafka Piano.obj",
+		"./Kafka.obj",
 		Vec3(0, 0, 0),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
@@ -62,8 +64,8 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 		Vec3(0, 0, 0),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
-		"./Tex.bmp",
-		Fragment_Shader_Type::TEXTURED
+		"",
+		Fragment_Shader_Type::ZBUFFER_DEBUG
 	);
 
 	loadObj(
@@ -74,15 +76,6 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 		"./Tex.bmp",
 		Fragment_Shader_Type::TEXTURED
 	);
-
-	/*loadObj(
-		"./Floor.obj",
-		Vec3(0, 0, 0),
-		Vec3(0, 0, 0),
-		Vec3(1, 1, 1),
-		"",
-		Fragment_Shader_Type::WIREFRAME
-	);*/
 }
 
 void Kerzenlicht_Renderer::drawToSurface() {
@@ -210,7 +203,17 @@ void Kerzenlicht_Renderer::setPenColor(const Rgba& P_Color) {
 
 void Kerzenlicht_Renderer::renderClear() {
 	ZBuffer = vector(Render_Camera.x_resolution, vector(Render_Camera.y_resolution, Render_Camera.far_clip));
-	Pixmap = vector(Render_Camera.x_resolution, vector(Render_Camera.y_resolution, Rgba(0.1, 0.1, 0.1, 1)));
+	if (BG.Width != 0) {
+		Pixmap = vector(Render_Camera.x_resolution, vector(Render_Camera.y_resolution, Rgba(0, 0, 0, 1)));
+		for (int x = 0; x < Render_Camera.x_resolution; x++) {
+			for (int y = 0; y < Render_Camera.y_resolution; y++) {
+				Pixmap[x][y] = BG.getColor(Vec2(double(x)*2 / double(BG.Width), double(y)*2 / double(BG.Height)));
+			}
+		}
+	}
+	else {
+		Pixmap = vector(Render_Camera.x_resolution, vector(Render_Camera.y_resolution, Rgba(0.1, 0.1, 0.1, 1)));
+	}
 }
 
 void Kerzenlicht_Renderer::renderPixel(const uint32_t& P_X, const uint32_t& P_Y) {
@@ -507,8 +510,40 @@ void Kerzenlicht_Renderer::f_fragmentShader(Object& i_object) {
 							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
 							if (Depth < ZBuffer[x][y]) {
 								ZBuffer[x][y] = Depth;
-								Rgb Color = v1.Color * u + v2.Color * v + v3.Color * w;
-								double Sun_Intensity = Vec3::dot(u * v1.Normal + v * v2.Normal + w * v3.Normal, -Vec3::normalize(Vec3(0.5,0.25,-0.5)));
+								Rgb Color = Rgb(1,1,1);
+								double Sun_Intensity = Vec3::dot(u * v1.Normal + v * v2.Normal + w * v3.Normal, -Vec3::normalize(Vec3(0, 0, -1))); // SUN DIR
+								Color = Color * Math::clamp(Sun_Intensity, 0.0, 1.0);
+								renderPixel(x, y, Rgba(Color, 1.0));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	else if (i_object.MeshShader.Frag_Shader == Fragment_Shader_Type::SMOOTH_TEXTURED) {
+		for (const Mesh_Triangle& tri : i_object.MeshData.Faces) {
+			const Vertex& v1 = i_object.MeshData.Vertex_Output[tri.Index1];
+			const Vertex& v2 = i_object.MeshData.Vertex_Output[tri.Index2];
+			const Vertex& v3 = i_object.MeshData.Vertex_Output[tri.Index3];
+			const int minX = min({ v1.Pos.X, v2.Pos.X, v3.Pos.X });
+			const int maxX = max({ v1.Pos.X, v2.Pos.X, v3.Pos.X }) + 1;
+			const int minY = min({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y });
+			const int maxY = max({ v1.Pos.Y, v2.Pos.Y, v3.Pos.Y }) + 1;
+			for (int x = minX; x < maxX; x++) {
+				for (int y = minY; y < maxY; y++) {
+					if (x >= 0 && x < Render_Camera.x_resolution && y >= 0 && y < Render_Camera.y_resolution) {
+						auto [u, v, w] = barycentricCoords(v1.Pos, v2.Pos, v3.Pos, x, y);
+						if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0 && w >= 0.0 && w <= 1.0) {
+							const double Depth = u * v1.Pos.Z + v * v2.Pos.Z + w * v3.Pos.Z;
+							if (Depth < ZBuffer[x][y]) {
+								ZBuffer[x][y] = Depth;
+								Vec2 UVs = Vec2(
+									u * v1.UV.X + v * v2.UV.X + w * v3.UV.X,
+									u * v1.UV.Y + v * v2.UV.Y + w * v3.UV.Y
+								);
+								Rgb Color = Rgb::fromRgba(i_object.MeshShader.Albedo.getColor(UVs));
+								double Sun_Intensity = Vec3::dot(u * v1.Normal + v * v2.Normal + w * v3.Normal, -Vec3::normalize(Vec3(0,0,-1))); // SUN DIR
 								Color = Color * Math::clamp(Sun_Intensity, 0.0, 1.0);
 								renderPixel(x, y, Rgba(Color, 1.0));
 							}
