@@ -72,18 +72,19 @@ void Obj_File_Loader::run() {
 				vector<string> Vert2 = Math::splitString(Tokens[2], "/");
 				vector<string> Vert3 = Math::splitString(Tokens[3], "/");
 
-				Mesh_Triangle triangle = Mesh_Triangle (
+				Mesh_Triangle triangle = Mesh_Triangle(
 					stoull(Vert1[0]) - 1,
 					stoull(Vert2[0]) - 1,
 					stoull(Vert3[0]) - 1
 				);
-				if (Vert1.size() == 3) {
+				if (Vert1.size() > 1) {
 					if (!Vert1[1].empty()) {
 						triangle.UV_1 = stoull(Vert1[1]) - 1;
 						triangle.UV_2 = stoull(Vert2[1]) - 1;
 						triangle.UV_3 = stoull(Vert3[1]) - 1;
 					}
-
+				}
+				if (Vert1.size() == 3) {
 					if (!Vert1[2].empty()) {
 						triangle.Normal_1 = stoull(Vert1[2]) - 1;
 						triangle.Normal_2 = stoull(Vert2[2]) - 1;

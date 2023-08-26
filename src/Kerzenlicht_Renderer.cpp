@@ -29,38 +29,60 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	///////////
 	renderClear();
 	drawToSurface();
+
 	loadObj(
 		"./Logo.obj",
-		Vec3(-1.5, 10, -10),
+		Vec3(-5.75, 3.25, -10),
 		Vec3(0, 0, 0),
 		Vec3(0.25, 0.25, 0.25),
 		"",
 		Fragment_Shader_Type::VERTEX_COLOR_DEBUG
 	);
+
 	loadObj(
-		"./Mika.obj",
+		"./Arona.obj",
 		Vec3(0, 0, 0),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
-		"./Mika.bmp",
+		"./Tex.bmp",
 		Fragment_Shader_Type::TEXTURED
 	);
+
 	loadObj(
-		"./Kafka.obj",
-		Vec3(0, 0, -7),
+		"./Kafka Piano.obj",
+		Vec3(0, 0, 0),
+		Vec3(0, 0, 0),
+		Vec3(1, 1, 1),
+		"./Tex.bmp",
+		Fragment_Shader_Type::TEXTURED
+	);
+
+	loadObj(
+		"./Piano.obj",
+		Vec3(0, 0, 0),
+		Vec3(0, 0, 0),
+		Vec3(1, 1, 1),
+		"./Tex.bmp",
+		Fragment_Shader_Type::TEXTURED
+	);
+
+	loadObj(
+		"./Amiya.obj",
+		Vec3(0, 0, 0),
+		Vec3(0, 0, 0),
+		Vec3(1, 1, 1),
+		"./Tex.bmp",
+		Fragment_Shader_Type::TEXTURED
+	);
+
+	/*loadObj(
+		"./Floor.obj",
+		Vec3(0, 0, 0),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
 		"",
-		Fragment_Shader_Type::ZBUFFER_DEBUG
-	);
-	loadObj(
-		"./Logo.obj",
-		Vec3(1.5, 0, -10),
-		Vec3(0, 0, 0),
-		Vec3(1, 1, 1),
-		"",
-		Fragment_Shader_Type::SMOOTH
-	);
+		Fragment_Shader_Type::WIREFRAME
+	);*/
 }
 
 void Kerzenlicht_Renderer::drawToSurface() {

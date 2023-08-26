@@ -1,18 +1,18 @@
 #include "Camera.h"
 
 Camera::Camera() {
-	position =    Vec3(0, 0, 5);
+	position =    Vec3(0, 0, 0);
 	rotation =    Vec3(0, 0, 0);
 	right_vec =   Vec3(1, 0, 0);
 	up_vec =      Vec3(0, 1, 0);
-	forward_vec = Vec3(0, 0, -1);
+	forward_vec = Vec3(0, 0, 1);
 
-	fov = 40.0;
+	fov = 39.5978;
 	sensor_size = 50.0;
 	near_clip = 0.1;
 	far_clip = 1000.0;
-	x_resolution = 1800;
-	y_resolution = 1100;
+	x_resolution = 2048;
+	y_resolution = 1200;
 	orthogonal = false;
 	aspect_ratio = double(x_resolution) / double(y_resolution);
 

@@ -140,7 +140,7 @@ void Mesh::f_processVertexShader(const Matrix_4x4& P_Camera_Matrix, const Matrix
 	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
 
 	for (int i = 0; i < Vertex_Positions.size(); i++) {
-		const Vec4 vertShader = View_Matrix * Vec4(Vertex_Positions[i], 1);
+		const Vec4 vertShader = Vec4(Vertex_Positions[i], 1) * View_Matrix;
 		Vertex_Output[i] = Vertex(
 			Vec3(
 				vertShader.X / vertShader.W,
@@ -164,7 +164,7 @@ void Mesh::f_processVertexShader(const Matrix_4x4& P_Camera_Matrix, const Matrix
 			Vertex_Output[Tri.Index3].UV = Vertex_UV_Coords["UV"][Tri.UV_3];
 		}
 	}
-	if (Vertex_Colors["Color"].size() > 0) {
+	if (Vertex_Colors["Color"].size() == Vertex_Positions.size()) {
 		for (const Mesh_Triangle& Tri : Faces) {
 			Vertex_Output[Tri.Index1].Color = Vertex_Colors["Color"][Tri.Index1];
 			Vertex_Output[Tri.Index2].Color = Vertex_Colors["Color"][Tri.Index2];
