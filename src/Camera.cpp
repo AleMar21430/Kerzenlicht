@@ -7,7 +7,7 @@ Camera::Camera() {
 	up_vec =      Vec3(0, 1, 0);
 	forward_vec = Vec3(0, 0, 1);
 
-	fov = 60;
+	fov = 25;
 	sensor_size = 50.0;
 	near_clip = 0.1;
 	far_clip = 1000.0;

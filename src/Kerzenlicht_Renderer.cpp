@@ -34,7 +34,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 
 	loadObj(
 		"./Logo.obj",
-		Vec3(-5.75, 3.25, -10),
+		Vec3(-3, 1.5, -10),
 		Vec3(0, 0, 0),
 		Vec3(0.25, 0.25, 0.25),
 		"",
