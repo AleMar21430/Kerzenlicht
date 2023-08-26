@@ -99,6 +99,7 @@ struct Vec4 {
 	Vec4(double P_X, double P_Y, double P_Z, double P_W);
 
 	Vec4 operator*(const Matrix_4x4& other) const;
+	friend Vec4 operator*(const Matrix_4x4& other, const Vec4& vec) { return  vec * other ; };
 };
 
 struct Matrix_4x4 {

@@ -373,6 +373,7 @@ Matrix_4x4 Matrix_4x4::operator/(double other) const {
 	return Result;
 }
 
+
 Matrix_4x4 Matrix_4x4::inv() const {
 	return adjugate() / determinant();
 }

@@ -135,12 +135,12 @@ void Mesh::f_processModelMatrix(const Vec3& P_Translate, const Vec3& P_Rotate, c
 }
 
 void Mesh::f_processVertexShader(const Matrix_4x4& P_Camera_Matrix, const Matrix_4x4& P_Projection_Matrix, const Matrix_4x4& P_Viewport_Matrix) {
-	const Matrix_4x4 View_Matrix = model_matrix * P_Viewport_Matrix * P_Projection_Matrix * P_Camera_Matrix.inv(); // Multiplication order is important
+	const Matrix_4x4 View_Matrix = P_Viewport_Matrix * P_Projection_Matrix * P_Camera_Matrix.inv() * model_matrix; // Multiplication order is important for left to right
 
 	Vertex_Output = vector(Vertex_Positions.size(), Vertex());
 
 	for (int i = 0; i < Vertex_Positions.size(); i++) {
-		const Vec4 vertShader = Vec4(Vertex_Positions[i], 1) * View_Matrix;
+		const Vec4 vertShader = View_Matrix * Vec4(Vertex_Positions[i], 1);
 		Vertex_Output[i] = Vertex(
 			Vec3(
 				vertShader.X / vertShader.W,

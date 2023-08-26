@@ -31,15 +31,15 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	drawToSurface();
 	loadObj(
 		"./Logo.obj",
-		Vec3(500, 0, 0),
+		Vec3(-1.5, 10, -10),
 		Vec3(0, 0, 0),
-		Vec3(1, 1, 1),
+		Vec3(0.25, 0.25, 0.25),
 		"",
 		Fragment_Shader_Type::VERTEX_COLOR_DEBUG
 	);
 	loadObj(
 		"./Mika.obj",
-		Vec3(-500, -250, 0),
+		Vec3(0, 0, 0),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
 		"./Mika.bmp",
@@ -47,7 +47,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	);
 	loadObj(
 		"./Kafka.obj",
-		Vec3(0, -250, 0),
+		Vec3(0, 0, -7),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
 		"",
@@ -55,7 +55,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	);
 	loadObj(
 		"./Logo.obj",
-		Vec3(0, 250, 0),
+		Vec3(1.5, 0, -10),
 		Vec3(0, 0, 0),
 		Vec3(1, 1, 1),
 		"",

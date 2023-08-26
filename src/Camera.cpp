@@ -5,7 +5,7 @@ Camera::Camera() {
 	rotation =    Vec3(0, 0, 0);
 	right_vec =   Vec3(1, 0, 0);
 	up_vec =      Vec3(0, 1, 0);
-	forward_vec = Vec3(0, 0, 1);
+	forward_vec = Vec3(0, 0, -1);
 
 	fov = 40.0;
 	sensor_size = 50.0;
