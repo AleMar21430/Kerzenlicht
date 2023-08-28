@@ -26,7 +26,7 @@ Kerzenlicht_Renderer::Kerzenlicht_Renderer(QT_Text_Stream* P_Log) : QT_Graphics_
 	// Scene //
 	///////////
 
-	Texture BG = Texture();
+	BG = Texture();
 	BG.loadfromBitmap("./BG.bmp");
 
 	renderClear();
