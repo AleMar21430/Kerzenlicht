@@ -1,4 +1,5 @@
 # Kerzenlicht
+![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/7d347808-a838-45da-91fb-fce951e59714)
 
 ![image](https://github.com/AleMar21430/Kerzenlicht/assets/99276653/8701aa99-9d94-4fcd-bfe5-844a7f367d4e)
 
